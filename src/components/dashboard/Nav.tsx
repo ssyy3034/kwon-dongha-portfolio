@@ -8,6 +8,7 @@ import {
   PenTool,
   Globe,
   FileDown,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
@@ -45,6 +46,7 @@ export default function Nav() {
       icon: Globe,
       external: true,
     },
+    { name: "이력서", href: "/resume", icon: FileText },
     { name: "스튜디오", href: "/customize", icon: PenTool },
   ];
 
