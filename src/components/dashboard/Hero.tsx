@@ -10,6 +10,7 @@ import {
   Code,
   Lightbulb,
   Users,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -160,6 +161,16 @@ export default function Hero({
                 size={18}
                 className="group-hover:translate-x-2 transition-transform"
               />
+            </Link>
+            <Link
+              href="/resume"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-200 text-stone-900 rounded-2xl text-base font-black hover:bg-stone-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 group"
+            >
+              <FileText
+                size={20}
+                className="group-hover:scale-110 transition-transform text-amber-600"
+              />
+              이력서 보기
             </Link>
             <a
               href={profile.cta.secondary.href}
