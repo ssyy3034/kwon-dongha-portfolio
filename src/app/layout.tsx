@@ -25,7 +25,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Kwon Dong Ha — Engineering Knowledge Garden",
+  title: "Gwon Dongha - Software Engineer",
   description: "3D Visualization of an Engineer's Learning Journey",
 };
 

@@ -120,7 +120,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     });
 
     matches.forEach((match) => {
-      let target = match[1].split("|")[0].split("#")[0].trim();
+      const target = match[1].split("|")[0].split("#")[0].trim();
       links.push({ source: file.id, target });
     });
   });

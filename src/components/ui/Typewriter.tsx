@@ -27,8 +27,6 @@ export function Typewriter({
   const [typingSpeed, setTypingSpeed] = useState(typeSpeed);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-
     const handleTyping = () => {
       const i = loopNum % words.length;
       const fullText = words[i];
@@ -53,7 +51,7 @@ export function Typewriter({
       }
     };
 
-    timer = setTimeout(handleTyping, typingSpeed);
+    const timer = setTimeout(handleTyping, typingSpeed);
 
     return () => clearTimeout(timer);
   }, [
