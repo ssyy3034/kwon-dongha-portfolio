@@ -1,0 +1,53 @@
+[
+  {
+    "id": "stolink",
+    "title": "StoLink",
+    "subtitle": "웹소설 작가용 에디터 프론트엔드",
+    "role": "Frontend Developer",
+    "period": "2025.12 - 2026.01",
+    "team": "5인 팀 (FE 전담)",
+    "description": "D3.js 그래프 Canvas 전환(INP 16배 개선) 및 AI 에이전트 기반 개발 워크플로우 자동화. Vite 번들 최적화로 초기 로딩 60% 단축.",
+    "metrics": [
+      { "value": "1048 → 64ms", "label": "드래그 응답 (INP)" },
+      { "value": "CLI & Agent", "label": "워크플로우 자동화" },
+      { "value": "450 → 190KB", "label": "초기 번들 (gzip)" }
+    ],
+    "tech": ["React", "TypeScript", "Canvas API", "AI Agent", "Zustand", "TanStack Query"],
+    "link": "/projects/stolink",
+    "github": "https://github.com/stolink/stolink_frontend",
+    "color": "amber"
+  },
+  {
+    "id": "pintos",
+    "title": "Pintos Kernel",
+    "subtitle": "커널 프로그래밍 및 운영체제 실습",
+    "role": "System Engineer",
+    "period": "2025.11 - 2025.12",
+    "team": "KAIST Jungle 4인 팀",
+    "description": "Priority Donation, Demand Paging 구현. GDB로 SW-HW 상태 불일치(Widowed Frame) 버그를 추적하여 해결.",
+    "metrics": [
+      { "value": "4개 모듈", "label": "Threads, Userprog, VM, FS" },
+      { "value": "GDB 디버깅", "label": "Page Fault 무한루프 해결" }
+    ],
+    "tech": ["C", "Assembly", "OS Internals", "QEMU"],
+    "link": "/projects/pintos",
+    "color": "emerald"
+  },
+  {
+    "id": "aidiary",
+    "title": "Aidiary",
+    "subtitle": "AI 기반 육아 기록 플랫폼",
+    "role": "Full-stack Developer",
+    "period": "2025.03 - 2025.06",
+    "team": "3인 팀",
+    "description": "Spring Boot + Python Flask 마이크로서비스 구조로 AI 연산 분리. Zustand로 전역 상태 관리, Docker Compose로 전체 서비스 구성.",
+    "metrics": [
+      { "value": "3개 서비스", "label": "Spring, Flask, React" },
+      { "value": "6개 컨테이너", "label": "Docker Compose 구성" }
+    ],
+    "tech": ["React", "Zustand", "Spring Boot", "Python", "Docker"],
+    "link": "/projects/aidiary",
+    "github": "https://github.com/ssyy3034/aidiary-main",
+    "color": "indigo"
+  }
+]

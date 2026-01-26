@@ -1,0 +1,154 @@
+{
+  "name": "권동하",
+  "role": "Software Engineer",
+  "avatar": "/images/me.jpg",
+  "bio": {
+    "badge": "AI Native Software Engineer",
+    "headline": "기술적 트레이드오프를 분석하고 논리적 근거로 최적의 의사결정을 내리는 개발자 {name}입니다.",
+    "paragraphs": [
+      {
+        "text": "JavaScript/TypeScript와 React를 주력으로 사용하며, 단순히 기능 구현을 넘어 {highlight}를 위해 노력합니다. 견고한 컴포넌트 설계와 효율적인 상태 관리 패턴을 끊임없이 고민하며, 사용자가 믿고 사용할 수 있는 안정적인 인터페이스를 구축합니다.",
+        "highlight": "성능과 유지보수성까지 고려한 '좋은 코드'"
+      },
+      {
+        "text": "OS(Pintos) 구현 프로젝트를 통해  {highlight}를 길렀습니다. 컴퓨터 동작 원리에 대한 이해를 바탕으로, 브라우저 렌더링 최적화 같은 기술적 난제를 마주했을 때 논리적으로 접근하여 근본적인 해결책을 찾아냈습니다.",
+        "highlight": "문제의 본질을 파고드는 끈기"
+      },
+      {
+        "text": "좋은 서비스는 개발자 혼자가 아닌, {highlight} 속에서 만들어진다고 믿습니다. 약 3년간 맥도날드 팀 리더로서 피크타임의 병목 구간을 파악하고, 인력을 효율적으로 배치해 대기 시간을 줄인 경험이 있습니다. 이 운영 최적화 경험은 개발 협업에서도 동일하게 적용됩니다.",
+        "highlight": "팀 전체의 소통"
+      }
+    ]
+  },
+  "cta": {
+    "primary": {
+      "text": "프로젝트 보기",
+      "href": "/#projects"
+    },
+    "secondary": {
+      "text": "GitHub",
+      "href": "https://github.com/ssyy3034"
+    }
+  },
+  "stats": {
+    "posts": {
+      "label": "Daily Insights",
+      "subLabel": "Knowledge Artifacts"
+    },
+    "streak": {
+      "label": "Deep Focus",
+      "subLabel": "Current Learning Streak"
+    }
+  },
+  "social": {
+    "github": "https://github.com/ssyy3034",
+    "blog": "https://velog.io/@ansqhrl3037/posts",
+    "email": "ansqhrl3037@gmail.com"
+  },
+  "goals": {
+    "title": "핵심 학습 목표",
+    "quote": "열린 시야로 배우고, 기본기에 충실한 코드로 해결합니다",
+    "description": "다양한 분야에 대한 호기심을 바탕으로 사용자의 맥락을 이해하려 노력하며, AI를 활용해 견고한 결과물을 가장 효율적으로 만들어내기 위해 매일 스스로를 점검합니다."
+  },
+  "skills": [
+    {
+      "category": "Frontend",
+      "items": [
+        {
+          "name": "React",
+          "slug": "react",
+          "color": "61DAFB",
+          "description": "useRef로 에디터 인스턴스 재생성 방지, useMemo로 불필요한 트리 연산 제거 등 리렌더링 최적화 경험이 있습니다."
+        },
+        {
+          "name": "TypeScript",
+          "slug": "typescript",
+          "color": "3178C6",
+          "description": "인터페이스를 활용해 데이터 구조를 명확히 정의하고, 컴파일 단계에서 잠재적인 오류를 예방했습니다."
+        },
+        {
+          "name": "Zustand",
+          "slug": "react",
+          "color": "443E38",
+          "description": "Prop Drilling 문제를 해결하고, 도메인별 스토어를 분리하여 상태 관리 복잡도를 낮춘 경험이 있습니다."
+        },
+        {
+          "name": "TanStack Query",
+          "slug": "reactquery",
+          "color": "FF4154",
+          "description": "서버/클라이언트 상태를 분리하고, 낙관적 업데이트 및 자동 롤백 전략으로 사용자에게 즉각적인 피드백을 제공했습니다."
+        },
+        {
+          "name": "Tiptap",
+          "slug": "tiptap",
+          "color": "000000",
+          "description": "ProseMirror 기반 에디터를 확장하여 커스텀 노드를 개발하고, 에디터 안정화 문제를 해결했습니다."
+        },
+        {
+          "name": "Vite",
+          "slug": "vite",
+          "color": "646CFF",
+          "description": "manualChunks로 번들을 분리하고 Lazy Loading을 적용하여 초기 로딩 시간을 개선했습니다."
+        }
+      ]
+    },
+    {
+      "category": "Backend & System (기반 역량)",
+      "items": [
+        {
+          "name": "Java",
+          "slug": "java",
+          "color": "B07219",
+          "description": "학부 시절 주 언어로 사용했으며, 객체지향 프로그래밍(OOP)의 기본 개념을 이해하고 있습니다."
+        },
+        {
+          "name": "Spring Boot",
+          "slug": "springboot",
+          "color": "6DB33F",
+          "description": "Layered Architecture 기반으로 API를 개발하며, 기본적인 트랜잭션 처리와 예외 핸들링을 경험했습니다."
+        },
+        {
+          "name": "C",
+          "slug": "c",
+          "color": "A8B9CC",
+          "description": "Pintos OS 프로젝트에서 스케줄러, 가상 메모리를 구현하며 시스템이 어떻게 동작하는지 이해했습니다."
+        },
+        {
+          "name": "Docker",
+          "slug": "docker",
+          "color": "2496ED",
+          "description": "Docker Compose로 로컬 개발 환경을 구성하고, 기본적인 컨테이너 명령어를 사용할 수 있습니다."
+        },
+        {
+          "name": "PostgreSQL",
+          "slug": "postgresql",
+          "color": "4169E1",
+          "description": "SQL을 사용하여 데이터를 조작하고, 인덱스와 트랜잭션의 기본 개념을 이해하여 데이터 무결성을 고려한 개발이 가능합니다."
+        },
+        {
+          "name": "Neo4j",
+          "slug": "neo4j",
+          "color": "008CC1",
+          "description": "노드와 관계 중심의 그래프 DB 개념을 이해하고 있으며, Cypher 쿼리를 통해 데이터를 조회하고 가시화해 본 경험이 있습니다."
+        }
+      ]
+    },
+    {
+      "category": "관심 분야",
+      "items": [
+        {
+          "name": "Next.js",
+          "slug": "nextdotjs",
+          "color": "000000",
+          "description": "App Router 기반으로 포트폴리오를 구축하며 SSR/RSC 개념을 학습하고 있습니다."
+        },
+        {
+          "name": "Web Performance",
+          "slug": "lighthouse",
+          "color": "F44B21",
+          "description": "Chrome DevTools로 INP, LCP를 측정하며 병목을 찾고 개선하는 방법을 익히고 있습니다."
+        }
+      ]
+    }
+  ]
+}
