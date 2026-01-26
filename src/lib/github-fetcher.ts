@@ -10,15 +10,24 @@ export async function fetchGitHubContributions(
 ): Promise<ContributionDay[]> {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   if (!GITHUB_TOKEN) {
-    console.warn("GITHUB_TOKEN not set in process.env. Returning empty.");
+    console.warn("GITHUB_TOKEN not set. Fallback to basic data.");
+    // Return mock data or empty if GraphQL is strictly required,
+    // but let's check if we can skip the token check for non-essential calls if needed.
     return [];
   }
 
   const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
   // Get authenticated user if username not provided
-  let login = username || process.env.REPO_OWNER;
+  const GITHUB_USERNAME =
+    username ||
+    process.env.VERCEL_GIT_REPO_OWNER ||
+    process.env.REPO_OWNER ||
+    "ssyy3034";
+  let login = GITHUB_USERNAME; // Initialize login with the determined username
+
   if (!login) {
+    // This condition might now be redundant if GITHUB_USERNAME always has a value
     try {
       const { data: user } = await octokit.rest.users.getAuthenticated();
       login = user.login;
