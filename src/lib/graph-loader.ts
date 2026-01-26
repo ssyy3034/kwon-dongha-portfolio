@@ -188,7 +188,6 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   }
 
   // Stats for Consistency (using local data for competency eval)
-  const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
 
