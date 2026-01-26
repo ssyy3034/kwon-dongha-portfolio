@@ -127,7 +127,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
   // --- GITHUB INTEGRATION ---
   // Fetch GitHub contributions and merge with local data
-  const GITHUB_USERNAME = process.env.REPO_OWNER || process.env.GITHUB_USERNAME;
+  const GITHUB_USERNAME =
+    process.env.REPO_OWNER || process.env.GITHUB_USERNAME || "ssyy3034";
 
   const [githubContributions, githubStats] = await Promise.all([
     fetchGitHubContributions(GITHUB_USERNAME),

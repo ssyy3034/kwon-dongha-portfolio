@@ -46,7 +46,7 @@ export default function Nav() {
       icon: Globe,
       external: true,
     },
-    { name: "이력서", href: "/resume", icon: FileText },
+    { name: "이력서", href: "/resume", icon: FileText, external: true },
     { name: "스튜디오", href: "/customize", icon: PenTool },
   ];
 
