@@ -161,11 +161,31 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     .map(([date, data]) => ({ date, ...data }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  // Use GitHub streak if available, otherwise calculate from local data
-  const streak =
-    githubStats.currentStreak > 0
-      ? githubStats.currentStreak
-      : Object.keys(dateMap).length;
+  // --- INTEGRATED STREAK CALCULATION ---
+  // Calculate streak from merged data (GitHub + Local)
+  let streak = 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const sortedHeatmapDesc = [...heatmap].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+
+  for (const day of sortedHeatmapDesc) {
+    const dayDate = new Date(day.date);
+    dayDate.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.floor(
+      (today.getTime() - dayDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    // Allow for today or yesterday to start/continue the streak
+    if (diffDays <= streak + 1 && day.count > 0) {
+      streak++;
+    } else if (diffDays > streak + 1) {
+      break;
+    }
+  }
 
   // Stats for Consistency (using local data for competency eval)
   const today = new Date();
