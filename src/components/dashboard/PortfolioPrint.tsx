@@ -183,7 +183,7 @@ export default function PortfolioPrint() {
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <span className="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-1">
-                    Project Case Study
+                    Project
                   </span>
                   <h2 className="text-3xl font-black text-stone-900 mb-1">
                     {project.title}

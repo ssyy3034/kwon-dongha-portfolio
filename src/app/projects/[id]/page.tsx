@@ -143,7 +143,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                 <span
                   className={`px-4 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${colors.gradient} shadow-lg`}
                 >
-                  Case Study
+                  Project
                 </span>
                 <span className="text-stone-400 text-sm">{project.period}</span>
               </div>

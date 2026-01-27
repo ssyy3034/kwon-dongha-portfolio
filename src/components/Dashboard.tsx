@@ -41,7 +41,7 @@ export default function Dashboard({
       <section className="min-h-[100svh] flex flex-col no-print relative">
         <div className="flex-1 animate-fade-in-up opacity-0 fill-mode-forwards">
           <Hero
-            totalPosts={data.totalPosts}
+            totalActivity={data.totalActivity}
             streak={data.streak}
             radarData={data.radar}
             heatmapData={data.heatmap}
@@ -122,7 +122,9 @@ export default function Dashboard({
           </div>
 
           <div className="mt-10 pt-6 border-t border-stone-50 flex justify-between text-[10px] text-stone-300">
-            <span>&copy; {new Date().getFullYear()} {profile.name}</span>
+            <span>
+              &copy; {new Date().getFullYear()} {profile.name}
+            </span>
             <span>v1.5.0</span>
           </div>
         </div>

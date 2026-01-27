@@ -42,6 +42,7 @@ export interface DashboardData {
     firstDate: string;
     lastDate: string;
   };
+  totalActivity: number;
 }
 
 // Alias for KnowledgeGraph compatibility
@@ -245,5 +246,6 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       firstDate,
       lastDate,
     },
+    totalActivity: nodes.length + githubStats.totalContributions,
   };
 }

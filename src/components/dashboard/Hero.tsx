@@ -21,12 +21,12 @@ import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 
 export default function Hero({
-  totalPosts,
+  totalActivity,
   streak,
   radarData,
   heatmapData,
 }: {
-  totalPosts: number;
+  totalActivity: number;
   streak: number;
   radarData: any[];
   heatmapData: any[];
@@ -135,7 +135,7 @@ export default function Hero({
                           {part.replace("{name}", profile.name)}
                           {index < array.length - 1 && (
                             <span className="relative inline-block px-1 mx-0.5">
-                              <span className="absolute inset-0 bg-amber-100/80 -skew-x-3 rounded-sm" />
+                              <span className="absolute inset-0 bg-amber-100/80 -skew-x-3 rounded-xl" />
                               <span className="relative text-stone-900 font-bold">
                                 {p.highlight}
                               </span>
@@ -298,11 +298,6 @@ export default function Hero({
                 <div className="flex items-center gap-2">
                   <span className="text-stone-500">Streak</span>
                   <span className="font-bold text-emerald-400">{streak}일</span>
-                </div>
-                <div className="w-px h-3 bg-stone-700" />
-                <div className="flex items-center gap-2">
-                  <span className="text-stone-500">Total</span>
-                  <span className="font-bold text-white">{totalPosts}개</span>
                 </div>
               </div>
             </div>
