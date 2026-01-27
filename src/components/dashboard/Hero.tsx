@@ -78,6 +78,9 @@ export default function Hero({
             </span>
           </span>
         </h1>
+        <p className="mt-8 text-xl md:text-2xl text-stone-600 font-medium max-w-2xl leading-relaxed">
+          {profile.bio.headline.replace("{name}", profile.name)}
+        </p>
       </div>
 
       {/* 2. CONTENT COLUMNS */}
@@ -132,7 +135,7 @@ export default function Hero({
                           {part.replace("{name}", profile.name)}
                           {index < array.length - 1 && (
                             <span className="relative inline-block px-1 mx-0.5">
-                              <span className="absolute inset-0 bg-yellow-100/80 -skew-x-3 rounded-sm" />
+                              <span className="absolute inset-0 bg-amber-100/80 -skew-x-3 rounded-sm" />
                               <span className="relative text-stone-900 font-bold">
                                 {p.highlight}
                               </span>

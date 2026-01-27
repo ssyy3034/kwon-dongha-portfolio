@@ -105,19 +105,20 @@ export const projectDetails: Record<string, ProjectDetail> = {
       },
       {
         id: "ai-workflow",
-        title: "AI 에이전트 워크플로우 자동화",
-        subtitle: "개발 워크플로우 자동화",
+        title: "AI 에이전트 워크플로우 자동화 (Context-as-a-Service)",
+        subtitle: "Multi-Agent 협업 및 운영 인프라 구축",
         challenge:
-          "5인 팀 개발 중 Git 숙련도 격차로 인한 브랜치 충돌, 이슈 트래킹 누락, 구두 합의된 컨벤션 미준수 등 협업 비효율이 발생했습니다.",
+          "5인 팀 개발 중 Git 숙련도 격차로 인한 브랜치 충돌, 이슈 트래킹 누락, 구두 합의된 컨벤션 미준수 등 협업 비효율이 발생했습니다. 특히 대규모 리팩토링 시 AI의 컨텍스트 한계로 인한 오류 제어가 어려웠습니다.",
         solution:
-          "이슈 생성부터 PR까지의 수명주기를 자동화하는 'Smart-Commit' CLI와, 작업 크기에 따라 최적의 프롬프트를 주입하는 'Supervisor Agent' 시스템을 구축했습니다.",
+          "코드베이스를 AI 친화적으로 구조화하는 'Context-as-a-Service' 전략을 도입하고, Supervisor-Worker 모델 기반의 Multi-Agent 워크플로우를 구축하여 개발 전 과정을 자동화했습니다.",
         details: [
-          "Smart-Commit: Staging된 변경사항을 분석하여 Conventional Commits 메시지 및 이슈 연결 자동화",
-          "Supervisor Agent: 작업 명세를 분석하여 Stylist/Architect 등 전문 에이전트에게 최소한의 Context만 동적 주입",
-          "Quality Gates: 'Design Compliance'를 포함한 3단계 자동 감사를 통해 코드와 디자인 품질 집중 검증",
+          "Smart-Commit & Git Flow: Staging 내역을 분석해 Conventional Commits를 자동 생성하고 Jira/GitHub Issue를 동적으로 연결하여 운영 오버헤드 80% 절감",
+          "T-shirt Sizing 전략: 작업 규모(S/M/L)를 사전 분석하여 토큰 효율을 최적화하고, 규모에 맞는 'Dynamic Context Injection'으로 AI의 응답 정확도 개선",
+          "Multi-Agent Orchestration: 작업 명세를 분석하는 'Supervisor'와 구현을 담당하는 'Worker' 에인전트를 분리하고, 에이전트 전용 '.agent' 가이드라인을 통해 일관된 품질 유지",
+          "Quality Gates: 'Design Compliance' 및 'Type Safety'를 포함한 3단계 자동 감사를 통해 Hallucination을 방지하고 코드 리뷰 시간을 대폭 단축",
         ],
         impact:
-          "개인 도구로 시작하여 4팀 중 3팀(15/20명)으로 확산, 기수 전체 생산성 견인",
+          "개인 도구로 시작하여 기수 전체(4팀 중 3팀)로 확산, 주당 개발 가용 시간을 15% 이상 추가 확보",
       },
     ],
 
@@ -180,9 +181,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
       points: [
         {
           icon: "layers",
-          title: "전체 테스트 All Pass",
+          title: "OS Deep Dive",
           description:
-            "Threads 25개 + User Programs 76개 + Virtual Memory 40개 테스트 전체 통과",
+            "Threads, User Programs, Virtual Memory 전반에 걸친 OS 내부 동작 이해도 향상",
         },
         {
           icon: "cpu",

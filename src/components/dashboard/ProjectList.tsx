@@ -69,9 +69,6 @@ export default function ProjectList() {
         <h2 className="text-3xl md:text-4xl font-black text-stone-900 mb-3">
           Projects
         </h2>
-        <p className="text-stone-600 text-base md:text-lg max-w-2xl">
-          기술적 의사결정을 통해 문제를 해결한 프로젝트들입니다.
-        </p>
       </motion.div>
 
       {/* Projects Grid */}
