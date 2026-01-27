@@ -4,6 +4,7 @@ import React, { use } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
+import FormattedText from "@/components/common/FormattedText";
 import {
   ArrowLeft,
   ArrowRight,
@@ -161,8 +162,12 @@ export default function ProjectDetailPage({ params }: PageProps) {
               </p>
 
               {/* Tagline */}
-              <div className={`p-6 rounded-2xl ${colors.light} ${colors.border} border`}>
-                <p className={`text-lg md:text-xl font-bold ${colors.text} leading-relaxed`}>
+              <div
+                className={`p-6 rounded-2xl ${colors.light} ${colors.border} border`}
+              >
+                <p
+                  className={`text-lg md:text-xl font-bold ${colors.text} leading-relaxed`}
+                >
                   &ldquo;{detail.tagline}&rdquo;
                 </p>
               </div>
@@ -267,7 +272,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
               Overview
             </p>
             <p className="text-lg md:text-2xl text-stone-800 leading-relaxed font-medium break-keep">
-              {detail.overview}
+              <FormattedText text={detail.overview} />
             </p>
           </div>
         </motion.section>
@@ -352,10 +357,14 @@ export default function ProjectDetailPage({ params }: PageProps) {
 
                 <div className="relative z-10 bg-white rounded-[32px] border border-stone-200 overflow-hidden shadow-lg">
                   {/* Section Header */}
-                  <div className={`p-8 md:p-10 border-b border-stone-100 bg-gradient-to-r ${colors.light}`}>
+                  <div
+                    className={`p-8 md:p-10 border-b border-stone-100 bg-gradient-to-r ${colors.light}`}
+                  >
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
                       <div className="flex-1">
-                        <p className={`text-xs font-bold ${colors.text} uppercase tracking-wider mb-2`}>
+                        <p
+                          className={`text-xs font-bold ${colors.text} uppercase tracking-wider mb-2`}
+                        >
                           {section.subtitle}
                         </p>
                         <h3
@@ -366,7 +375,9 @@ export default function ProjectDetailPage({ params }: PageProps) {
                         </h3>
                       </div>
                       {section.impact && (
-                        <div className={`shrink-0 px-5 py-3 rounded-2xl ${colors.bg} text-white`}>
+                        <div
+                          className={`shrink-0 px-5 py-3 rounded-2xl ${colors.bg} text-white`}
+                        >
                           <p className="text-[10px] uppercase tracking-wider opacity-80 mb-1">
                             Impact
                           </p>
@@ -389,7 +400,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                         </p>
                       </div>
                       <p className="text-stone-700 text-lg leading-relaxed pl-8 border-l-2 border-red-300">
-                        {section.challenge}
+                        <FormattedText text={section.challenge} />
                       </p>
                     </div>
 
@@ -397,14 +408,17 @@ export default function ProjectDetailPage({ params }: PageProps) {
                     <div className="mb-10">
                       <div className="flex items-center gap-2 mb-4">
                         <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center">
-                          <CheckCircle2 size={14} className="text-emerald-600" />
+                          <CheckCircle2
+                            size={14}
+                            className="text-emerald-600"
+                          />
                         </div>
                         <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
                           Solution
                         </p>
                       </div>
                       <p className="text-stone-800 text-lg leading-relaxed font-medium pl-8 border-l-2 border-emerald-300 mb-6">
-                        {section.solution}
+                        <FormattedText text={section.solution} />
                       </p>
 
                       {/* Details */}
@@ -417,7 +431,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                                 className={`${colors.text} shrink-0 mt-0.5`}
                               />
                               <p className="text-stone-700 leading-relaxed">
-                                {detail}
+                                <FormattedText text={detail} />
                               </p>
                             </div>
                           ))}
@@ -451,9 +465,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
         >
           <div className="flex items-center gap-3 mb-8">
             <Trophy size={20} className={colors.text} />
-            <h2 className="text-2xl font-bold text-stone-900">
-              Key Results
-            </h2>
+            <h2 className="text-2xl font-bold text-stone-900">Key Results</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -463,7 +475,9 @@ export default function ProjectDetailPage({ params }: PageProps) {
                 className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-stone-200"
               >
                 {achievement.metric && (
-                  <span className={`text-2xl font-black ${colors.text} shrink-0`}>
+                  <span
+                    className={`text-2xl font-black ${colors.text} shrink-0`}
+                  >
                     {achievement.metric}
                   </span>
                 )}
@@ -502,7 +516,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                 >
                   {item}
                 </span>
-              ))
+              )),
             )}
           </div>
         </motion.section>

@@ -3,6 +3,7 @@
 import { useProfile } from "@/context/ProfileContext";
 import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
+import FormattedText from "@/components/common/FormattedText";
 
 export default function PortfolioPrint() {
   const { profile } = useProfile();
@@ -103,7 +104,7 @@ export default function PortfolioPrint() {
 
               {/* Description */}
               <p className="text-sm text-stone-700 leading-relaxed mb-2">
-                {project.description}
+                <FormattedText text={project.description} />
               </p>
 
               {/* Key Metrics */}
@@ -212,7 +213,7 @@ export default function PortfolioPrint() {
                 Overview
               </h3>
               <p className="text-sm text-stone-800 leading-relaxed font-medium">
-                {detail.overview}
+                <FormattedText text={detail.overview} />
               </p>
             </section>
 
@@ -264,7 +265,7 @@ export default function PortfolioPrint() {
                     <div className="grid grid-cols-[80px_1fr] gap-4 mb-3 text-xs">
                       <span className="font-bold text-red-600">Challenge</span>
                       <span className="text-stone-700 leading-relaxed">
-                        {section.challenge}
+                        <FormattedText text={section.challenge} />
                       </span>
                     </div>
 
@@ -274,12 +275,14 @@ export default function PortfolioPrint() {
                       </span>
                       <div>
                         <span className="text-stone-800 font-medium leading-relaxed block mb-1">
-                          {section.solution}
+                          <FormattedText text={section.solution} />
                         </span>
                         {section.details && (
                           <ul className="list-disc list-outside ml-3 text-stone-600 space-y-0.5 mt-1">
                             {section.details.map((d, i) => (
-                              <li key={i}>{d}</li>
+                              <li key={i}>
+                                <FormattedText text={d} />
+                              </li>
                             ))}
                           </ul>
                         )}

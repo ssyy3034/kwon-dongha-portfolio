@@ -6,7 +6,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
     tagline:
       "SVG→Canvas 마이그레이션으로 INP 16배 개선, 번들 최적화로 초기 로딩 60% 단축",
     overview:
-      "5인 개발팀의 웹소설 작가용 플랫폼에서 프론트엔드 전체를 단독 담당했습니다. 노드 30개에서 멈추던 관계도 그래프를 600개 이상 처리 가능하도록 Canvas로 전환하고, Vite 번들 최적화로 초기 로딩을 60% 단축했습니다.",
+      "5인 개발팀의 웹소설 작가용 플랫폼에서 프론트엔드 전체를 담당했습니다. 노드 30개에서 멈추던 관계도 그래프를 600개 이상 처리 가능하도록 Canvas로 전환하고, Vite 번들 최적화로 초기 로딩을 60% 단축했습니다.",
 
     keyFocus: {
       headline: "핵심 성과 (Chrome DevTools 측정)",
@@ -105,20 +105,20 @@ export const projectDetails: Record<string, ProjectDetail> = {
       },
       {
         id: "ai-workflow",
-        title: "AI 에이전트 워크플로우 자동화 (Context-as-a-Service)",
+        title: "AI 에이전트 워크플로우 자동화",
         subtitle: "Multi-Agent 협업 및 운영 인프라 구축",
         challenge:
           "5인 팀 개발 중 Git 숙련도 격차로 인한 브랜치 충돌, 이슈 트래킹 누락, 구두 합의된 컨벤션 미준수 등 협업 비효율이 발생했습니다. 특히 대규모 리팩토링 시 AI의 컨텍스트 한계로 인한 오류 제어가 어려웠습니다.",
         solution:
           "코드베이스를 AI 친화적으로 구조화하는 'Context-as-a-Service' 전략을 도입하고, Supervisor-Worker 모델 기반의 Multi-Agent 워크플로우를 구축하여 개발 전 과정을 자동화했습니다.",
         details: [
-          "Smart-Commit & Git Flow: Staging 내역을 분석해 Conventional Commits를 자동 생성하고 Jira/GitHub Issue를 동적으로 연결하여 운영 오버헤드 80% 절감",
-          "T-shirt Sizing 전략: 작업 규모(S/M/L)를 사전 분석하여 토큰 효율을 최적화하고, 규모에 맞는 'Dynamic Context Injection'으로 AI의 응답 정확도 개선",
-          "Multi-Agent Orchestration: 작업 명세를 분석하는 'Supervisor'와 구현을 담당하는 'Worker' 에인전트를 분리하고, 에이전트 전용 '.agent' 가이드라인을 통해 일관된 품질 유지",
-          "Quality Gates: 'Design Compliance' 및 'Type Safety'를 포함한 3단계 자동 감사를 통해 Hallucination을 방지하고 코드 리뷰 시간을 대폭 단축",
+          "**작업 분류 및 할당 (Supervisor)**: 작업의 크기를 분석해 필요한 정보만 골라주고, 가장 적합한 에이전트에게 일을 맡깁니다.",
+          "**역할별 전문가 협업 (Specialized Workers)**: 구조 설계, 감성적 디자인, 미세 코드 수정 등 각자 맡은 분야만 전문적으로 처리합니다.",
+          "**자동 품질 보증 (Auditor)**: 성능이나 접근성 등 엄격한 기준을 통과하지 못한 코드는 배포되지 않도록 사전에 차단합니다.",
+          "**문서 최신화 (Librarian)**: 코드가 바뀌면 기술 문서도 자동으로 업데이트하여, 언제나 믿을 수 있는 최신 상태를 유지합니다.",
         ],
         impact:
-          "개인 도구로 시작하여 기수 전체(4팀 중 3팀)로 확산, 주당 개발 가용 시간을 15% 이상 추가 확보",
+          "개인 생산성 도구로 시작하여 팀 전체 및 타 프로젝트 팀으로 도입 확산",
       },
     ],
 
@@ -204,9 +204,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
         solution:
           "Priority Donation 메커니즘을 설계하고 구현했습니다. 락 대기 시 보유자에게 우선순위를 기부하고, 중첩된 락 대기 상황까지 재귀적으로 전파합니다.",
         details: [
-          "Donation: 락 대기 시 보유자에게 자신의 높은 우선순위를 일시적으로 기부",
-          "Chain Handling: Nested Donation까지 재귀적으로 전파 (depth limit: 8)",
-          "Revert: 락 해제 시 기부받은 우선순위 반납 및 본래 우선순위로 복귀",
+          "**Donation**: 락 대기 시 보유자에게 자신의 높은 우선순위를 일시적으로 기부",
+          "**Chain Handling**: `Nested Donation`까지 재귀적으로 전파 (depth limit: 8)",
+          "**Revert**: 락 해제 시 기부받은 우선순위 반납 및 본래 우선순위로 복귀",
         ],
         impact: "donate-nest/chain 테스트 통과",
       },
@@ -215,13 +215,13 @@ export const projectDetails: Record<string, ProjectDetail> = {
         title: "Widowed Frame 디버깅: 무한 Page Fault 해결",
         subtitle: "소프트웨어-하드웨어 상태 불일치 문제 추적",
         challenge:
-          "mmap된 메모리 접근 시 Page Fault가 무한 반복되며 프로세스가 exit(-1)로 강제 종료되었습니다. page->frame은 존재하지만 실제 PML4 매핑은 없는 '고아 프레임' 상태였습니다.",
+          "mmap된 메모리 영역에 접근하는 순간 `Page Fault`가 무한 루프로 발생하며 시스템이 멈추거나 프로세스가 `exit(-1)`로 강제 종료되는 치명적인 버그가 발생했습니다. 논리적으로는 페이지가 존재해야 했으나, 하드웨어(CPU)는 해당 주소를 찾지 못하는 상황이었습니다.",
         solution:
           "vm_do_claim_page에서 프레임 존재 여부만 확인하던 로직에 PML4 매핑 검증을 추가했습니다. 고아 상태 감지 시 pml4_set_page로 매핑을 복구합니다.",
         details: [
-          "Before: page->frame != NULL이면 true 반환 → PML4 매핑 누락 시 무한 루프",
-          "After: pml4_get_page로 하드웨어 매핑 검증 → 누락 시 pml4_set_page로 복구",
-          "GDB로 Page Fault Handler 진입점 추적하여 원인 특정",
+          "Before: `page->frame != NULL`이면 `true` 반환 → PML4 매핑 누락 시 무한 루프",
+          "After: `pml4_get_page`로 하드웨어 매핑 검증 → 누락 시 `pml4_set_page`로 복구",
+          "**GDB**로 `Page Fault Handler` 진입점 추적하여 원인 특정",
         ],
         impact: "mmap-* 테스트 전체 통과",
       },
@@ -235,9 +235,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
         solution:
           "Page Fault가 발생했을 때만 해당 페이지를 로드하는 Demand Paging을 구현했습니다.",
         details: [
-          "Supplemental Page Table (SPT): 페이지 메타데이터(디스크 위치, 쓰기 가능 여부) 관리",
-          "Page Fault Handler: 디스크에서 데이터를 읽어 물리 프레임에 매핑 후 재시작",
-          "Stack Growth: rsp 레지스터 감시하여 스택 영역 접근 시 자동 페이지 할당",
+          "**Supplemental Page Table** (SPT): 페이지 메타데이터(디스크 위치, 쓰기 가능 여부) 관리",
+          "**Page Fault Handler**: 디스크에서 데이터를 읽어 물리 프레임에 매핑 후 재시작",
+          "**Stack Growth**: `rsp` 레지스터 감시하여 스택 영역 접근 시 자동 페이지 할당",
         ],
         impact: "한정된 물리 메모리 극복 및 가상 공간 활용",
       },
@@ -308,9 +308,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
         solution:
           "Zustand 스토어 기반으로 전역 상태를 일원화하고, Custom Hooks로 비즈니스 로직을 View에서 분리했습니다.",
         details: [
-          "Zustand 스토어로 전역 상태 중앙 관리",
-          "useCharacter.ts 등 도메인별 Custom Hooks로 로직 분리",
-          "Single Source of Truth 원칙 적용",
+          "**Zustand** 스토어로 전역 상태 중앙 관리",
+          "**useCharacter.ts** 등 도메인별 `Custom Hooks`로 로직 분리",
+          "**Single Source of Truth** 원칙 적용",
         ],
         impact: "Prop Drilling 제거",
       },
@@ -323,9 +323,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
         solution:
           "적재적소 원칙으로 서비스를 분리했습니다. Spring Boot는 비즈니스 로직과 인증, Python Flask는 AI/ML 라이브러리 활용에 집중합니다.",
         details: [
-          "Spring Boot: 비즈니스 로직, 트랜잭션, 보안/인증",
-          "Python Flask: face-cli, OpenAI API 등 AI 연산",
-          "RestTemplate: 서비스 간 HTTP 통신",
+          "**Spring Boot**: 비즈니스 로직, 트랜잭션, 보안/인증",
+          "**Python Flask**: `face-cli`, `OpenAI API` 등 AI 연산",
+          "**RestTemplate**: 서비스 간 HTTP 통신",
         ],
         impact: "AI 연산 분리로 메인 서버 블로킹 방지",
       },
@@ -338,10 +338,10 @@ export const projectDetails: Record<string, ProjectDetail> = {
         solution:
           "face-cli로 얼굴 특징점을 추출하고, 이를 자연어 프롬프트로 변환하여 DALL-E 3에 전달하는 파이프라인을 구축했습니다.",
         details: [
-          "Input: 부모 사진 업로드",
-          "Preprocessing: face-cli로 얼굴 특징점 추출",
-          "Prompt Engineering: 특징 → 자연어 프롬프트 변환",
-          "Generation: DALL-E 3 API 호출",
+          "**Input**: 부모 사진 업로드",
+          "**Preprocessing**: `face-cli`로 얼굴 특징점 추출",
+          "**Prompt Engineering**: 특징 → 자연어 프롬프트 변환",
+          "**Generation**: `DALL-E 3` API 호출",
         ],
         impact: "얼굴 특징 기반 프롬프트 자동 생성",
       },
