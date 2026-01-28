@@ -4,7 +4,7 @@
   "avatar": "/images/me.jpg",
   "bio": {
     "badge": "AI Native Software Engineer",
-    "headline": "기술적 트레이드오프를 분석하고 논리적 근거로 최적의 의사결정을 내리는 개발자 {name}입니다.",
+    "headline": "탄탄한 기본기를 토대로 문제를 해결하고, 팀의 생산성 향상에 기여하는 개발자 {name}입니다.",
     "paragraphs": [
       {
         "text": "JavaScript/TypeScript와 React를 주력으로 사용하며, 기본기가 탄탄한 개발자를 지향합니다. OS(Pintos) 구현 프로젝트를 통해 문제를 해결했던 끈기를 바탕으로 컴퓨터의 동작 원리를 깊이 있게 학습했고, 이 경험을 바탕으로 브라우저 렌더링 최적화나 효율적인 상태 관리 방법을 고민하고 있습니다. 단순히 기능만 구현하는 것이 아니라, {highlight}를 작성하기 위해 노력합니다.",
