@@ -79,6 +79,13 @@ const accentColors = {
     text: "text-rose-600",
     gradient: "from-rose-500 to-pink-600",
   },
+  red: {
+    bg: "bg-red-600",
+    light: "bg-red-50",
+    border: "border-red-300",
+    text: "text-red-600",
+    gradient: "from-red-600 to-red-800",
+  },
 };
 
 export default function ProjectDetailPage({ params }: PageProps) {
