@@ -383,12 +383,12 @@ export default function ProjectDetailPage({ params }: PageProps) {
                       </div>
                       {section.impact && (
                         <div
-                          className={`shrink-0 px-5 py-3 rounded-2xl ${colors.bg} text-white`}
+                          className={`shrink-0 px-5 py-3 rounded-2xl ${colors.bg}`}
                         >
-                          <p className="text-[10px] uppercase tracking-wider opacity-80 mb-1">
+                          <p className="text-[10px] uppercase tracking-wider text-white/80 mb-1">
                             Impact
                           </p>
-                          <p className="text-sm font-bold">{section.impact}</p>
+                          <p className="text-sm font-bold text-white">{section.impact}</p>
                         </div>
                       )}
                     </div>
