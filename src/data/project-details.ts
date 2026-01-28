@@ -146,12 +146,6 @@ export const projectDetails: Record<string, ProjectDetail> = {
         label: "트리 변환 최적화",
         description: "useMemo + 참조 동등성으로 데이터 변경 시에만 트리 재구성",
       },
-      {
-        metric: "100%",
-        label: "표준 준수",
-        description:
-          "자동화된 워크플로우 도입으로 온보딩 비용 제거 및 코드 품질 표준화",
-      },
     ],
 
     techStack: [
