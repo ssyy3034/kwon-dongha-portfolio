@@ -135,7 +135,7 @@ export default function Hero({
                           {part.replace("{name}", profile.name)}
                           {index < array.length - 1 && (
                             <span className="relative inline-block px-1 mx-0.5">
-                              <span className="absolute inset-0 bg-amber-100/80 -skew-x-3 rounded-xl" />
+                              <span className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(253,224,71,0.6)_2%,rgba(253,224,71,0.6)_98%,transparent_100%)] -skew-x-3 -rotate-1 rounded-sm mix-blend-multiply decoration-clone" />
                               <span className="relative text-stone-900 font-bold">
                                 {p.highlight}
                               </span>
