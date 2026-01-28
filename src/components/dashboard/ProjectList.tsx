@@ -50,6 +50,38 @@ const accentColors = {
     light: "bg-rose-50",
     gradient: "from-rose-500 to-pink-600",
   },
+  // 부드러운 세이지 그린
+  sage: {
+    bg: "bg-lime-600",
+    text: "text-lime-700",
+    border: "border-lime-200",
+    light: "bg-lime-50",
+    gradient: "from-lime-500 to-green-600",
+  },
+  // 따뜻한 피치/살구색
+  peach: {
+    bg: "bg-orange-300",
+    text: "text-orange-600",
+    border: "border-orange-200",
+    light: "bg-orange-50",
+    gradient: "from-rose-300 to-orange-400",
+  },
+  // 하늘색
+  sky: {
+    bg: "bg-sky-400",
+    text: "text-sky-700",
+    border: "border-sky-200",
+    light: "bg-sky-50",
+    gradient: "from-sky-400 to-cyan-500",
+  },
+  // 빨강
+  red: {
+    bg: "bg-red-600",
+    text: "text-red-800",
+    border: "border-red-300",
+    light: "bg-red-50",
+    gradient: "from-red-600 to-red-800",
+  },
 };
 
 export default function ProjectList() {

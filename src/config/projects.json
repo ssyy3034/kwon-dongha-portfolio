@@ -48,6 +48,6 @@
     "tech": ["React", "Zustand", "Spring Boot", "Python", "Docker"],
     "link": "/projects/aidiary",
     "github": "https://github.com/ssyy3034/aidiary-main",
-    "color": "indigo"
+    "color": "red"
   }
 ]
