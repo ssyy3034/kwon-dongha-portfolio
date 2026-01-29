@@ -6,7 +6,6 @@ import {
   Github,
   Mail,
   BookOpen,
-  MapPin,
   Code,
   Lightbulb,
   Users,
@@ -252,12 +251,6 @@ export default function Hero({
                 </div>
 
                 <div className="space-y-4">
-                  {/* Location */}
-                  <div className="flex items-center gap-2 text-xs font-semibold text-stone-500 pl-1">
-                    <MapPin size={14} />
-                    <span>대한민국 서울</span>
-                  </div>
-
                   {/* Now Learning (Interests) */}
                   <div className="pt-2 border-t border-stone-200">
                     <p className="text-xs font-semibold text-stone-500 mb-2 pl-1">
