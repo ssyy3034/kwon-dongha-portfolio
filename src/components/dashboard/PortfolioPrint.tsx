@@ -4,6 +4,7 @@ import { useProfile } from "@/context/ProfileContext";
 import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
 import FormattedText from "@/components/common/FormattedText";
+import { Code, Lightbulb, Users } from "lucide-react";
 
 export default function PortfolioPrint() {
   const { profile } = useProfile();
@@ -35,18 +36,53 @@ export default function PortfolioPrint() {
         <h2 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-3">
           About
         </h2>
-        <p className="text-sm text-stone-700 leading-relaxed">
-          {profile.bio.paragraphs
-            .map((p) =>
-              p.text
-                .replace("{highlight}", p.highlight)
-                .replace("{name}", profile.name),
-            )
-            .join(" ")}
-          <br />
-          <br />
-          {profile.goals.description}
-        </p>
+        <div className="flex flex-col gap-4">
+          {profile.bio.cards?.map((card, idx) => (
+            <div
+              key={idx}
+              className="flex items-start gap-4 p-4 border border-stone-200 rounded-2xl bg-white shadow-sm break-inside-avoid"
+            >
+              {/* Icon Box */}
+              <div
+                className="flex items-center justify-center shrink-0 w-12 h-12 rounded-xl"
+                style={{
+                  backgroundColor: `${card.color}15`, // Ultra light background
+                  color: card.color,
+                }}
+              >
+                {card.icon === "code" && <Code className="w-6 h-6" />}
+                {card.icon === "bulb" && <Lightbulb className="w-6 h-6" />}
+                {card.icon === "users" && <Users className="w-6 h-6" />}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                <h3
+                  className="text-base font-bold mb-1.5"
+                  style={{ color: card.color }}
+                >
+                  {card.title}
+                </h3>
+                <p className="text-sm text-stone-700 leading-relaxed text-justify">
+                  {/* Highlighter Logic */}
+                  {card.content.split("**").map((text, i) =>
+                    i % 2 === 1 ? (
+                      <span
+                        key={i}
+                        className="font-bold px-0.5"
+                        style={{ backgroundColor: "#fff3cd" }} // Yellow highlighter
+                      >
+                        {text}
+                      </span>
+                    ) : (
+                      text
+                    ),
+                  )}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Primary Skills Quick View */}
