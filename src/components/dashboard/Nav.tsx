@@ -11,13 +11,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { useProfile } from "@/context/ProfileContext";
 
 export default function Nav() {
   const { profile } = useProfile();
   const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,6 +30,26 @@ export default function Nav() {
   const handlePrintPDF = useCallback(() => {
     window.print();
   }, []);
+
+  const handleHashClick = useCallback((e: React.MouseEvent, href: string) => {
+    if (href.startsWith("/#")) {
+      e.preventDefault();
+      const hash = href.slice(1); // "/#projects" -> "#projects"
+
+      if (pathname === "/") {
+        // 같은 페이지면 바로 스크롤
+        const element = document.querySelector(hash);
+        element?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // 다른 페이지면 홈으로 이동 후 스크롤
+        router.push("/");
+        setTimeout(() => {
+          const element = document.querySelector(hash);
+          element?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    }
+  }, [pathname, router]);
 
   const navItems = [
     { name: "홈", href: "/", icon: Home },
@@ -98,6 +119,7 @@ export default function Nav() {
                 <Component
                   key={item.name}
                   {...props}
+                  onClick={(e: React.MouseEvent) => handleHashClick(e, item.href)}
                   className={clsx(
                     "flex items-center gap-2 text-sm font-bold transition-all duration-300 relative py-2",
                     isActive
@@ -154,6 +176,7 @@ export default function Nav() {
                 <Component
                   key={item.name}
                   {...props}
+                  onClick={(e: React.MouseEvent) => handleHashClick(e, item.href)}
                   className={clsx(
                     "flex-1 flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all duration-300",
                     isActive
