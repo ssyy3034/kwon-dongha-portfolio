@@ -123,7 +123,7 @@
           "name": "AWS",
           "slug": "amazonaws",
           "color": "232F3E",
-          "description": "EC2, VPC, ALB, RDS, CloudFront, Route53으로 3-tier 아키텍처를 구성하고, Multi-AZ와 Auto Scaling으로 고가용성을 확보한 경험이 있습니다."
+          "description": "EC2, VPC, RDS 등 기본 개념을 학습했으며, 토이 프로젝트 배포에 활용해 본 경험이 있습니다."
         },
         {
           "name": "PostgreSQL",
