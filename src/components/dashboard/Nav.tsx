@@ -5,9 +5,8 @@ import {
   Folder,
   Github,
   Home,
-  PenTool,
-  Globe,
   FileDown,
+  Globe,
   FileText,
 } from "lucide-react";
 import Link from "next/link";
@@ -47,7 +46,6 @@ export default function Nav() {
       external: true,
     },
     // { name: "이력서", href: "/resume", icon: FileText, external: true },
-    { name: "스튜디오", href: "/customize", icon: PenTool },
   ];
 
   return (
