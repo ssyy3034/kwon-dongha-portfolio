@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         source: "/resume/:path*",
         destination: "https://resume-nextjs-4e97.vercel.app/:path*",
       },
+      // Shortcut for Toss resume
+      {
+        source: "/toss",
+        destination: "https://resume-nextjs-4e97.vercel.app/toss",
+      },
     ];
   },
 };
