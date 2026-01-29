@@ -64,7 +64,7 @@
           "name": "TypeScript",
           "slug": "typescript",
           "color": "3178C6",
-          "description": "인터페이스를 활용해 데이터 구조를 명확히 정의하고, 컴파일 단계에서 잠재적인 오류를 예방했습니다."
+          "description": "Props와 API 응답 타입 정의를 통해 코드 안정성을 높이는 데 활용하고 있습니다."
         },
         {
           "name": "Zustand",
