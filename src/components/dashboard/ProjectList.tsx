@@ -88,7 +88,7 @@ export default function ProjectList() {
   return (
     <section
       id="projects"
-      className="py-12 md:py-20 max-w-[1400px] mx-auto px-5 md:px-10 scroll-mt-32"
+      className="py-12 md:py-20 max-w-[1400px] mx-auto px-5 md:px-10 scroll-mt-16"
     >
       {/* Section Header */}
       <motion.div
