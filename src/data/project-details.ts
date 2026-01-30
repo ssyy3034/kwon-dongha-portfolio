@@ -330,11 +330,11 @@ export const projectDetails: Record<string, ProjectDetail> = {
         challenge:
           "부모 사진으로 아이 얼굴을 예측하려면 단순 API 호출이 아닌 전처리 과정이 필요했습니다.",
         solution:
-          "face-cli로 얼굴 특징점을 추출하고, 이를 자연어 프롬프트로 변환하여 DALL-E 3에 전달하는 파이프라인을 구축했습니다.",
+          "huggingface의 `face-analyzer`로 얼굴 특징점을 추출하고, 이를 자연어 프롬프트로 변환하여 DALL-E 3에 전달하는 파이프라인을 구축했습니다.",
         details: [
           "**Input**: 부모 사진 업로드",
-          "**Preprocessing**: `face-cli`로 얼굴 특징점 추출",
-          "**Prompt Engineering**: 특징 → 자연어 프롬프트 변환",
+          "**Preprocessing**: `face-analyzer`로 얼굴 특징점 추출",
+          "**Prompt Engineering**: 필요한 특징 데이터 정제 → 자연어 프롬프트 변환",
           "**Generation**: `DALL-E 3` API 호출",
         ],
         impact: "얼굴 특징 기반 프롬프트 자동 생성",
