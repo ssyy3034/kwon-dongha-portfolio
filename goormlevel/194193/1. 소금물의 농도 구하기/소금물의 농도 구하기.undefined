@@ -1,0 +1,13 @@
+import sys
+input = sys.stdin.readline
+
+N, M = map(int, input().split())
+
+# 1. 농도 공식: (N * 0.07 / (N + M)) * 100 = 7 * N / (N + M)
+# 2. '버림'을 구현하기 위해 100을 더 곱해서 정수로 만듦 (총 700 곱함)
+#    예: 3.456 -> 345.6 -> (int 변환) -> 345
+truncated_val = (700 * N) // (N + M)
+
+# 3. 다시 100으로 나눠서 소수점 복구
+#    345 -> 3.45
+print(f"{truncated_val / 100:.2f}")
