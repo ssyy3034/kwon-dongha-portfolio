@@ -1,0 +1,18 @@
+import sys
+
+input = sys.stdin.readline
+N = int(input())
+for _ in range(N):
+	tc = list(map(int,input().split()))
+	x = tc[0]
+	y = tc[1]
+	dst = tc[2]
+	distance = abs(x)+abs(y)
+
+	if distance <= abs(dst):
+		if distance % 2 == 0 and dst % 2 ==0 or distance % 2 != 0 and dst % 2 != 0 :
+			print("YES")
+		else:
+			print("NO")
+	else:
+		print("NO")
