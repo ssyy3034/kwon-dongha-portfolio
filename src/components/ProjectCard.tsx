@@ -17,10 +17,10 @@ const CATEGORY_LABELS: Record<Project["category"], string> = {
 };
 
 const CATEGORY_COLORS: Record<Project["category"], string> = {
-  frontend: "bg-amber-50 text-amber-700 border-amber-200",
-  fullstack: "bg-orange-50 text-orange-700 border-orange-200",
-  backend: "bg-stone-100 text-stone-700 border-stone-200",
-  other: "bg-stone-50 text-stone-600 border-stone-200",
+  frontend: "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-700",
+  fullstack: "bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-700",
+  backend: "bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700",
+  other: "bg-stone-50 dark:bg-stone-800 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-700",
 };
 
 export default function ProjectCard({
@@ -31,12 +31,12 @@ export default function ProjectCard({
 
   return (
     <article
-      className={`group relative bg-white border border-stone-200 rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-[0_20px_60px_rgba(245,158,11,0.12)] hover:-translate-y-1 ${
+      className={`group relative bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-[0_20px_60px_rgba(245,158,11,0.12)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.3)] hover:-translate-y-1 ${
         isFeatured ? "lg:col-span-2" : ""
       }`}
     >
       {/* Ambient glow */}
-      <div className="absolute top-0 right-0 w-40 h-40 bg-amber-100/30 blur-[80px] rounded-full -mr-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute top-0 right-0 w-40 h-40 bg-amber-100/30 dark:bg-amber-500/10 blur-[80px] rounded-full -mr-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="p-6 md:p-8 relative z-10">
         {/* Header */}
@@ -55,15 +55,15 @@ export default function ProjectCard({
           </div>
           <ArrowUpRight
             size={18}
-            className="text-stone-300 group-hover:text-amber-500 transition-colors duration-300"
+            className="text-stone-300 dark:text-stone-600 group-hover:text-amber-500 transition-colors duration-300"
           />
         </div>
 
         {/* Title & Description */}
-        <h3 className="text-xl md:text-2xl font-bold text-stone-900 mb-2 group-hover:text-amber-700 transition-colors duration-300">
+        <h3 className="text-xl md:text-2xl font-bold text-stone-900 dark:text-stone-100 mb-2 group-hover:text-amber-700 dark:group-hover:text-amber-500 transition-colors duration-300">
           {project.title}
         </h3>
-        <p className="text-sm text-stone-500 leading-relaxed mb-5">
+        <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed mb-5">
           {project.description}
         </p>
 
@@ -77,7 +77,7 @@ export default function ProjectCard({
           {project.highlights.map((highlight, idx) => (
             <li
               key={idx}
-              className="flex items-start gap-2 text-sm text-stone-600"
+              className="flex items-start gap-2 text-sm text-stone-600 dark:text-stone-400"
             >
               <span className="w-1 h-1 bg-amber-500 rounded-full mt-2 shrink-0" />
               {highlight}
@@ -87,7 +87,7 @@ export default function ProjectCard({
 
         {/* Technical Deep Dive (New) */}
         {(project.problemSolving || project.techDecisions) && (
-          <div className="space-y-6 mb-8 p-5 bg-stone-50 rounded-2xl border border-stone-100">
+          <div className="space-y-6 mb-8 p-5 bg-stone-50 dark:bg-stone-800 rounded-2xl border border-stone-100 dark:border-stone-700">
             {project.problemSolving && (
               <div>
                 <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -97,11 +97,11 @@ export default function ProjectCard({
                 <div className="space-y-4">
                   {project.problemSolving.map((item, idx) => (
                     <div key={idx} className="space-y-1">
-                      <p className="text-xs font-bold text-stone-800">
+                      <p className="text-xs font-bold text-stone-800 dark:text-stone-200">
                         Q. {item.challenge}
                       </p>
-                      <p className="text-xs text-stone-500 leading-relaxed">
-                        <span className="text-amber-600 font-semibold">A.</span>{" "}
+                      <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+                        <span className="text-amber-600 dark:text-amber-500 font-semibold">A.</span>{" "}
                         {item.approach} → {item.result}
                       </p>
                     </div>
@@ -113,14 +113,14 @@ export default function ProjectCard({
             {project.techDecisions && (
               <div>
                 <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <div className="w-1 h-3 bg-stone-900 rounded-full" />
+                  <div className="w-1 h-3 bg-stone-900 dark:bg-stone-100 rounded-full" />
                   Tech Decisions
                 </h4>
                 <div className="flex flex-wrap gap-3">
                   {project.techDecisions.map((item, idx) => (
                     <div key={idx} className="group/item relative">
-                      <p className="text-xs text-stone-600 font-medium bg-white px-3 py-1.5 rounded-lg border border-stone-200">
-                        <span className="font-bold text-stone-900">
+                      <p className="text-xs text-stone-600 dark:text-stone-400 font-medium bg-white dark:bg-stone-900 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700">
+                        <span className="font-bold text-stone-900 dark:text-stone-100">
                           {item.tech}
                         </span>
                         : {item.reason}
@@ -129,7 +129,7 @@ export default function ProjectCard({
                             href={item.deepDive}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="ml-2 text-amber-600 hover:text-amber-700 underline"
+                            className="ml-2 text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 underline"
                           >
                             상세보기
                           </a>
@@ -148,7 +148,7 @@ export default function ProjectCard({
           {project.techStack.map((tech) => (
             <span
               key={tech}
-              className="px-2 py-1 bg-white border border-stone-100 rounded text-[10px] font-bold text-stone-400 uppercase tracking-wide"
+              className="px-2 py-1 bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700 rounded text-[10px] font-bold text-stone-400 uppercase tracking-wide"
             >
               {tech}
             </span>
@@ -156,13 +156,13 @@ export default function ProjectCard({
         </div>
 
         {/* Links */}
-        <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
+        <div className="flex items-center gap-3 pt-4 border-t border-stone-100 dark:border-stone-700">
           {project.links.github && (
             <a
               href={project.links.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-xl text-xs font-bold hover:bg-stone-800 transition-colors shadow-lg shadow-stone-900/10"
+              className="flex items-center gap-2 px-4 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl text-xs font-bold hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors shadow-lg shadow-stone-900/10 dark:shadow-stone-900/30"
             >
               <Github size={14} />
               GitHub
@@ -184,7 +184,7 @@ export default function ProjectCard({
               href={project.retrospective}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-700 rounded-xl text-xs font-bold hover:bg-stone-200 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-xl text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
             >
               <FileText size={14} />
               회고록

@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import mermaid from "mermaid";
 
 mermaid.initialize({
-  startOnLoad: true,
+  startOnLoad: false,
   theme: "neutral",
   securityLevel: "loose",
   fontFamily: "Inter, sans-serif",
@@ -20,14 +20,18 @@ export default function Mermaid({ chart }: MermaidProps) {
   useEffect(() => {
     if (ref.current) {
       ref.current.removeAttribute("data-processed");
-      mermaid.contentLoaded();
+      // Use mermaid.run to process specific nodes after hydration
+      mermaid.run({
+        nodes: [ref.current],
+      });
     }
   }, [chart]);
 
   return (
     <div
-      className="mermaid flex justify-center my-12 p-8 rounded-3xl bg-white border border-stone-200/60 shadow-sm"
+      className="mermaid flex justify-center my-12 p-8 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-700/60 shadow-sm overflow-hidden"
       ref={ref}
+      suppressHydrationWarning
     >
       {chart}
     </div>

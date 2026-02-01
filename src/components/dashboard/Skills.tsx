@@ -17,7 +17,7 @@ export default function Skills() {
     <section className="space-y-10">
       <div className="flex items-center gap-3 mb-6">
         <div className="h-8 w-1 bg-amber-500 rounded-full" />
-        <h2 className="text-xl font-black text-stone-900 tracking-tight">
+        <h2 className="text-xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
           보유 기술 스택
         </h2>
       </div>
@@ -25,9 +25,9 @@ export default function Skills() {
       <div className="grid gap-8">
         {profile.skills.map((category, idx) => (
           <div key={idx} className="space-y-4">
-            <h3 className="text-sm font-black text-stone-600 uppercase tracking-widest pl-1 flex items-center gap-2">
+            <h3 className="text-sm font-black text-stone-600 dark:text-stone-400 uppercase tracking-widest pl-1 flex items-center gap-2">
               <span
-                className={`w-1.5 h-1.5 rounded-full ${idx === 0 ? "bg-amber-500" : idx === 1 ? "bg-stone-400" : "bg-stone-200"}`}
+                className={`w-1.5 h-1.5 rounded-full ${idx === 0 ? "bg-amber-500" : idx === 1 ? "bg-stone-400 dark:bg-stone-500" : "bg-stone-200 dark:bg-stone-600"}`}
               />
               {category.category}
             </h3>
@@ -36,7 +36,7 @@ export default function Skills() {
               {category.items.map((skill, sIdx) => (
                 <div
                   key={sIdx}
-                  className="group flex flex-col gap-3 p-5 bg-white border border-stone-200 rounded-xl hover:border-amber-400 hover:shadow-lg transition-all duration-300"
+                  className="group flex flex-col gap-3 p-5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-lg dark:hover:shadow-stone-900/50 transition-all duration-300"
                 >
                   <div className="flex items-center gap-2">
                     <img
@@ -45,7 +45,7 @@ export default function Skills() {
                       className="h-6 object-contain rounded-sm"
                     />
                   </div>
-                  <p className="text-sm font-medium text-stone-700 leading-relaxed group-hover:text-stone-900 transition-colors">
+                  <p className="text-sm font-medium text-stone-700 dark:text-stone-300 leading-relaxed group-hover:text-stone-900 dark:group-hover:text-stone-100 transition-colors">
                     {skill.description}
                   </p>
                 </div>

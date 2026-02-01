@@ -8,24 +8,37 @@ import {
   FileDown,
   Globe,
   FileText,
+  Moon,
+  Sun,
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { useProfile } from "@/context/ProfileContext";
+import { useTheme } from "next-themes";
 
 export default function Nav() {
   const { profile } = useProfile();
   const pathname = usePathname();
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  };
 
   const handlePrintPDF = useCallback(() => {
     window.print();
@@ -76,7 +89,7 @@ export default function Nav() {
         className={clsx(
           "hidden md:block sticky top-0 z-[100] w-full transition-all duration-500 border-b no-print",
           scrolled
-            ? "bg-white/80 backdrop-blur-xl border-stone-200/60 py-3"
+            ? "bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border-stone-200/60 dark:border-stone-700/60 py-3"
             : "bg-transparent border-transparent py-5",
         )}
       >
@@ -86,11 +99,11 @@ export default function Nav() {
             href="/"
             className="flex items-center gap-3 transition-transform hover:scale-[1.02]"
           >
-            <div className="w-10 h-10 bg-stone-900 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-stone-900 dark:bg-amber-600 rounded-xl flex items-center justify-center shadow-lg">
               <Sparkles size={20} className="text-white fill-white" />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-base tracking-wide uppercase leading-none text-stone-900">
+              <span className="font-black text-base tracking-wide uppercase leading-none text-stone-900 dark:text-stone-100">
                 {profile.name}
               </span>
             </div>
@@ -123,8 +136,8 @@ export default function Nav() {
                   className={clsx(
                     "flex items-center gap-2 text-sm font-bold transition-all duration-300 relative py-2",
                     isActive
-                      ? "text-amber-600"
-                      : "text-stone-600 hover:text-stone-900",
+                      ? "text-amber-600 dark:text-amber-500"
+                      : "text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100",
                   )}
                 >
                   <Icon
@@ -140,14 +153,34 @@ export default function Nav() {
             })}
           </div>
 
-          {/* PDF Button */}
-          <button
-            onClick={handlePrintPDF}
-            className="hidden lg:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-stone-900 text-white hover:bg-stone-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-          >
-            <FileDown size={18} />
-            <span className="text-sm font-bold">PDF 저장</span>
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-900 text-stone-600 dark:text-amber-400 hover:scale-110 hover:shadow-lg dark:hover:shadow-amber-500/20 active:scale-95 transition-all duration-300 border border-stone-200/50 dark:border-stone-700/50 overflow-hidden group"
+              aria-label="테마 변경"
+            >
+              <span className="absolute inset-0 bg-gradient-to-br from-amber-400/0 to-amber-500/0 group-hover:from-amber-400/10 group-hover:to-amber-500/20 dark:group-hover:from-amber-400/20 dark:group-hover:to-amber-500/30 transition-all duration-300" />
+              {mounted ? (
+                (resolvedTheme || theme) === "dark" ? (
+                  <Sun size={18} className="relative z-10 transition-transform duration-300 group-hover:rotate-45" />
+                ) : (
+                  <Moon size={18} className="relative z-10 transition-transform duration-300 group-hover:-rotate-12" />
+                )
+              ) : (
+                <Moon size={18} className="relative z-10" />
+              )}
+            </button>
+
+            {/* PDF Button */}
+            <button
+              onClick={handlePrintPDF}
+              className="hidden lg:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-stone-900 dark:bg-amber-600 text-white hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
+            >
+              <FileDown size={18} />
+              <span className="text-sm font-bold">PDF 저장</span>
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -192,6 +225,23 @@ export default function Nav() {
           </div>
 
           <div className="w-[1px] h-8 bg-white/10 mx-2" />
+
+          {/* Mobile Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 hover:bg-amber-500/30 active:scale-95 transition-all duration-300 overflow-hidden group"
+            aria-label="테마 변경"
+          >
+            {mounted ? (
+              (resolvedTheme || theme) === "dark" ? (
+                <Sun size={20} className="text-amber-400 transition-transform duration-300 group-hover:rotate-45 group-hover:scale-110" />
+              ) : (
+                <Moon size={20} className="text-white transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
+              )
+            ) : (
+              <Moon size={20} className="text-white" />
+            )}
+          </button>
 
           {/* Mobile PDF Button */}
           <button

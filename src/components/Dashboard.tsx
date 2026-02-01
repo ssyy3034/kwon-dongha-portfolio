@@ -26,7 +26,7 @@ export default function Dashboard({
   };
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB] text-stone-900 font-sans antialiased selection:bg-amber-500 selection:text-white">
+    <div className="min-h-screen bg-[#FEFDFB] dark:bg-stone-950 text-stone-900 dark:text-stone-50 font-sans antialiased selection:bg-amber-500 selection:text-white transition-colors duration-300">
       {/* PDF 출력 전용 포트폴리오 */}
       <div className="print-portfolio">
         <PortfolioPrint />
@@ -69,7 +69,7 @@ export default function Dashboard({
       <section
         ref={projectsRef}
         id="projects"
-        className="py-24 md:py-32 bg-white border-y border-stone-100 animate-fade-in-up opacity-0 delay-100 fill-mode-forwards no-print"
+        className="py-24 md:py-32 bg-white dark:bg-stone-900 border-y border-stone-100 dark:border-stone-800 animate-fade-in-up opacity-0 delay-100 fill-mode-forwards no-print"
       >
         <ProjectList />
       </section>
@@ -86,7 +86,7 @@ export default function Dashboard({
       {/* ═══════════════════════════════════════════════════════════════
           SECTION 4: RECENT LOGS - 최근 학습 기록
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-32 bg-white border-t border-stone-100 no-print">
+      <section className="py-24 md:py-32 bg-white dark:bg-stone-900 border-t border-stone-100 dark:border-stone-800 no-print">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <EngineeringLogs recentPosts={data.recentPosts} />
         </div>
@@ -95,11 +95,11 @@ export default function Dashboard({
       {/* ═══════════════════════════════════════════════════════════════
           FOOTER - 미니멀하게 정리
       ═══════════════════════════════════════════════════════════════ */}
-      <footer className="py-16 border-t border-stone-100 no-print">
+      <footer className="py-16 border-t border-stone-100 dark:border-stone-800 no-print">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div>
-              <p className="text-sm font-black text-stone-900 mb-1">
+              <p className="text-sm font-black text-stone-900 dark:text-stone-100 mb-1">
                 {profile.name}
               </p>
               <p className="text-xs text-stone-400">
@@ -108,20 +108,20 @@ export default function Dashboard({
             </div>
 
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-[10px] text-emerald-600 font-bold">
+              <div className="flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-500 font-bold">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                 Live
               </div>
               <a
                 href={`mailto:${profile.social.email}`}
-                className="text-xs font-bold text-stone-600 hover:text-amber-600 transition-colors"
+                className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
               >
                 Contact
               </a>
             </div>
           </div>
 
-          <div className="mt-10 pt-6 border-t border-stone-50 flex justify-between text-[10px] text-stone-300">
+          <div className="mt-10 pt-6 border-t border-stone-50 dark:border-stone-800 flex justify-between text-[10px] text-stone-300 dark:text-stone-600">
             <span>
               &copy; {new Date().getFullYear()} {profile.name}
             </span>

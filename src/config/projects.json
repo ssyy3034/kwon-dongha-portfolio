@@ -14,24 +14,8 @@
     ],
     "tech": ["React", "TypeScript", "Canvas API", "AI Agent", "Zustand", "TanStack Query"],
     "link": "/projects/stolink",
-    "github": "https://github.com/stolink/stolink_frontend",
+    "github": "https://github.com/stolink",
     "color": "amber"
-  },
-  {
-    "id": "pintos",
-    "title": "Pintos Kernel",
-    "subtitle": "커널 프로그래밍 및 운영체제 실습",
-    "role": "System Engineer",
-    "period": "2025.11 - 2025.12",
-    "team": "KAIST Jungle 4인 팀",
-    "description": "Priority Donation, Demand Paging 구현. GDB로 SW-HW 상태 불일치(Widowed Frame) 버그를 추적하여 해결.",
-    "metrics": [
-      { "value": "4개 모듈", "label": "Threads, Userprog, VM, FS" },
-      { "value": "GDB 디버깅", "label": "Page Fault 무한루프 해결" }
-    ],
-    "tech": ["C", "Assembly", "OS Internals", "QEMU"],
-    "link": "/projects/pintos",
-    "color": "emerald"
   },
   {
     "id": "aidiary",

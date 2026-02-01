@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Space_Grotesk, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ProfileProvider } from "@/context/ProfileContext";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 // Display font: Bold, geometric, memorable
 const spaceGrotesk = Space_Grotesk({
@@ -49,7 +50,14 @@ export default function RootLayout({
             backgroundRepeat: "repeat",
           }}
         />
-        <ProfileProvider>{children}</ProfileProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ProfileProvider>{children}</ProfileProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

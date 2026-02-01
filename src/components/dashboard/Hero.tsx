@@ -42,7 +42,7 @@ export default function Hero({
     <header className="max-w-[1400px] mx-auto px-6 md:px-10 pt-16 pb-12 md:pt-24 md:pb-20">
       {/* 1. HEADER SECTION (Full Width) */}
       <div className="max-w-4xl mb-12 lg:mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-200/50 text-amber-700 mb-6">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200/50 dark:border-amber-700/50 text-amber-700 dark:text-amber-400 mb-6">
           <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="text-xs font-bold">{profile.bio.badge}</span>
         </div>
@@ -77,7 +77,7 @@ export default function Hero({
             </span>
           </span>
         </h1>
-        <p className="mt-8 text-xl md:text-2xl text-stone-600 font-medium max-w-2xl leading-relaxed">
+        <p className="mt-8 text-xl md:text-2xl text-stone-600 dark:text-stone-400 font-medium max-w-2xl leading-relaxed">
           {profile.bio.headline.replace("{name}", profile.name)}
         </p>
       </div>
@@ -93,20 +93,20 @@ export default function Hero({
                 {
                   icon: Code,
                   label: "Frontend Developer",
-                  color: "text-blue-500",
-                  bg: "bg-blue-50 border-blue-100",
+                  color: "text-blue-500 dark:text-blue-400",
+                  bg: "bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800",
                 },
                 {
                   icon: Lightbulb,
                   label: "Problem Solver",
-                  color: "text-amber-500",
-                  bg: "bg-amber-50 border-amber-100",
+                  color: "text-amber-500 dark:text-amber-400",
+                  bg: "bg-amber-50 dark:bg-amber-900/30 border-amber-100 dark:border-amber-800",
                 },
                 {
                   icon: Users,
                   label: "Team Player",
-                  color: "text-emerald-500",
-                  bg: "bg-emerald-50 border-emerald-100",
+                  color: "text-emerald-500 dark:text-emerald-400",
+                  bg: "bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800",
                 },
               ];
               const info = titles[i] || titles[0];
@@ -115,7 +115,7 @@ export default function Hero({
               return (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-5 sm:p-6 rounded-3xl bg-white/40 border border-stone-200 hover:bg-white/80 hover:border-stone-300 hover:shadow-xl transition-all duration-500 group relative overflow-hidden"
+                  className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-5 sm:p-6 rounded-3xl bg-white/40 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 hover:bg-white/80 dark:hover:bg-stone-800/80 hover:border-stone-300 dark:hover:border-stone-600 hover:shadow-xl dark:hover:shadow-stone-900/50 transition-all duration-500 group relative overflow-hidden"
                 >
                   <div
                     className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${info.bg} border flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}
@@ -128,14 +128,14 @@ export default function Hero({
                     <h3 className={`font-black text-lg mb-2 ${info.color}`}>
                       {info.label}
                     </h3>
-                    <p className="text-stone-600 text-[15px] leading-relaxed font-medium">
+                    <p className="text-stone-600 dark:text-stone-400 text-[15px] leading-relaxed font-medium">
                       {p.text.split("{highlight}").map((part, index, array) => (
                         <span key={index}>
                           {part.replace("{name}", profile.name)}
                           {index < array.length - 1 && (
                             <span className="relative inline-block px-1 mx-0.5">
-                              <span className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(253,224,71,0.6)_2%,rgba(253,224,71,0.6)_98%,transparent_100%)] -skew-x-3 -rotate-1 rounded-sm mix-blend-multiply decoration-clone" />
-                              <span className="relative text-stone-900 font-bold">
+                              <span className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(253,224,71,0.6)_2%,rgba(253,224,71,0.6)_98%,transparent_100%)] dark:bg-[linear-gradient(90deg,transparent_0%,rgba(253,224,71,0.3)_2%,rgba(253,224,71,0.3)_98%,transparent_100%)] -skew-x-3 -rotate-1 rounded-sm mix-blend-multiply dark:mix-blend-normal decoration-clone" />
+                              <span className="relative text-stone-900 dark:text-stone-100 font-bold">
                                 {p.highlight}
                               </span>
                             </span>
@@ -152,7 +152,7 @@ export default function Hero({
           <div className="flex flex-wrap gap-4">
             <Link
               href="/#projects"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#24201e] text-[#fcfaf9] rounded-2xl text-base font-black hover:bg-[#4a3b31] transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 group"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-stone-900 dark:bg-amber-600 text-white rounded-2xl text-base font-black hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 group"
             >
               <Folder
                 size={20}
@@ -178,7 +178,7 @@ export default function Hero({
               href={profile.cta.secondary.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-stone-100 text-stone-700 rounded-2xl text-sm font-bold hover:bg-stone-200 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-2xl text-sm font-bold hover:bg-stone-200 dark:hover:bg-stone-700 transition-all duration-300"
             >
               {profile.cta.secondary.text}
             </a>
@@ -188,15 +188,15 @@ export default function Hero({
         {/* RIGHT COLUMN: Profile & Stats */}
         <div className="flex flex-col gap-5 shrink-0 w-full lg:w-auto">
           {/* Profile Card */}
-          <div className="bg-white/80 backdrop-blur-2xl border border-stone-200 rounded-[32px] p-8 premium-shadow group hover:-translate-y-1.5 transition-all duration-500 w-full lg:w-[520px] relative overflow-hidden">
+          <div className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-2xl border border-stone-200 dark:border-stone-700 rounded-[32px] p-8 premium-shadow group hover:-translate-y-1.5 transition-all duration-500 w-full lg:w-[520px] relative overflow-hidden">
             {/* Decorative Background */}
-            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 blur-[80px] rounded-full -mr-10 -mt-10" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 dark:bg-amber-500/10 blur-[80px] rounded-full -mr-10 -mt-10" />
 
             <div className="flex items-start gap-8 relative z-10">
               {/* Avatar Slot */}
-              <div className="w-40 min-h-[160px] shrink-0 rounded-2xl overflow-hidden border border-stone-100 shadow-inner bg-stone-100 relative group-hover:scale-[1.02] transition-transform duration-500 flex items-center justify-center">
-                <div className="absolute inset-0 bg-stone-200 flex items-center justify-center pointer-events-none">
-                  <span className="text-6xl text-stone-400">👤</span>
+              <div className="w-40 min-h-[160px] shrink-0 rounded-2xl overflow-hidden border border-stone-100 dark:border-stone-700 shadow-inner bg-stone-100 dark:bg-stone-800 relative group-hover:scale-[1.02] transition-transform duration-500 flex items-center justify-center">
+                <div className="absolute inset-0 bg-stone-200 dark:bg-stone-700 flex items-center justify-center pointer-events-none">
+                  <span className="text-6xl text-stone-400 dark:text-stone-500">👤</span>
                 </div>
                 {/* Fallback pattern if no image, or actual image */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -213,10 +213,10 @@ export default function Hero({
               {/* Personal Info */}
               <div className="flex-1 pt-1 min-w-0">
                 <div>
-                  <h3 className="text-3xl font-black text-stone-900 leading-tight mb-1 truncate">
+                  <h3 className="text-3xl font-black text-stone-900 dark:text-stone-100 leading-tight mb-1 truncate">
                     {profile.name}
                   </h3>
-                  <p className="text-sm font-bold text-amber-600 uppercase tracking-wider mb-5">
+                  <p className="text-sm font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider mb-5">
                     {profile.role}
                   </p>
 
@@ -226,7 +226,7 @@ export default function Hero({
                       href={profile.social.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-900 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
+                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-900 dark:hover:bg-stone-100 hover:text-white dark:hover:text-stone-900 hover:scale-110 transition-all duration-300 shadow-sm"
                       aria-label="GitHub"
                     >
                       <Github size={18} />
@@ -235,14 +235,14 @@ export default function Hero({
                       href={profile.social.blog}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 text-stone-600 hover:bg-emerald-500 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
+                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-500 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
                       aria-label="Blog"
                     >
                       <BookOpen size={18} />
                     </a>
                     <a
                       href={`mailto:${profile.social.email}`}
-                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 text-stone-600 hover:bg-blue-500 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
+                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-blue-500 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
                       aria-label="Email"
                     >
                       <Mail size={18} />
@@ -252,8 +252,8 @@ export default function Hero({
 
                 <div className="space-y-4">
                   {/* Now Learning (Interests) */}
-                  <div className="pt-2 border-t border-stone-200">
-                    <p className="text-xs font-semibold text-stone-500 mb-2 pl-1">
+                  <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
+                    <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 mb-2 pl-1">
                       최근 관심 분야
                     </p>
                     <div className="flex flex-wrap gap-1.5">
@@ -262,7 +262,7 @@ export default function Hero({
                         ?.items.map((skill) => (
                           <span
                             key={skill.slug}
-                            className="px-2 py-1 rounded-md bg-stone-50 border border-stone-200 text-xs font-bold text-stone-700 uppercase tracking-wide flex items-center gap-1.5"
+                            className="px-2 py-1 rounded-md bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wide flex items-center gap-1.5"
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                             {skill.name}
