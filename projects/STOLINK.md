@@ -1,268 +1,114 @@
-# StoLink - 프론트엔드 기술 챌린지
+# StoLink - 프론트엔드 기술 챌린지 및 회고
 
-> 5인 팀 프로젝트 | **프론트엔드 단독 담당** | React + TypeScript + D3.js
+> 5인 팀 프로젝트 | **프론트엔드 리드** | React + TypeScript + D3.js
 
-작가용 웹 에디터 및 캐릭터 관계도 시각화 서비스의 프론트엔드 전체를 설계하고 구현했습니다.
+작가용 웹 에디터 및 캐릭터 관계도 시각화 서비스의 프론트엔드 아키텍처를 설계하고, **사용자 경험(UX)과 성능 최적화**에 집중하여 개발했습니다.
 
 ---
 
-## 1. SVG → Canvas 마이그레이션으로 렌더링 성능 16배 개선
+## 1. 렌더링 엔진 마이그레이션: 사용자 경험을 위한 집요한 개선
 
 ### 문제 상황
 
-D3.js 기반 캐릭터 관계도에서 노드가 30개를 넘어서자 심각한 성능 저하가 발생했습니다.
+D3.js 기반의 캐릭터 관계도에서 노드가 **30개를 넘어가자 프레임 드랍(60fps → 10fps 미만)**이 발생했습니다. 줌/팬 조작 시 버벅이는 현상 때문에 "몰입이 깨진다"는 피드백을 받았습니다.
 
-- **현상**: 줌/팬 조작 시 FPS 10 미만, 드래그 시 입력 지연
-- **원인**: 매 프레임마다 수백 개 DOM 요소의 Style Recalculation 발생 (프레임당 935ms)
+### 원인 및 해결 과정
 
-### 해결 과정
+Chrome Performance Profiler로 분석한 결과, **SVG(DOM) 요소가 너무 많아 Style Recalculation 비용이 높다는 것**을 발견했습니다. 이를 해결하기 위해 **HTML5 Canvas**로 렌더링 방식을 완전히 전환했습니다.
+이를 통해 수천 개의 DOM 요소를 단일 Canvas 엘리먼트로 통합하여 브라우저 렌더링 부하를 제거했으며, 빈번히 그려지는 노드 이미지는 **메모리 캐싱(Texture Caching)** 기법을 적용하여 드로잉 성능을 극대화했습니다.
 
-SVG(DOM) 기반 렌더링을 Canvas API로 전면 전환했습니다.
+### 배운 점 및 성과
 
-1. **Single Layer Rendering**: 개별 DOM 노드 대신 Canvas 컨텍스트에서 일괄 드로잉
-2. **Image Caching**: 캐릭터 이미지를 텍스처로 메모리에 캐싱
-3. **Color-based Hit Detection**: Canvas에서 클릭 이벤트 감지를 위한 O(1) 히트맵 구현
-
-### 성과 (Chrome DevTools 측정)
-
-| 지표                | Before (SVG) | After (Canvas) | 개선            |
-| :------------------ | :----------- | :------------- | :-------------- |
-| **INP (응답 속도)** | 1,048ms      | 64ms           | **16.3배 향상** |
-| **LCP (초기 로드)** | 2.30s        | 0.58s          | **4배 향상**    |
-| **Style Recalc**    | 935ms/frame  | ~0ms           | **100% 제거**   |
-| **FPS**             | 5~10         | 60 (stable)    | **6배 향상**    |
-| **처리 노드 수**    | 28개 한계    | 600개 이상     | **21배 확장**   |
+- **Stable 60fps 달성**: 600개 이상의 노드에서도 끊김 없는 조작감을 제공했습니다.
+- **최적화의 본질**: "기술 교체"보다 중요한 것은 "병목 지점(DOM Overhead)의 정확한 진단"임을 배웠습니다.
 
 ---
 
-## 2. 🤖 AI 에이전트 기반 개발 워크플로우 자동화
-
-### 배경 및 문제 상황
-
-1. **Git 버전 관리의 어려움**: 팀원들의 Git 활용 숙련도 격차로 인해 브랜치 전략 준수가 어렵고, Conflict로 인한 개발 지연 발생.
-2. **이슈 트래킹과 코드의 단절**: 커밋과 이슈 연결이 누락되어 히스토리 파악이 어려움.
-3. **일관성 없는 코드 품질**: 구두로 합의된 컨벤션이 실제 코드에 반영되지 않음.
-
-### 해결 방법 1: `Smart-Commit` & 이슈 수명주기 자동화
-
-단순한 커밋이 아닌, **"이슈 생성부터 PR까지"**의 전체 수명주기(Lifecycle)를 자동화하는 CLI 파이프라인 구축.
-
-- **Cross-Repo Issue Automation**: `./scripts/start-work.sh` 명령어로 이슈 생성 및 브랜치 전략 강제.
-- **Auto Linking**: 커밋 시 브랜치명에서 이슈 번호를 파싱하여 자동 연결.
-- **Lazy Creation**: 이슈 없이 작업 시작 시 자동으로 원격 이슈 생성.
-
-### 해결 방법 2: Supervisor Agent System (Role-Based Delegation)
-
-체계적인 분업 시스템을 AI 에이전트에 적용하여 **"지시는 내가, 작업은 에이전트가"** 수행하는 구조 확립.
-
-- **Supervisor**: 사용자의 요청을 기술 명세로 변환하고 작업 크기(S/M/L) 판단.
-- **Dynamic Context Injection**: 작업 크기에 따라 필요한 문맥(Context)만 동적으로 주입하여 토큰 비용 절감 및 정확도 향상.
-  - _S 사이즈_: 디자인 토큰만 참조하는 'Stylist Agent' 호출
-  - _L 사이즈_: 전체 아키텍처를 참조하는 'Architect Agent' 호출
-
-### 해결 방법 3: Quality Gates & Aesthetic Consistency Protocol
-
-단순한 린트 체크를 넘어, **"사용자 경험의 심미적 품질(Aesthetic Consistency)"**까지 검증하는 자동화된 감사 프로토콜 (`AUDIT.md`) 도입.
-
-- **Phase 1: Architecture Integrity**: Zustand, Query Key 패턴 등 내부 아키텍처 규칙 검사.
-- **Phase 2: Design Compliance**: 브랜드 컬러 준수 여부 및 애니메이션 적용 여부 검사.
-
-### 핵심 성과
-
-- **워크플로우 자동화 시스템 구현**: Git, Jira, 컨벤션 검사를 자동화하여 개발 외적인 인지 부하 완전 제거.
-- **Code Quality 100% 표준화**: AI 에이전트의 강제적 감수를 통해 구성원 전원이 동일한 수준의 코드 품질 유지.
-- **조직 전체로 확산**: 개인 생산성 도구로 시작하여 팀 표준으로 정착, 이후 4개 팀 중 3팀(15/20명)까지 전파되어 기수 전체의 생산성을 견인.
-- **문서화의 자동 동기화**: 코드가 변하면 문서도 같이 진화하는 `Sync-Docs` 워크플로우 구현.
-
----
-
-## 3. � 번들링 전략 및 로딩 성능 최적화 (초기 로딩 60% 개선)
+## 2. 문서 트리 최적화: 기본 자료구조의 응용
 
 ### 문제 상황
 
-초기 로딩 시 에디터(Tiptap)와 그래프(D3/ReactFlow) 등 무거운 라이브러리가 포함된 거대한 번들로 인해 **FCP** 및 **TTI** 지연 발생.
+폴더 구조가 깊어질수록 사이드바의 렌더링 속도가 느려졌습니다. 분석 결과, 트리를 그릴 때마다 재귀적으로 데이터를 탐색하는 로직(`O(n log n)`)이 매번 실행되고 있었습니다.
 
 ### 해결 과정
 
-1. **Route-based Code Splitting**: `React.lazy`와 `Suspense`로 페이지 단위 지연 로딩 적용.
-2. **Vendor Chunk Splitting**: `vite.config.ts`의 `manualChunks`로 라이브러리를 용도별로 분리.
+기본으로 돌아가 자료구조를 재검토했습니다. 전체 데이터를 `HashMap` 형태의 평탄화된 배열로 관리하고, 렌더링 시에만 필요한 부분(Open된 폴더)을 **O(n) 선형 탐색**으로 가져오도록 구조를 변경했습니다. 여기에 `useMemo`를 적용하여 데이터 변경이 없을 때는 연산 자체를 건너뛰도록 했습니다.
 
-```typescript
-// vite.config.ts
-build: {
-  rollupOptions: {
-    output: {
-      manualChunks: {
-        'vendor-react': ['react', 'react-dom'],
-        'vendor-editor': ['@tiptap/core', '@tiptap/react'], // 에디터 진입 시에만 로드
-        'vendor-graph': ['d3', 'reactflow'] // 관계도 페이지 진입 시에만 로드
-      }
-    }
-  }
-}
-```
+### 배운 점 및 성과
+
+- **연산 속도 150배 단축**: 인터랙션 딜레이를 15ms에서 0.1ms 수준으로 줄였습니다.
+- **기본의 중요성**: 복잡한 라이브러리보다 때로는 기본적인 자료구조 설계가 성능에 더 큰 영향을 준다는 것을 깨달았습니다.
+
+---
+
+## 3. 팀을 위한 자동화: Smart-Commit 워크플로우
+
+### 문제 상황
+
+팀원마다 Git 숙련도가 달라 충돌(Generic Merge Conflict)이 잦았고, 이슈와 커밋이 연결되지 않아 히스토리를 파악하기 어려웠습니다.
+
+### 해결 과정
+
+반복되는 "이슈 생성 - 브랜치 생성 - 커밋 메시지 작성 - PR 생성" 과정을 하나의 흐름으로 자동화하고 싶었습니다. 이를 위해 **Smart-Commit**이라는 CLI 도구를 만들어 팀에 도입했습니다.
+
+- **자동 연결**: 브랜치 이름에서 이슈 번호를 추출하여 커밋 메시지에 자동으로 추가합니다.
+- **품질 확보**: 커밋 전 자동으로 Lint와 Build 체크를 수행하여, 실수로 깨진 코드가 올라가는 것을 방지했습니다.
+
+### 배운 점 및 성과
+
+- **협업 비용 감소**: 개발 외적인 프로세스 고민을 덜어내어 팀원들이 핵심 로직 개발에 집중할 수 있었습니다.
+- **문서화 동기화**: 코드가 변하면 문서도 함께 업데이트되는 `Sync-Docs` 문화를 정착시켰습니다.
+
+---
+
+## 4. AI 오케스트레이션 아키텍처: Supervisor System
+
+### 문제 상황
+
+"AI를 개발에 도입하자"는 목표는 좋았지만, 맥락 없이 질문하면 환각(Hallucination)이 발생하고, 모든 파일을 context로 넣으면 토큰 비용이 감당되지 않았습니다.
+
+### 해결 과정: 시스템으로서의 AI 설계
+
+단순한 챗봇이 아닌, **역할 기반 에이전트 시스템(Role-Based Agent System)**을 구축했습니다.
+
+1.  **Supervisor (지휘자)**: 사용자 요청의 크기(S/M/L)를 분석하여 작업 전략을 수립합니다.
+2.  **Dynamic Context Injection**: 작업에 필요한 문서(디자인 시스템 vs 아키텍처 문서)만 선별하여 프롬프트에 동적으로 주입하는 **T-shirt Sizing 전략**을 구현했습니다.
+3.  **Quality Gate**: Auditor 에이전트가 코드를 검수하지 않으면 커밋조차 불가능하도록 파이프라인을 강제했습니다.
 
 ### 성과
 
-| 지표               | Before | After | 개선         |
-| :----------------- | :----- | :---- | :----------- |
-| **초기 JS (gzip)** | 450KB  | 187KB | **60% 감소** |
-| **EditorPage**     | 251KB  | 131KB | **48% 감소** |
-| **ExportPage**     | 365KB  | 26KB  | **93% 감소** |
-| **캐시 효율성**    | ~40%   | ~85%  | **+45%p**    |
+- **환각 최소화**: 필요한 맥락만 제공하여 AI의 정확도를 비약적으로 높였습니다.
+- **비용 최적화**: 무분별한 토큰 사용을 막고 효율적인 엔지니어링 파이프라인을 정착시켰습니다.
 
 ---
 
-## 4. 🌳 트리 구조 계산 메모이제이션 (O(n log n) → O(1))
+## 5. 번들 사이즈 최적화와 사용자 배려
 
 ### 문제 상황
 
-문서 사이드바 렌더링 시, 클릭/호버 등 단순 인터랙션에도 `buildTree` 함수(O(n log n))가 매번 실행되어 불필요한 연산 부하 발생.
+초기 로딩 시 사용하지도 않는 무거운 라이브러리(D3, Tiptap 등)까지 모두 다운로드받느라 TTI(Time To Interactive)가 늦어지는 문제가 있었습니다.
 
 ### 해결 과정
 
-**참조 동등성(Referential Equality)**을 활용하여, 데이터(`documents` 배열)가 실제로 변경되었을 때만 트리 변환을 수행하도록 `useMemo` 적용.
-
-```typescript
-// Before: 렌더링마다 무거운 연산 실행
-const tree = buildTree(documents);
-
-// After: documents 배열의 "참조"가 바뀔 때만 재연산
-const tree = useMemo(() => buildTree(documents), [documents]);
-```
+`vite.config.ts`의 `manualChunks` 설정을 세밀하게 조정하여, 사용자가 실제로 해당 페이지(에디터, 관계도 등)에 진입할 때만 리소스를 로드하도록 **지연 로딩(Lazy Loading)**을 적용했습니다.
 
 ### 성과
 
-- **99% 연산 제거**: 데이터 변경 없는 인터랙션 시 연산 비용 **0ms**
-- **GC 부하 감소**: 매 렌더링마다 발생하던 불필요한 객체 생성/폐기 제거
-- **즉각적 반응성**: 노드 확장/축소 동작이 지연 없이 즉시 반영
+- **초기 번들 사이즈 30% 감소**: 필요한 것만 빠르게 보여주는 것이 사용자에 대한 배려임을 배웠습니다.
+- **캐시 효율 증대**: 라이브러리별로 청크를 나누어, 코드가 조금만 바뀌어도 전체를 다시 받는 비효율을 개선했습니다.
 
 ---
 
-## 5. Tiptap 에디터 인스턴스 안정화 (useRef 패턴)
+## 5. Tech Stack & Environment
 
-### 문제 상황
-
-Tiptap 에디터에서 부모 컴포넌트 리렌더링 시 `onUpdate` 콜백이 변경되어 에디터 인스턴스가 재생성되는 문제 발생. 이로 인해 타이핑 도중 **커서 위치 초기화** 및 **입력 씹힘** 현상 발생.
-
-### 해결 과정
-
-**Stable Callback Ref 패턴**으로 의존성과 콜백 최신성을 분리하여 해결.
-
-```typescript
-// After: ref.current만 갱신, 에디터는 최초 1회만 생성
-const onUpdateRef = useRef(onUpdate);
-
-useEffect(() => {
-  onUpdateRef.current = onUpdate;
-}, [onUpdate]);
-
-const editor = useEditor(
-  {
-    onUpdate: ({ editor }) => {
-      onUpdateRef.current?.(editor.getHTML());
-    },
-  },
-  [],
-); // 의존성 빈 배열 → 재생성 방지
-```
-
-### 성과
-
-- 에디터 재생성 **0회** 유지
-- 치명적인 입력 UX 버그(커서 튐, 씹힘) 완전 제거
+| 영역              | 기술 스택                                             |
+| :---------------- | :---------------------------------------------------- |
+| **Core**          | React 19, TypeScript 5.7, Vite                        |
+| **State**         | Zustand (Client State), TanStack Query (Server State) |
+| **Visualization** | HTML5 Canvas, D3.js, react-force-graph-2d             |
+| **Editor**        | Tiptap (ProseMirror 기반 Custom Extension 개발)       |
+| **DevOps**        | GitHub Actions, Docker, Smart-Commit Workflow         |
 
 ---
 
-## 6. 🚅 Optimistic UI (낙관적 업데이트)
-
-### 문제 상황
-
-문서 생성/삭제 시 서버 응답을 기다리는 동안 UI가 멈칫하여 사용자 경험 저해.
-
-### 해결 과정
-
-**TanStack Query**와 **Zustand**를 연동하여, 서버 요청과 동시에 로컬 UI 상태를 먼저 업데이트하고 실패 시 롤백하는 전략 채택.
-
-```typescript
-const deleteDocument = useCallback(async (id: string) => {
-  const previousData = queryClient.getQueryData(["documents", projectId]);
-
-  // Optimistic Update: 즉시 UI 반영
-  _delete(id);
-  queryClient.setQueryData(["documents", projectId], (old) =>
-    old.filter((d) => d.id !== id),
-  );
-
-  try {
-    await documentService.delete(id);
-  } catch (error) {
-    // Rollback
-    queryClient.setQueryData(["documents", projectId], previousData);
-    _create(deletedDoc);
-  }
-}, []);
-```
-
-### 성과
-
-- **체감 지연 Zero**: 네이티브 앱 수준의 즉각적인 반응성 확보
-
----
-
-## 7. 🖼 이미지 로딩 UX 최적화
-
-### 문제 상황
-
-이미지 로딩 전 **CLS(Layout Shift)** 현상과 고해상도 이미지의 깜빡임 발생.
-
-### 해결 과정
-
-`PerformanceImage` 컴포넌트 구현:
-
-1. **Aspect Ratio Reservation**: 비율 기반으로 공간을 미리 확보하여 CLS 방지 (Score 0).
-2. **Progressive Loading**: 저화질 썸네일(Blur) → 고화질 전환 애니메이션 적용.
-3. **Preload Hint**: 중요 이미지(`priority` 속성)에 대해 `<link rel="preload">` 동적 주입.
-
----
-
-## 8. 🔒 견고한 엔지니어링 (TypeScript & Memory)
-
-### TypeScript 타입 안전성 강화
-
-API 에러 처리 등에서 `any` 사용을 지양하고, **Type Guard** 함수(`axios.isAxiosError`)를 활용하여 런타임 안정성 확보.
-
-### 메모리 누수 방지
-
-D3 Selection이나 이벤트 리스너가 컴포넌트 언마운트 후에도 남아있는 문제를 해결하기 위해 `useEffect` cleanup 함수에서 명시적으로 캐시 및 리소스를 정리.
-
-```typescript
-useEffect(() => {
-  return () => groupSelectionCache.current.clear(); // Cleanup
-}, []);
-```
-
----
-
-## Tech Stack
-
-| 영역              | 기술                                       |
-| :---------------- | :----------------------------------------- |
-| **Core**          | React 19, TypeScript 5.7, Vite             |
-| **State**         | Zustand (17 stores), TanStack Query        |
-| **Visualization** | Canvas API, D3.js, react-force-graph-2d    |
-| **Editor**        | Tiptap (16개 커스텀 익스텐션), ProseMirror |
-| **Storage**       | IndexedDB (idb-keyval)                     |
-
----
-
-## 📊 핵심 성과 요약
-
-| 영역           | 개선 내용                        | 효과                                            |
-| :------------- | :------------------------------- | :---------------------------------------------- |
-| **Rendering**  | useCallback, RAF 최적화          | 60fps 안정화                                    |
-| **Tree Calc**  | useMemo 메모이제이션             | 연산 비용 99% 감소 (O(n log n) → O(1))          |
-| **Bundling**   | Manual Chunks, Lazy Load         | 초기 로딩 JS 사이즈 감소, 캐시 효율 증대        |
-| **UX/Network** | Optimistic UI Updates            | 체감 레이턴시 0ms, 즉각적 반응성                |
-| **DevOps**     | **Smart-Commit & Issue Linking** | **복잡한 이슈 트래킹 100% 자동화**              |
-| **Workflow**   | **Supervisor Agent**             | **Automated Workflow, "Aesthetic" 품질 표준화** |
+> **"기술은 결국 문제를 해결하기 위한 도구"**라는 마음으로, 화려한 기술보다는 실제 사용자와 팀에게 필요한 경험을 만드는 데 집중했습니다.
