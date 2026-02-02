@@ -319,7 +319,7 @@ export default function PortfolioPrint() {
                               className="p-3 border border-stone-100 rounded-xl bg-stone-50/30"
                             >
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[9px] font-black bg-stone-900 text-white px-1.5 py-0.5 rounded leading-none">
+                                <span className="text-[9px] font-black bg-stone-200 text-stone-800 px-1.5 py-0.5 rounded leading-none">
                                   {item.id}
                                 </span>
                                 <span className="text-xs font-black text-stone-900">
@@ -355,12 +355,12 @@ export default function PortfolioPrint() {
                     key={idx}
                     className="border border-stone-200 rounded-2xl overflow-hidden break-inside-avoid"
                   >
-                    <div className="px-5 py-2.5 bg-stone-900 text-white flex justify-between items-center">
+                    <div className="px-5 py-2.5 bg-stone-100 text-stone-900 border-b border-stone-200 flex justify-between items-center">
                       <h4 className="text-xs font-black tracking-tight">
                         {idx + 1}. {section.title}
                       </h4>
                       {section.impact && (
-                        <span className="text-[9px] font-black bg-white/10 px-2 py-0.5 rounded">
+                        <span className="text-[9px] font-black bg-white border border-stone-200 px-2 py-0.5 rounded text-stone-700">
                           RESULT: {section.impact}
                         </span>
                       )}
