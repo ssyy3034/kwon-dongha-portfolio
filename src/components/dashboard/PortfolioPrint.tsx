@@ -33,7 +33,7 @@ export default function PortfolioPrint() {
 
       {/* About */}
       <section className="mb-8">
-        <h2 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-3">
+        <h2 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-3">
           About
         </h2>
         <div className="flex flex-col gap-4">
@@ -91,7 +91,7 @@ export default function PortfolioPrint() {
 
       {/* Primary Skills Quick View */}
       <section className="mb-8">
-        <h2 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-3">
+        <h2 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-3">
           Core Expertise
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -112,7 +112,7 @@ export default function PortfolioPrint() {
 
       {/* Project Summaries */}
       <section className="mb-8">
-        <h2 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-4">
+        <h2 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-4">
           Key Projects
         </h2>
 
@@ -129,7 +129,7 @@ export default function PortfolioPrint() {
                     — {project.subtitle}
                   </span>
                 </div>
-                <span className="text-xs text-stone-400">{project.period}</span>
+                <span className="text-xs text-stone-500">{project.period}</span>
               </div>
 
               {/* Meta */}
@@ -144,7 +144,7 @@ export default function PortfolioPrint() {
 
               {/* Description */}
               <p className="text-sm text-stone-700 leading-relaxed mb-2">
-                <FormattedText text={project.description} />
+                <FormattedText noDark text={project.description} />
               </p>
 
               {/* Key Metrics */}
@@ -162,7 +162,7 @@ export default function PortfolioPrint() {
               )}
 
               {/* Tech Stack */}
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-stone-500">
                 {project.tech.join(" · ")}
               </p>
             </article>
@@ -242,7 +242,7 @@ export default function PortfolioPrint() {
                 </div>
               </div>
               <p className="text-sm text-stone-700 leading-relaxed font-medium max-w-3xl">
-                <FormattedText text={detail.overview} />
+                <FormattedText noDark text={detail.overview} />
               </p>
             </div>
 
@@ -250,7 +250,7 @@ export default function PortfolioPrint() {
             <div className="grid grid-cols-[1fr_250px] gap-8 mb-10 items-start">
               {/* Key Results - Visual Anchors */}
               <section className="break-inside-avoid">
-                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">
+                <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
                   Core Achievements & Impact
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -275,13 +275,13 @@ export default function PortfolioPrint() {
 
               {/* Tech Stack - Side Column for better space usage */}
               <section className="break-inside-avoid bg-stone-50 p-4 rounded-2xl border border-stone-100">
-                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">
+                <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
                   Tech Stack
                 </h3>
                 <div className="space-y-4">
                   {detail.techStack.map((stack, idx) => (
                     <div key={idx}>
-                      <p className="text-[9px] font-black text-stone-400 uppercase mb-1">
+                      <p className="text-[9px] font-black text-stone-500 uppercase mb-1">
                         {stack.category}
                       </p>
                       <p className="text-xs font-bold text-stone-800 leading-tight">
@@ -296,7 +296,7 @@ export default function PortfolioPrint() {
             {/* Technical Decisions (ADR) - Compact Row Based Layout */}
             {detail.decisions && (
               <section className="mb-10 break-inside-avoid">
-                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">
+                <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
                   Architectural Decision Records
                 </h3>
                 <div className="space-y-3">
@@ -346,7 +346,7 @@ export default function PortfolioPrint() {
 
             {/* Technical Deep Dive - Structured & Scannable */}
             <section className="break-inside-avoid">
-              <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">
+              <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
                 Technical Deep Dive (Case Studies)
               </h3>
               <div className="space-y-4">
@@ -371,7 +371,7 @@ export default function PortfolioPrint() {
                           Challenge
                         </p>
                         <p className="text-[11px] text-stone-700 leading-relaxed font-medium">
-                          <FormattedText text={section.challenge} />
+                          <FormattedText noDark text={section.challenge} />
                         </p>
                       </div>
                       <div>
@@ -379,7 +379,7 @@ export default function PortfolioPrint() {
                           Solution & Implementation
                         </p>
                         <p className="text-[11px] text-stone-900 leading-relaxed font-bold mb-3">
-                          <FormattedText text={section.solution} />
+                          <FormattedText noDark text={section.solution} />
                         </p>
                         {section.details && (
                           <div className="space-y-1.5">
@@ -388,10 +388,10 @@ export default function PortfolioPrint() {
                                 key={i}
                                 className="flex gap-2 text-[10px] text-stone-600 leading-normal"
                               >
-                                <span className="text-stone-300 font-black mt-px">
+                                <span className="text-stone-400 font-black mt-px">
                                   •
                                 </span>
-                                <FormattedText text={bullet} />
+                                <FormattedText noDark text={bullet} />
                               </div>
                             ))}
                           </div>
