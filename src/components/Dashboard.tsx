@@ -40,12 +40,7 @@ export default function Dashboard({
       ═══════════════════════════════════════════════════════════════ */}
       <section className="min-h-[100svh] flex flex-col no-print relative">
         <div className="flex-1 animate-fade-in-up opacity-0 fill-mode-forwards">
-          <Hero
-            totalActivity={data.totalActivity}
-            streak={data.streak}
-            radarData={data.radar}
-            heatmapData={data.heatmap}
-          />
+          <Hero streak={data.streak} heatmapData={data.heatmap} />
         </div>
 
         {/* Scroll Indicator */}
