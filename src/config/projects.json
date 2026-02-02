@@ -6,7 +6,7 @@
     "role": "Software Engineer",
     "period": "2025.12 - 2026.01",
     "team": "5인 팀 (Fullstack)",
-    "description": "D3.js 그래프 Canvas 전환(INP 16배 개선) 및 AI 에이전트 기반 개발 워크플로우 자동화. Vite 번들 최적화로 초기 로딩 60% 단축.",
+    "description": "D3.js 그래프 Canvas 전환(INP 16.3배 개선) 및 AI 에이전트 기반 개발 워크플로우 자동화. Vite 번들 최적화로 초기 로딩 58% 단축.",
     "metrics": [
       { "value": "1048 → 64ms", "label": "드래그 응답 (INP)" },
       { "value": "CLI & Agent", "label": "워크플로우 자동화" },
@@ -26,8 +26,8 @@
     "team": "2인 팀",
     "description": "Spring Boot + Python Flask 마이크로서비스 구조로 AI 연산 분리. Zustand로 전역 상태 관리, Docker Compose로 전체 서비스 구성.",
     "metrics": [
-      { "value": "3개 서비스", "label": "Spring, Flask, React" },
-      { "value": "6개 컨테이너", "label": "Docker Compose 구성" }
+      { "value": "30초+ 블로킹 방지", "label": "AI 연산 서비스 분리" },
+      { "value": "4단계 파이프라인", "label": "얼굴분석→이미지생성 자동화" }
     ],
     "tech": ["React", "Zustand", "Spring Boot", "Python", "Docker"],
     "link": "/projects/aidiary",

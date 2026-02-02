@@ -137,7 +137,7 @@
           "name": "Spring Boot",
           "slug": "springboot",
           "color": "6DB33F",
-          "description": "Layered Architecture 기반으로 API를 개발하며, 기본적인 트랜잭션 처리와 예외 핸들링을 경험했습니다."
+          "description": "Layered Architecture 기반으로 API를 개발하며, JWT 인증/인가 구현 및 트랜잭션 처리, 예외 핸들링을 경험했습니다."
         },
         {
           "name": "C",

@@ -3,9 +3,10 @@ import { ProjectDetail } from "@/types/project";
 export const projectDetails: Record<string, ProjectDetail> = {
   stolink: {
     id: "stolink",
-    tagline: "Canvas 마이그레이션을 통한 렌더링 최적화 및 End-to-End 성능 개선",
+    tagline:
+      "웹소설 인물 관계 시각화 서비스 개발: Canvas 마이그레이션, 성능 개선 및 인증 구현",
     overview:
-      "사용자 경험 향상을 위해 브라우저 렌더링 병목 해결부터 백엔드 쿼리 최적화까지, 서비스 전반의 기술적 난제를 End-to-End로 해결했습니다.",
+      "Stolink는 웹소설 작가들이 방대한 인물 관계와 세계관 설정을 직관적으로 관리할 수 있는 창작 도구입니다. 노드 증가에 따른 SVG 렌더링 성능 저하를 해결하기 위해 Canvas API로 시각화 엔진을 재설계하여 600+ 노드 환경에서 60FPS를 달성했습니다. 또한, 초기 로딩 속도 58% 단축 및 에디터 입력 지연을 제거하여 창작에 온전히 몰입할 수 있는 최적의 사용자 경험을 구축했습니다.",
 
     keyFocus: {
       headline: "핵심 성과 (Chrome DevTools 측정)",
@@ -14,11 +15,11 @@ export const projectDetails: Record<string, ProjectDetail> = {
           icon: "zap",
           title: "렌더링 성능 최적화",
           description:
-            "SVG 기반 렌더링을 Canvas API로 전환하여 대규모 데이터 상황에서의 인터랙션 성능을 획기적으로 개선했습니다.",
+            "SVG 기반 렌더링을 Canvas API로 전환하여 대규모 데이터 상황에서의 인터랙션 성능을 개선했습니다.",
         },
         {
           icon: "layers",
-          title: "초기 로딩 60% 감소",
+          title: "초기 로딩 58% 감소",
           description:
             "Vite manualChunks로 Export/Graph 라이브러리를 Lazy Load 처리. 초기 JS 450KB → 187KB(gzip) 달성했습니다.",
         },
@@ -30,87 +31,63 @@ export const projectDetails: Record<string, ProjectDetail> = {
         type: "initial",
         decision: "React 19 + Vite (SPA)",
         reason:
-          "SEO가 필요 없는 편집 도구 특성상 Next.js의 SSR 오버헤드보다는 SPA가 적합하다고 판단했습니다.",
-        tradeoff:
-          "빌드 속도 10배 개선을 얻었으나, 초기 로드 최적화(청크 분할) 과제가 추가되었습니다.",
+          "SEO가 필요 없는 편집 도구 특성상 Next.js의 SSR보다 CSR 방식이 적합하다고 판단했습니다.",
+        result:
+          "SSR/SSG 미지원으로 초기 로딩 시 빈 화면이 노출되지만, 편집 도구 특성상 SEO가 불필요하여 문제없음. Webpack 대비 HMR 10배 이상 향상.",
       },
       {
         id: "002",
         type: "initial",
-        decision: "Tailwind + shadcn/ui",
+        decision: "Zustand + React Query",
         reason:
-          "외부 패키지에 의존하기보다 코드를 직접 소유하고 수정할 수 있는 shadcn의 방식을 택했습니다.",
-        tradeoff:
-          "유틸리티 클래스로 인한 코드 복잡도는 높아졌지만, Paper 스타일의 미세 조정이 가능해졌습니다.",
+          "서버 상태와 UI 상태를 분리하고, 낙관적 업데이트나 트리 연산이 필요한 경우에만 Zustand로 동기화했습니다.",
+        result:
+          "Redux 대비 미들웨어 생태계가 작지만, 단순 UI 상태에는 Redux의 보일러플레이트가 과함. 낙관적 업데이트와 트리 연산 최적화 달성.",
       },
       {
         id: "003",
         type: "initial",
-        decision: "Zustand + React Query",
+        decision: "Tiptap (ProseMirror)",
         reason:
-          "서버 데이터(캐싱 필요)와 UI 상태(경량 필요)를 분할하여 Redux 대비 보일러플레이트를 80% 줄였습니다.",
-        tradeoff: "두 가지 도구를 모두 학습해야 하는 팀 비용이 발생했습니다.",
+          "#복선, @캐릭터와 같은 커스텀 문법 기능 구현을 위해 확장성이 높은 Tiptap을 도입했습니다.",
+        result:
+          "ProseMirror의 학습 곡선이 높지만, Draft.js/Quill로는 불가능한 커스텀 노드(React Component) 확장으로 인터랙티브 요소 구현.",
       },
       {
         id: "004",
         type: "initial",
-        decision: "Tiptap (ProseMirror)",
+        decision: "Spring Boot + FastAPI (Polyglot)",
         reason:
-          "단순 텍스트를 넘어 #복선, @캐릭터 같은 커스텀 문법을 구현하기 위해 ProseMirror 기반 확장성이 필수였습니다.",
-        tradeoff:
-          "Draft.js나 Quill보다 학습 곡선이 매우 높지만, 자유로운 토큰 렌더링이 가능해졌습니다.",
+          "비즈니스 로직은 Spring Boot로, AI 라이브러리 활용은 Python 기반 FastAPI로 역할을 분리했습니다.",
+        result:
+          "두 언어/런타임 관리로 인프라 복잡도 증가. Docker Compose로 환경을 통합하고, 각 서비스의 책임을 명확히 분리하여 관리.",
       },
       {
         id: "005",
         type: "initial",
-        decision: "Spring Boot + FastAPI (Polyglot)",
+        decision: "PostgreSQL + Neo4j (Hybrid)",
         reason:
-          "안정적인 비즈니스 로직(Spring)과 최신 AI 생태계 활용(FastAPI)을 위해 역할을 분리했습니다.",
-        tradeoff:
-          "두 가지 언어 스택을 유지보수해야 하는 인프라 복잡도가 증가했습니다.",
+          "소설의 정형 데이터와 복잡한 인물 관계(Graph)를 각각 최적의 DB로 처리하기 위해 혼용했습니다.",
+        result:
+          "이기종 DB 간 동기화 복잡도 증가. PostgreSQL은 소설/챕터 CRUD, Neo4j는 관계 탐색 전용으로 책임을 분리하여 동기화 지점 최소화.",
       },
       {
         id: "006",
-        type: "initial",
-        decision: "PostgreSQL + Neo4j (Hybrid)",
+        type: "development",
+        decision: "Canvas API Migration (vs SVG)",
         reason:
-          "정형 데이터의 무결성과 복잡한 인물 관계(Graph) 탐색 성능을 동시에 확보하고자 했습니다.",
-        tradeoff: "서로 다른 두 DB 간의 데이터 동기화 전략이 중요해졌습니다.",
+          "DOM 기반 SVG는 노드 30개부터 Reflow로 프레임 저하가 발생하여 Canvas로 전환했습니다.",
+        result:
+          "DOM 이벤트 위임 불가로 히트맵 감지 직접 구현 필요. react-force-graph-2d의 내장 히트맵 기능을 활용하여 해결, 600+ 노드에서 60FPS 유지.",
       },
       {
         id: "007",
         type: "development",
-        decision: "RabbitMQ 기반 비동기 메시징",
+        decision: "Vendor Chunk Splitting + Prefetch",
         reason:
-          "무거운 AI 분석 작업을 HTTP 동기 요청으로 처리할 때 발생하는 타임아웃과 스레드 고갈을 해결했습니다.",
-        tradeoff:
-          "메시지 브로커 운영 비용과 최종 일관성(Eventual Consistency) 처리가 필요합니다.",
-      },
-      {
-        id: "008",
-        type: "development",
-        decision: "D3.js Force Simulation",
-        reason:
-          "수동으로 노드를 배치하는 React Flow와 달리, 물리 시뮬레이션으로 관계를 유기적으로 배치했습니다.",
-        tradeoff:
-          "번들 크기를 59% 절감했으나, 5개의 커스텀 훅으로 시뮬레이션을 정밀 제어해야 하는 복잡도가 생겼습니다.",
-      },
-      {
-        id: "009",
-        type: "development",
-        decision: "LangGraph AI Pipeline",
-        reason:
-          "글쓰기 과정에서 설정을 자동 추출하여 작가의 데이터 관리 부담을 제거하고 핵심 가치를 구현했습니다.",
-        tradeoff: "",
-      },
-      {
-        id: "010",
-        type: "development",
-        decision: "13개 Vendor 청크 분할",
-        reason:
-          "90%의 사용자가 쓰지 않는 1.25MB의 Export 라이브러리가 초기 로딩을 방해하는 문제를 발견했습니다.",
-        tradeoff:
-          "빌드 시간은 9% 늘어났지만 초기 번들 로딩 속도를 1.5초(Fast 3G) 단축했습니다.",
+          "무거운 외부 라이브러리가 초기 로딩을 지연시켜 별도 청크로 분리하고 Lazy Loading을 적용했습니다.",
+        result:
+          "Lazy Loading으로 해당 페이지 진입 시 로딩 지연 발생. 마우스 호버 시 프리페칭을 시작하여 체감 로딩 시간 최소화. 초기 번들 450KB → 187KB(58% 감소).",
       },
     ],
 
@@ -120,46 +97,52 @@ export const projectDetails: Record<string, ProjectDetail> = {
         title: "도메인 시각화 엔진 최적화",
         subtitle: "Canvas API 마이그레이션",
         challenge:
-          "D3.js 기반 캐릭터 관계도에서 노드가 30개를 넘어서자 줌/팬 조작 시 FPS가 10 미만으로 하락했습니다. Chrome DevTools 프로파일링 결과, 매 프레임마다 수백 개 DOM 요소의 Style Recalculation에 935ms가 소요되고 있었습니다.",
+          "D3.js로 구현된 관계도에서 노드가 30개를 넘어서자, 줌/팬 인터랙션 시 FPS가 10 미만으로 떨어지는 성능 저하가 발생했습니다. 브라우저 렌더링 파이프라인 분석 결과, SVG(DOM) 방식은 매 프레임마다 수백 개의 DOM 요소를 다시 계산(Layout/Reflow)하는 것이 병목임을 확인했습니다.",
         solution:
-          "SVG(DOM) 기반 렌더링을 Canvas API(react-force-graph-2d)로 전면 전환했습니다. 단일 Canvas 레이어에서 일괄 드로잉하여 브라우저의 스타일 재계산 부하를 완전히 제거했습니다.",
+          "Retained Mode(SVG)에서 Immediate Mode(Canvas)로 렌더링 방식을 전환하여 DOM 부하를 완전히 제거했습니다. react-force-graph-2d 라이브러리를 커스터마이징하여 단일 Canvas 엘리먼트 위에서 모든 노드와 엣지를 픽셀 단위로 직접 제어하도록 아키텍처를 변경했습니다.",
         details: [
-          "Single Layer Rendering: 개별 DOM 노드 대신 Canvas 컨텍스트에서 Batch Drawing",
-          "Image Caching (useImageCache): 캐릭터 이미지를 텍스처로 메모리에 캐싱하여 드로잉 성능 최적화",
-          "Color-based Hit Detection: Canvas에서 클릭 이벤트 감지를 위한 O(1) 히트맵 구현 - 각 노드를 고유 색상으로 칠한 히든 캔버스에서 픽셀 색상으로 노드 ID 역추적",
+          "**Rendering Paradigm Shift**: 수백 개의 SVG DOM을 단 하나의 <canvas> 태그로 통합 (21배 규모에서도 메모리 사용량 오히려 감소)",
+          "**Batch Rendering**: 개별적으로 그려지던 노드들을 단일 렌더 루프(Render Loop)에서 일괄 처리하여 드로잉 콜 최소화",
+          "**Texture Caching**: 복잡한 캐릭터 이미지를 미리 비트맵으로 캐싱(Offscreen Canvas)하여 프레임당 연산 비용 제거",
         ],
         diagram: {
           type: "mermaid",
-          content: `graph TB
-  subgraph Before[Before: SVG/DOM]
-    A[Node 1] --> S1[Style Recalc]
-    B[Node 2] --> S1
-    C[Node N] --> S1
-    S1 --> R1[Reflow 935ms/frame]
+          content: `graph LR
+  subgraph Before["Before: SVG/DOM 기반"]
+    N1["DOM Node 1"] --> L["Layout Calculation"]
+    N2["DOM Node 2"] --> L
+    N_ALL["DOM Node N..."] --> L
+    L --> P["Paint"]
+    P --> C["Composite"]
+    note1["병목: 노드 = DOM 요소 (Memory Heavy)"]
   end
-  subgraph After[After: Canvas]
-    D[All Nodes] --> C1[Single Canvas]
-    C1 --> R2[GPU Rasterization ~0ms]
-  end`,
-          caption: "렌더링 파이프라인 비교",
+  subgraph After["After: Canvas 기반"]
+    JS["Js Data"] --> D["Draw Command"]
+    D --> C_ALL["Single Canvas Layer"]
+    C_ALL --> GPU["GPU Rasterization"]
+    note2["해결: 픽셀 데이터를 직접 제어 (Low Overhead)"]
+  end
+  C ~~~ JS`,
+          caption: "렌더링 파이프라인 아키텍처 변화",
         },
-        impact: "INP 1,048ms → 64ms",
+        impact:
+          "최대 500+ 노드에서도 60FPS 유지, INP 94% 개선 (1,048ms → 64ms)",
       },
       {
         id: "bundle-optimization",
-        title: "번들 최적화로 초기 로딩 60% 개선",
-        subtitle: "Vite Code Splitting",
+        title: "번들 최적화로 초기 로딩 58% 개선",
+        subtitle: "Vite Code Splitting + Prefetch",
         challenge:
           "프로덕션 빌드 후 Lighthouse 측정 시, 사용하지 않는 Export 라이브러리(docx 714KB, jspdf 341KB, epub-gen)가 초기 번들에 포함되어 로딩 지연 발생. 초기 JS 크기가 450KB(gzip)에 달했습니다.",
         solution:
-          "Vite의 manualChunks 설정으로 라이브러리를 용도별로 분리하고 Lazy Loading을 적용했습니다.",
+          "Vite의 manualChunks 설정으로 라이브러리를 용도별로 분리하고, Lazy Loading의 로딩 지연 문제는 마우스 호버 시 프리페칭으로 해결했습니다.",
         details: [
           "vendor-export (714KB): docx, jspdf, epub-gen → Export 페이지에서만 로드",
           "vendor-graph (61KB): D3, react-force-graph → 관계도 페이지에서만 로드",
           "vendor-editor-extensions (33KB): Tiptap 확장 → 에디터 페이지에서만 로드",
-          "캐시 효율성: 세분화된 청크로 코드 수정 시 변경된 청크만 재다운로드 (40% → 85%)",
+          "Hover Prefetch: 메뉴 호버 시 해당 청크 프리페칭 시작 → 클릭 시 즉시 렌더링",
         ],
-        impact: "초기 JS 450KB → 187KB",
+        impact: "초기 JS 450KB → 187KB, 페이지 전환 지연 최소화",
       },
       {
         id: "editor-stabilization",
@@ -168,7 +151,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
         challenge:
           "Tiptap(ProseMirror) 에디터에서 부모 컴포넌트가 리렌더링될 때마다 onUpdate 콜백이 새로 생성되어 에디터 인스턴스가 파괴/재생성되었습니다. 이로 인해 타이핑 도중 커서 위치가 초기화되고, 입력이 씹히는 치명적인 UX 문제가 발생했습니다.",
         solution:
-          "Stable Callback Ref 패턴을 적용하여 에디터의 의존성(Dependencies)과 콜백의 최신성(Freshness)을 분리했습니다. 함수 자체가 아닌 함수의 참조(ref)를 구독하게 하여 리렌더링 사이클을 끊었습니다.",
+          "useRef를 활용하여 에디터의 의존성과 콜백의 최신성을 분리했습니다. 콜백 함수 대신 ref를 구독하게 하여 리렌더링 사이클을 끊었습니다.",
         details: [
           "Before: useEditor({ onUpdate }, [onUpdate]) → 콜백 변경 시 에디터 전체 재생성",
           "After: onUpdateRef = useRef(callback) → ref.current만 갱신, 에디터는 최초 1회만 생성",
@@ -179,7 +162,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
       {
         id: "tree-memoization",
         title: "트리 조립 로직 및 메모이제이션 최적화",
-        subtitle: "O(n^2) → O(n) → O(1)",
+        subtitle: "O(n^2) → O(N)",
         challenge:
           "문서 트리 사이드바에서 노드 클릭/호버마다 Flat Array → Nested Tree 변환 함수(buildTree)가 매번 실행되었습니다. 초기 로직은 재귀 기반의 O(n^2) 연산으로, 문서 수백 개일 때 UI 반응성이 급격히 저하되었습니다.",
         solution:
@@ -189,7 +172,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
           "After: useMemo(() => buildTree(documents), [documents]) → 참조 변경 시에만 재연산",
           "불변성(Immutability) 원칙 덕분에 내용이 같으면 참조도 같음이 보장됨",
         ],
-        impact: "연산 비용 제거 (O(n^2) → O(1)), 반응성 극대화",
+        impact: "연산 비용 절감 (O(n^2) → O(N)), UI 반응성 향상",
         codeExample: {
           language: "typescript",
           caption: "HashMap 기반 O(n) 트리 조립 (Frontend)",
@@ -249,7 +232,7 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
         challenge:
           "5인 팀 개발 중 Git 숙련도 격차로 인한 브랜치 충돌, 이슈 트래킹 누락, 구두 합의된 컨벤션 미준수 등 협업 비효율이 발생했습니다. 특히 대규모 리팩토링 시 AI의 컨텍스트 한계로 인한 오류 제어가 어려웠습니다.",
         solution:
-          "코드베이스를 AI 친화적으로 구조화하는 'Context-as-a-Service' 전략을 도입하고, Supervisor-Worker 모델 기반의 Multi-Agent 워크플로우를 구축하여 개발 전 과정을 자동화했습니다.",
+          "작업 크기에 따라 필요한 컨텍스트만 동적으로 주입하는 구조를 설계하고, Supervisor-Worker 모델 기반의 Multi-Agent 워크플로우를 구축하여 개발 과정을 자동화했습니다.",
         details: [
           "**작업 분류 및 할당 (Supervisor)**: 작업의 크기를 분석해 필요한 정보만 골라주고, 가장 적합한 에이전트에게 일을 맡깁니다.",
           "**역할별 전문가 협업 (Specialized Workers)**: 구조 설계, 감성적 디자인, 미세 코드 수정 등 각자 맡은 분야만 전문적으로 처리합니다.",
@@ -269,7 +252,7 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
           "Canvas API 전환을 통한 대규모 노드 환경에서의 인터랙션 지연 제거",
       },
       {
-        metric: "450 → 190KB",
+        metric: "450 → 187KB",
         label: "초기 번들 크기",
         description:
           "Vite manualChunks로 Export/Graph 라이브러리 Lazy Loading 적용 (gzip 기준)",
@@ -281,7 +264,7 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
           "useRef 패턴으로 부모 리렌더링에도 Tiptap 인스턴스 유지, 커서 튐 현상 해결",
       },
       {
-        metric: "O(n^2) → O(1)",
+        metric: "O(n^2) → O(N)",
         label: "트리 최적화",
         description:
           "HashMap 기반 O(n) 조립 + useMemo로 데이터 변경 시에만 재구성",
@@ -321,94 +304,94 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
   aidiary: {
     id: "aidiary",
     tagline:
-      "Spring Boot + Python Flask 마이크로서비스, Docker Compose로 6개 컨테이너 구성",
+      "Spring Boot + Flask Polyglot 아키텍처로 AI 연산 분리 및 파이프라인 구축",
     overview:
-      "AI 기반 육아 기록 플랫폼의 기획부터 배포까지 담당했습니다. 프론트엔드에서는 사용자 UX를 고려한 상태 관리를, 백엔드에서는 Spring Boot와 Flask를 활용한 AI 파이프라인 아키텍처를 설계하여 대규모 연산 부하를 효율적으로 분산했습니다.",
+      "AI 기반 육아 기록 플랫폼의 기획부터 배포까지 담당했습니다. AI 이미지 생성이 30초 이상 소요되는 문제를 해결하기 위해 Spring Boot와 Flask를 분리하여 메인 서버 블로킹을 방지했고, 얼굴 특징 추출부터 DALL-E 3 이미지 생성까지 이어지는 AI 파이프라인을 구축했습니다.",
 
     keyFocus: {
       headline: "핵심 구현",
       points: [
         {
           icon: "layers",
-          title: "마이크로서비스 아키텍처",
+          title: "Polyglot 아키텍처",
           description:
-            "Spring Boot(비즈니스 로직) + Python Flask(AI 연산) + React 프론트엔드 3개 서비스 구성",
+            "AI 연산(Flask)을 분리하여 Spring Boot의 스레드 블로킹 방지. 각 언어의 강점을 적재적소에 활용",
         },
         {
           icon: "zap",
-          title: "Docker Compose 오케스트레이션",
+          title: "AI 파이프라인 구축",
           description:
-            "FE, BE, AI, DB, Prometheus, Grafana 6개 컨테이너를 단일 명령으로 구동",
+            "얼굴 분석 API → 특징 추출 → 프롬프트 생성 → DALL-E 3 이미지 생성까지 자동화",
         },
       ],
     },
 
     sections: [
       {
-        id: "client-state",
-        title: "클라이언트 상태 관리 아키텍처",
-        subtitle: "Zustand + Custom Hooks",
-        challenge:
-          "다수의 useState와 prop drilling으로 인해 상태 흐름을 파악하기 어려웠습니다. 같은 데이터를 여러 컴포넌트에서 중복 관리하고 있었습니다.",
-        solution:
-          "Zustand 스토어 기반으로 전역 상태를 일원화하고, Custom Hooks로 비즈니스 로직을 View에서 분리했습니다.",
-        details: [
-          "**Zustand** 스토어로 전역 상태 중앙 관리",
-          "**useCharacter.ts** 등 도메인별 `Custom Hooks`로 로직 분리",
-          "**Single Source of Truth** 원칙 적용",
-        ],
-        impact: "Prop Drilling 제거",
-      },
-      {
         id: "hybrid-architecture",
-        title: "Hybrid AI Architecture",
+        title: "Polyglot 아키텍처 설계",
         subtitle: "Spring Boot + Python Flask",
         challenge:
           "AI 이미지 생성(DALL-E 3)은 30초 이상 소요되는 작업입니다. 이를 메인 서버에서 처리하면 다른 요청이 블로킹됩니다.",
         solution:
-          "적재적소 원칙으로 서비스를 분리했습니다. Spring Boot는 비즈니스 로직과 인증, Python Flask는 AI/ML 라이브러리 활용에 집중합니다.",
+          "각 언어의 강점에 맞게 서비스를 분리했습니다. Spring Boot는 비즈니스 로직과 인증을, Python Flask는 AI 연산을 담당합니다.",
         details: [
-          "**Spring Boot**: 비즈니스 로직, 트랜잭션, 보안/인증",
-          "**Python Flask**: `face-cli`, `OpenAI API` 등 AI 연산",
-          "**RestTemplate**: 서비스 간 HTTP 통신",
+          "**Spring Boot**: 비즈니스 로직, JWT 인증, JPA 트랜잭션 처리",
+          "**Python Flask**: 얼굴 분석 API 호출, OpenAI API 연동",
+          "**RestTemplate**: 서비스 간 HTTP 통신으로 느슨한 결합 유지",
         ],
         impact: "AI 연산 분리로 메인 서버 블로킹 방지",
       },
       {
         id: "ai-pipeline",
-        title: "AI Pipeline 구축",
-        subtitle: "Face Analysis + DALL-E 3",
+        title: "AI 파이프라인 구축",
+        subtitle: "Face Analysis → DALL-E 3",
         challenge:
           "부모 사진으로 아이 얼굴을 예측하려면 단순 API 호출이 아닌 전처리 과정이 필요했습니다.",
         solution:
-          "huggingface의 `face-analyzer`로 얼굴 특징점을 추출하고, 이를 자연어 프롬프트로 변환하여 DALL-E 3에 전달하는 파이프라인을 구축했습니다.",
+          "AILab Tools API로 얼굴 특징점을 추출하고, 이를 자연어 프롬프트로 변환하여 DALL-E 3에 전달하는 파이프라인을 구축했습니다.",
         details: [
-          "**Input**: 부모 사진 업로드",
-          "**Preprocessing**: `face-analyzer`로 얼굴 특징점 추출",
-          "**Prompt Engineering**: 필요한 특징 데이터 정제 → 자연어 프롬프트 변환",
-          "**Generation**: `DALL-E 3` API 호출",
+          "**Face Analysis**: AILab Tools API로 눈 크기, 코 모양, 얼굴형 등 특징 추출",
+          "**Feature Extraction**: 추출된 데이터를 표준화된 형식으로 정제",
+          "**Prompt Engineering**: 유전적 영향 가중치를 반영한 DALL-E 최적화 프롬프트 생성",
+          "**Image Generation**: DALL-E 3 API 호출 및 결과 저장",
         ],
         impact: "얼굴 특징 기반 프롬프트 자동 생성",
+      },
+      {
+        id: "client-state",
+        title: "클라이언트 상태 관리",
+        subtitle: "Zustand + localStorage",
+        challenge:
+          "다수의 useState와 prop drilling으로 인해 상태 흐름을 파악하기 어려웠습니다.",
+        solution:
+          "Zustand 스토어 기반으로 전역 상태를 일원화하고, localStorage persist로 인증 상태를 유지했습니다.",
+        details: [
+          "**useAuthStore**: JWT 토큰 관리 및 localStorage 영속화",
+          "**useDiaryStore**: 페이지네이션 상태 관리",
+          "**Axios Interceptor**: 401 응답 시 자동 로그아웃 처리",
+        ],
+        impact: "Prop Drilling 제거, 페이지 새로고침에도 인증 상태 유지",
       },
     ],
 
     achievements: [
       {
-        metric: "3개 서비스",
-        label: "마이크로서비스 구성",
+        metric: "Polyglot",
+        label: "서비스 분리",
         description:
-          "Spring Boot + Python Flask + React 독립적인 서비스로 분리",
+          "Spring Boot(비즈니스) + Flask(AI) 분리로 30초+ AI 연산의 블로킹 방지",
       },
       {
-        metric: "6개 컨테이너",
-        label: "Docker Compose",
-        description: "FE, BE, AI, DB, Prometheus, Grafana 전체 인프라 구성",
+        metric: "4단계",
+        label: "AI 파이프라인",
+        description: "얼굴 분석 → 특징 추출 → 프롬프트 생성 → 이미지 생성 자동화",
       },
       {
         metric: "Zustand",
         label: "상태 관리",
         description:
-          "Custom Hooks 패턴으로 전역 상태 관리 및 비즈니스 로직 분리",
+          "localStorage persist로 인증 상태 유지, Axios Interceptor로 토큰 자동 처리",
       },
     ],
 
@@ -422,145 +405,14 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
         items: ["React 18", "TypeScript", "Zustand", "TailwindCSS"],
       },
       { category: "Database", items: ["MariaDB"] },
-      { category: "AI/ML", items: ["OpenAI API (DALL-E 3)", "face-cli"] },
+      { category: "AI/ML", items: ["OpenAI API (DALL-E 3, GPT-4)", "AILab Tools API"] },
       {
         category: "Infra",
-        items: ["Docker", "Docker Compose", "Prometheus", "Grafana"],
+        items: ["Docker", "Docker Compose"],
       },
     ],
   },
 
-  garden: {
-    id: "garden",
-    tagline:
-      "마크다운 파싱 + GitHub GraphQL API로 학습 데이터 자동 수집 및 시각화",
-    overview:
-      "옵시디언 마크다운 파일과 GitHub 기여 데이터를 자동으로 수집·분석하여 학습 현황을 시각화하는 개인 대시보드입니다. gray-matter로 frontmatter를 파싱하고, GitHub GraphQL API로 365일 기여 데이터를 조회하여 통합 히트맵을 생성합니다.",
-
-    keyFocus: {
-      headline: "핵심 기술 구현",
-      points: [
-        {
-          icon: "database",
-          title: "데이터 파이프라인 자동화",
-          description:
-            "glob으로 마크다운 파일 탐색 → gray-matter로 파싱 → [[wikilink]] 정규식 추출 → GitHub API 병합까지 완전 자동화된 데이터 수집 파이프라인을 구축했습니다.",
-        },
-        {
-          icon: "zap",
-          title: "Next.js SSR + 동적 import",
-          description:
-            "react-force-graph-3d(WebGL)가 서버에서 렌더링 불가한 문제를 dynamic import + ssr: false로 해결하여 3D 지식 그래프를 구현했습니다.",
-        },
-      ],
-    },
-
-    sections: [
-      {
-        id: "markdown-pipeline",
-        title: "마크다운 파싱 파이프라인",
-        subtitle: "gray-matter + glob",
-        challenge:
-          "옵시디언의 수백 개 마크다운 파일에서 frontmatter(태그, 날짜)와 [[wikilink]] 연결 관계를 추출하여 그래프 데이터로 변환해야 했습니다.",
-        solution:
-          "glob으로 파일 시스템을 탐색하고, gray-matter로 YAML frontmatter를 파싱한 뒤, 정규식으로 wikilink를 추출하는 파이프라인을 구축했습니다.",
-        details: [
-          "glob('**/*.md'): .obsidian 폴더 제외하고 모든 마크다운 파일 탐색",
-          "gray-matter: YAML frontmatter에서 tags, date, title 추출",
-          "정규식 /\\[\\[(.*?)\\]\\]/g: wikilink 파싱 후 노드 간 링크 생성",
-          "fs.statSync: frontmatter에 날짜 없으면 파일 생성일(birthtime) 폴백",
-        ],
-        impact: "수백 개 파일 자동 처리",
-      },
-      {
-        id: "github-graphql",
-        title: "GitHub GraphQL API 연동",
-        subtitle: "Octokit + 데이터 병합",
-        challenge:
-          "로컬 마크다운 데이터만으로는 실제 개발 활동을 반영할 수 없어, GitHub 기여 데이터를 통합해야 했습니다. REST API로는 contribution calendar 조회가 불가능했습니다.",
-        solution:
-          "Octokit의 GraphQL 클라이언트로 contributionsCollection을 조회하고, 로컬 데이터와 병합하여 통합 히트맵을 생성했습니다.",
-        details: [
-          "GraphQL query: user → contributionsCollection → contributionCalendar → weeks → contributionDays",
-          "365일 기여 데이터를 한 번의 API 호출로 조회 (REST 대비 효율적)",
-          "heatmapMap 객체로 로컬 + GitHub 데이터 병합 (동일 날짜는 합산)",
-          "스트릭 계산: 날짜 역순 정렬 후 연속 기여일 카운트",
-        ],
-        impact: "365일 기여 데이터 통합",
-      },
-      {
-        id: "competency-algorithm",
-        title: "역량 평가 알고리즘 설계",
-        subtitle: "Goldilocks Scoring",
-        challenge:
-          "단순 키워드 카운트로는 학습 깊이를 반영할 수 없고, 100점에 쉽게 도달하면 동기 부여가 되지 않는 문제가 있었습니다.",
-        solution:
-          "Diminishing Returns 로직을 적용하여 85점 이후 상승폭을 1/5로 제한하고, 문서 길이와 코드 블록 유무에 따른 가중치를 부여했습니다.",
-        details: [
-          "Base Score(35점): 활동이 있으면 최소 35%부터 시작",
-          "Coverage Score: 카테고리별 키워드 커버리지 (최대 35점)",
-          "Depth Score: 문서 길이 2000자 이상(+0.8), 코드 블록 포함(+0.7) 가중치",
-          "Diminishing Returns: 85점 초과 시 (rawScore - 85) / 5로 상승폭 제한",
-        ],
-        impact: "85점 이후 성장 난이도 5배",
-      },
-      {
-        id: "3d-graph-ssr",
-        title: "3D 지식 그래프 SSR 해결",
-        subtitle: "Next.js dynamic import",
-        challenge:
-          "react-force-graph-3d는 WebGL/Three.js 기반으로 window 객체가 필요하여 Next.js 서버 사이드 렌더링 시 'window is not defined' 에러가 발생했습니다.",
-        solution:
-          "Next.js의 dynamic import와 ssr: false 옵션으로 클라이언트에서만 컴포넌트를 로드하고, 로딩 중에는 fallback UI를 표시했습니다.",
-        details: [
-          "dynamic(() => import('react-force-graph-3d'), { ssr: false })",
-          "loading 콜백으로 'BOOTING NEURAL LINK...' 로딩 UI 제공",
-          "useMemo로 날짜별 필터링 데이터 메모이제이션",
-          "setInterval로 시간순 노드 등장 애니메이션 구현",
-        ],
-        impact: "SSR 에러 해결 + 3D 시각화",
-      },
-    ],
-
-    achievements: [
-      {
-        metric: "365일",
-        label: "GitHub 기여 데이터",
-        description:
-          "GraphQL API 단일 호출로 1년치 contribution calendar 조회 및 통합",
-      },
-      {
-        metric: "5x",
-        label: "85점 이후 난이도",
-        description:
-          "Diminishing Returns 로직으로 완벽한 척 방지, 지속적 성장 동기 부여",
-      },
-      {
-        metric: "0",
-        label: "수동 입력",
-        description: "마크다운 파싱 + GitHub API로 학습 데이터 완전 자동 수집",
-      },
-      {
-        metric: "SSR",
-        label: "에러 해결",
-        description:
-          "dynamic import로 WebGL 기반 3D 그래프의 서버 렌더링 문제 해결",
-      },
-    ],
-
-    techStack: [
-      {
-        category: "Framework",
-        items: ["Next.js 15", "React 19", "TypeScript"],
-      },
-      { category: "Data", items: ["gray-matter", "glob", "Octokit (GraphQL)"] },
-      {
-        category: "Visualization",
-        items: ["Recharts", "react-force-graph-3d", "react-calendar-heatmap"],
-      },
-      { category: "Styling", items: ["TailwindCSS", "Framer Motion"] },
-    ],
-  },
 };
 
 export function getProjectDetail(id: string): ProjectDetail | undefined {
