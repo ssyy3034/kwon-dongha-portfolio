@@ -45,7 +45,7 @@ export interface Decision {
   type: "initial" | "development";
   decision: string;
   reason: string;
-  tradeoff?: string;
+  result?: string;
 }
 
 export interface ProjectDetail {
