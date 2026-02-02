@@ -7,7 +7,6 @@ import {
   Home,
   FileDown,
   Globe,
-  FileText,
   Moon,
   Sun,
 } from "lucide-react";
@@ -27,6 +26,7 @@ export default function Nav() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line
     setMounted(true);
   }, []);
 
@@ -44,25 +44,28 @@ export default function Nav() {
     window.print();
   }, []);
 
-  const handleHashClick = useCallback((e: React.MouseEvent, href: string) => {
-    if (href.startsWith("/#")) {
-      e.preventDefault();
-      const hash = href.slice(1); // "/#projects" -> "#projects"
+  const handleHashClick = useCallback(
+    (e: React.MouseEvent, href: string) => {
+      if (href.startsWith("/#")) {
+        e.preventDefault();
+        const hash = href.slice(1); // "/#projects" -> "#projects"
 
-      if (pathname === "/") {
-        // 같은 페이지면 바로 스크롤
-        const element = document.querySelector(hash);
-        element?.scrollIntoView({ behavior: "smooth" });
-      } else {
-        // 다른 페이지면 홈으로 이동 후 스크롤
-        router.push("/");
-        setTimeout(() => {
+        if (pathname === "/") {
+          // 같은 페이지면 바로 스크롤
           const element = document.querySelector(hash);
           element?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        } else {
+          // 다른 페이지면 홈으로 이동 후 스크롤
+          router.push("/");
+          setTimeout(() => {
+            const element = document.querySelector(hash);
+            element?.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }
       }
-    }
-  }, [pathname, router]);
+    },
+    [pathname, router],
+  );
 
   const navItems = [
     { name: "홈", href: "/", icon: Home },
@@ -132,7 +135,9 @@ export default function Nav() {
                 <Component
                   key={item.name}
                   {...props}
-                  onClick={(e: React.MouseEvent) => handleHashClick(e, item.href)}
+                  onClick={(e: React.MouseEvent) =>
+                    handleHashClick(e, item.href)
+                  }
                   className={clsx(
                     "flex items-center gap-2 text-sm font-bold transition-all duration-300 relative py-2",
                     isActive
@@ -163,9 +168,15 @@ export default function Nav() {
               <span className="absolute inset-0 bg-gradient-to-br from-amber-400/0 to-amber-500/0 group-hover:from-amber-400/10 group-hover:to-amber-500/20 dark:group-hover:from-amber-400/20 dark:group-hover:to-amber-500/30 transition-all duration-300" />
               {mounted ? (
                 (resolvedTheme || theme) === "dark" ? (
-                  <Sun size={18} className="relative z-10 transition-transform duration-300 group-hover:rotate-45" />
+                  <Sun
+                    size={18}
+                    className="relative z-10 transition-transform duration-300 group-hover:rotate-45"
+                  />
                 ) : (
-                  <Moon size={18} className="relative z-10 transition-transform duration-300 group-hover:-rotate-12" />
+                  <Moon
+                    size={18}
+                    className="relative z-10 transition-transform duration-300 group-hover:-rotate-12"
+                  />
                 )
               ) : (
                 <Moon size={18} className="relative z-10" />
@@ -209,7 +220,9 @@ export default function Nav() {
                 <Component
                   key={item.name}
                   {...props}
-                  onClick={(e: React.MouseEvent) => handleHashClick(e, item.href)}
+                  onClick={(e: React.MouseEvent) =>
+                    handleHashClick(e, item.href)
+                  }
                   className={clsx(
                     "flex-1 flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all duration-300",
                     isActive
@@ -234,9 +247,15 @@ export default function Nav() {
           >
             {mounted ? (
               (resolvedTheme || theme) === "dark" ? (
-                <Sun size={20} className="text-amber-400 transition-transform duration-300 group-hover:rotate-45 group-hover:scale-110" />
+                <Sun
+                  size={20}
+                  className="text-amber-400 transition-transform duration-300 group-hover:rotate-45 group-hover:scale-110"
+                />
               ) : (
-                <Moon size={20} className="text-white transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
+                <Moon
+                  size={20}
+                  className="text-white transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110"
+                />
               )
             ) : (
               <Moon size={20} className="text-white" />

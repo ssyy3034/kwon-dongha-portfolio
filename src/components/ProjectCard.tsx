@@ -2,7 +2,6 @@
 
 import { Project } from "@/data/project-data";
 import { ExternalLink, Github, FileText, ArrowUpRight } from "lucide-react";
-import Link from "next/link";
 
 interface ProjectCardProps {
   project: Project;
@@ -17,10 +16,14 @@ const CATEGORY_LABELS: Record<Project["category"], string> = {
 };
 
 const CATEGORY_COLORS: Record<Project["category"], string> = {
-  frontend: "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-700",
-  fullstack: "bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-700",
-  backend: "bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700",
-  other: "bg-stone-50 dark:bg-stone-800 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-700",
+  frontend:
+    "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-700",
+  fullstack:
+    "bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-700",
+  backend:
+    "bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700",
+  other:
+    "bg-stone-50 dark:bg-stone-800 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-700",
 };
 
 export default function ProjectCard({
@@ -101,7 +104,9 @@ export default function ProjectCard({
                         Q. {item.challenge}
                       </p>
                       <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
-                        <span className="text-amber-600 dark:text-amber-500 font-semibold">A.</span>{" "}
+                        <span className="text-amber-600 dark:text-amber-500 font-semibold">
+                          A.
+                        </span>{" "}
                         {item.approach} → {item.result}
                       </p>
                     </div>

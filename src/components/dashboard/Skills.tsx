@@ -39,6 +39,7 @@ export default function Skills() {
                   className="group flex flex-col gap-3 p-5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-lg dark:hover:shadow-stone-900/50 transition-all duration-300"
                 >
                   <div className="flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={getBadgeUrl(skill.name, skill.slug, skill.color)}
                       alt={skill.name}

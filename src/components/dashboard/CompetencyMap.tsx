@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   PolarRadiusAxis,
 } from "recharts";
-import { Brain, ArrowUpRight } from "lucide-react";
+import { Brain } from "lucide-react";
 
 interface CompetencyMapProps {
   data: any[];

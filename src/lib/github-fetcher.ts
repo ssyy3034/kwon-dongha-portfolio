@@ -31,7 +31,7 @@ export async function fetchGitHubContributions(
     try {
       const { data: user } = await octokit.rest.users.getAuthenticated();
       login = user.login;
-    } catch (e) {
+    } catch {
       console.error(
         "Could not get authenticated user and no username provided.",
       );

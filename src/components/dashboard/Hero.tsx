@@ -9,7 +9,6 @@ import {
   Code,
   Lightbulb,
   Users,
-  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -20,14 +19,10 @@ import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 
 export default function Hero({
-  totalActivity,
   streak,
-  radarData,
   heatmapData,
 }: {
-  totalActivity: number;
   streak: number;
-  radarData: any[];
   heatmapData: any[];
 }) {
   const { profile } = useProfile();
@@ -316,7 +311,7 @@ export default function Hero({
                     y: rect.top,
                   });
                 }}
-                onMouseLeave={(event: any, value: any) => {
+                onMouseLeave={() => {
                   setTooltip({ ...tooltip, show: false });
                 }}
               />
