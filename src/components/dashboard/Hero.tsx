@@ -62,12 +62,7 @@ export default function Hero({
             {/* Actual text with gradient */}
             <span className="col-start-1 row-start-1 bg-clip-text text-transparent bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 font-black leading-[0.9] tracking-tight pb-2">
               <Typewriter
-                words={[
-                  profile.role,
-                  "Frontend Developer",
-                  "Problem Solver",
-                  "Team Player",
-                ]}
+                words={["Software Engineer", "Problem Solver", "Team Player"]}
                 loop={true}
                 delaySpeed={3000}
                 typeSpeed={80}
@@ -92,7 +87,7 @@ export default function Hero({
               const titles = [
                 {
                   icon: Code,
-                  label: "Frontend Developer",
+                  label: "Software Engineer",
                   color: "text-blue-500 dark:text-blue-400",
                   bg: "bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800",
                 },
@@ -128,21 +123,20 @@ export default function Hero({
                     <h3 className={`font-black text-lg mb-2 ${info.color}`}>
                       {info.label}
                     </h3>
-                    <p className="text-stone-600 dark:text-stone-400 text-[15px] leading-relaxed font-medium">
-                      {p.text.split("{highlight}").map((part, index, array) => (
-                        <span key={index}>
-                          {part.replace("{name}", profile.name)}
-                          {index < array.length - 1 && (
-                            <span className="relative inline-block px-1 mx-0.5">
-                              <span className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(253,224,71,0.6)_2%,rgba(253,224,71,0.6)_98%,transparent_100%)] dark:bg-[linear-gradient(90deg,transparent_0%,rgba(253,224,71,0.3)_2%,rgba(253,224,71,0.3)_98%,transparent_100%)] -skew-x-3 -rotate-1 rounded-sm mix-blend-multiply dark:mix-blend-normal decoration-clone" />
-                              <span className="relative text-stone-900 dark:text-stone-100 font-bold">
-                                {p.highlight}
-                              </span>
-                            </span>
-                          )}
-                        </span>
-                      ))}
+                    <p className="text-stone-900 dark:text-stone-100 font-bold mb-2 text-[15px]">
+                      {p.slogan}
                     </p>
+                    <ul className="space-y-1.5">
+                      {p.points.map((point, idx) => (
+                        <li
+                          key={idx}
+                          className="flex gap-2 text-stone-600 dark:text-stone-400 text-[14px] leading-relaxed font-medium"
+                        >
+                          <span className="shrink-0 text-amber-500">•</span>
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               );
@@ -196,7 +190,9 @@ export default function Hero({
               {/* Avatar Slot */}
               <div className="w-40 min-h-[160px] shrink-0 rounded-2xl overflow-hidden border border-stone-100 dark:border-stone-700 shadow-inner bg-stone-100 dark:bg-stone-800 relative group-hover:scale-[1.02] transition-transform duration-500 flex items-center justify-center">
                 <div className="absolute inset-0 bg-stone-200 dark:bg-stone-700 flex items-center justify-center pointer-events-none">
-                  <span className="text-6xl text-stone-400 dark:text-stone-500">👤</span>
+                  <span className="text-6xl text-stone-400 dark:text-stone-500">
+                    👤
+                  </span>
                 </div>
                 {/* Fallback pattern if no image, or actual image */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}

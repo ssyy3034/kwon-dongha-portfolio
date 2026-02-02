@@ -98,7 +98,9 @@ export default function ProjectDetailPage({ params }: PageProps) {
   if (!detail) return notFound();
 
   const Icon = icons[project.id as keyof typeof icons] || Code2;
-  const colors = accentColors[project.color as keyof typeof accentColors];
+  const colors =
+    accentColors[project.color as keyof typeof accentColors] ||
+    accentColors.amber;
 
   // 다음/이전 프로젝트
   const currentIndex = projects.findIndex((p) => p.id === id);
@@ -152,7 +154,9 @@ export default function ProjectDetailPage({ params }: PageProps) {
                 >
                   Project
                 </span>
-                <span className="text-stone-400 dark:text-stone-500 text-sm">{project.period}</span>
+                <span className="text-stone-400 dark:text-stone-500 text-sm">
+                  {project.period}
+                </span>
               </div>
 
               {/* Title */}
@@ -207,7 +211,10 @@ export default function ProjectDetailPage({ params }: PageProps) {
                 <div className="space-y-5">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                      <Briefcase size={18} className="text-stone-600 dark:text-stone-400" />
+                      <Briefcase
+                        size={18}
+                        className="text-stone-600 dark:text-stone-400"
+                      />
                     </div>
                     <div>
                       <p className="text-xs text-stone-500 dark:text-stone-400 font-semibold">
@@ -221,7 +228,10 @@ export default function ProjectDetailPage({ params }: PageProps) {
 
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                      <Calendar size={18} className="text-stone-600 dark:text-stone-400" />
+                      <Calendar
+                        size={18}
+                        className="text-stone-600 dark:text-stone-400"
+                      />
                     </div>
                     <div>
                       <p className="text-xs text-stone-500 dark:text-stone-400 font-semibold">
@@ -235,7 +245,10 @@ export default function ProjectDetailPage({ params }: PageProps) {
 
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                      <Users size={18} className="text-stone-600 dark:text-stone-400" />
+                      <Users
+                        size={18}
+                        className="text-stone-600 dark:text-stone-400"
+                      />
                     </div>
                     <div>
                       <p className="text-xs text-stone-500 dark:text-stone-400 font-semibold">
@@ -284,6 +297,35 @@ export default function ProjectDetailPage({ params }: PageProps) {
           </div>
         </motion.section>
 
+        {/* Tech Stack - Moved to Top for Context */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-24"
+        >
+          <div className="flex items-center gap-4 mb-8">
+            <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+              핵심 기술 스택
+            </h2>
+            <div className="flex-1 h-[1px] bg-stone-200 dark:bg-stone-700" />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {detail.techStack.flatMap((stack) =>
+              stack.items.map((item) => (
+                <span
+                  key={item}
+                  className="px-4 py-2 bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 text-sm font-bold rounded-xl border border-stone-200 dark:border-stone-700 shadow-sm"
+                >
+                  {item}
+                </span>
+              )),
+            )}
+          </div>
+        </motion.section>
+
         {/* Key Focus (if exists) */}
         {detail.keyFocus && (
           <motion.section
@@ -306,7 +348,8 @@ export default function ProjectDetailPage({ params }: PageProps) {
 
                 <div className="grid md:grid-cols-2 gap-8">
                   {detail.keyFocus.points.map((point, idx) => {
-                    const FocusIcon = focusIcons[point.icon];
+                    const FocusIcon =
+                      focusIcons[point.icon as keyof typeof focusIcons] || Zap;
                     return (
                       <div key={idx} className="space-y-4">
                         <div className="flex items-center gap-3">
@@ -323,6 +366,148 @@ export default function ProjectDetailPage({ params }: PageProps) {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            </div>
+          </motion.section>
+        )}
+
+        {/* 기술적 의사 결정 - Categorized Layout */}
+        {detail.decisions && (
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-24"
+          >
+            <div className="flex items-center gap-4 mb-12">
+              <h2
+                className="text-3xl md:text-4xl font-black text-stone-900 dark:text-stone-100"
+                style={{ fontFamily: "var(--font-editorial)" }}
+              >
+                기술적 의사 결정
+              </h2>
+              <div className="flex-1 h-[1px] bg-stone-300 dark:bg-stone-700" />
+              <span className="text-sm font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
+                ADR History
+              </span>
+            </div>
+
+            <div className="space-y-16">
+              {/* Category 1: Initial Selection */}
+              <div>
+                <div className="flex items-center gap-3 mb-8">
+                  <div className={`w-2 h-6 rounded-full ${colors.bg}`} />
+                  <h3 className="text-2xl font-black text-stone-800 dark:text-stone-200 tracking-tight">
+                    초기 기술 선택 (Framework & Core)
+                  </h3>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {detail.decisions
+                    .filter((d) => d.type === "initial")
+                    .map((item) => (
+                      <div
+                        key={item.id}
+                        className="group bg-white dark:bg-stone-900/40 rounded-[32px] border border-stone-200 dark:border-stone-800 p-8 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                      >
+                        <div className="flex items-center gap-4 mb-6">
+                          <span
+                            className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${colors.light} ${colors.text} text-[10px] font-black border ${colors.border}`}
+                          >
+                            {item.id}
+                          </span>
+                          <h4 className="text-lg font-black text-stone-900 dark:text-stone-100 tracking-tight">
+                            {item.decision}
+                          </h4>
+                        </div>
+                        <div className="space-y-6 flex-1">
+                          <div>
+                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-2">
+                              Context & Reason
+                            </p>
+                            <p className="text-stone-600 dark:text-stone-400 text-sm leading-relaxed break-keep">
+                              {item.reason}
+                            </p>
+                          </div>
+                          {item.tradeoff && (
+                            <div
+                              className={`p-5 rounded-2xl ${colors.light} border ${colors.border} border-dashed`}
+                            >
+                              <p
+                                className={`text-[10px] font-black ${colors.text} uppercase tracking-widest mb-2`}
+                              >
+                                Trade-off & Result
+                              </p>
+                              <p
+                                className={`text-sm ${colors.text} leading-relaxed opacity-90 break-keep font-medium`}
+                              >
+                                {item.tradeoff}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Category 2: Development Process */}
+              <div>
+                <div className="flex items-center gap-3 mb-8">
+                  <div
+                    className={`w-2 h-6 rounded-full bg-stone-400 dark:bg-stone-600`}
+                  />
+                  <h3 className="text-2xl font-black text-stone-800 dark:text-stone-200 tracking-tight">
+                    개발 과정에서의 기술적 결정
+                  </h3>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {detail.decisions
+                    .filter((d) => d.type === "development")
+                    .map((item) => (
+                      <div
+                        key={item.id}
+                        className="group bg-white dark:bg-stone-900/40 rounded-[32px] border border-stone-200 dark:border-stone-800 p-8 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                      >
+                        <div className="flex items-center gap-4 mb-6">
+                          <span
+                            className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${colors.light} ${colors.text} text-[10px] font-black border ${colors.border}`}
+                          >
+                            {item.id}
+                          </span>
+                          <h4 className="text-lg font-black text-stone-900 dark:text-stone-100 tracking-tight">
+                            {item.decision}
+                          </h4>
+                        </div>
+                        <div className="space-y-6 flex-1">
+                          <div>
+                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-2">
+                              Problem & Solution
+                            </p>
+                            <p className="text-stone-600 dark:text-stone-400 text-sm leading-relaxed break-keep">
+                              {item.reason}
+                            </p>
+                          </div>
+                          {item.tradeoff && (
+                            <div
+                              className={`p-5 rounded-2xl ${colors.light} border ${colors.border} border-dashed`}
+                            >
+                              <p
+                                className={`text-[10px] font-black ${colors.text} uppercase tracking-widest mb-2`}
+                              >
+                                Trade-off & Result
+                              </p>
+                              <p
+                                className={`text-sm ${colors.text} leading-relaxed opacity-90 break-keep font-medium`}
+                              >
+                                {item.tradeoff}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
@@ -404,7 +589,10 @@ export default function ProjectDetailPage({ params }: PageProps) {
                     <div className="mb-10">
                       <div className="flex items-center gap-2 mb-4">
                         <div className="w-6 h-6 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                          <Target size={14} className="text-red-600 dark:text-red-500" />
+                          <Target
+                            size={14}
+                            className="text-red-600 dark:text-red-500"
+                          />
                         </div>
                         <p className="text-xs font-bold text-red-600 dark:text-red-500 uppercase tracking-wider">
                           Challenge
@@ -435,14 +623,14 @@ export default function ProjectDetailPage({ params }: PageProps) {
                       {/* Details */}
                       {section.details && section.details.length > 0 && (
                         <div className="pl-8 space-y-3">
-                          {section.details.map((detail, i) => (
+                          {section.details.map((bullet, i) => (
                             <div key={i} className="flex items-start gap-3">
                               <ChevronRight
                                 size={18}
                                 className={`${colors.text} shrink-0 mt-0.5`}
                               />
                               <p className="text-stone-700 dark:text-stone-300 leading-relaxed">
-                                <FormattedText text={detail} />
+                                <FormattedText text={bullet} />
                               </p>
                             </div>
                           ))}
@@ -476,7 +664,9 @@ export default function ProjectDetailPage({ params }: PageProps) {
         >
           <div className="flex items-center gap-3 mb-8">
             <Trophy size={20} className={colors.text} />
-            <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">Key Results</h2>
+            <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+              Key Results
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -505,33 +695,6 @@ export default function ProjectDetailPage({ params }: PageProps) {
           </div>
         </motion.section>
 
-        {/* Tech Stack - 간결한 인라인 태그 */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-24"
-        >
-          <div className="flex items-center gap-4 mb-8">
-            <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">Tech Stack</h2>
-            <div className="flex-1 h-[1px] bg-stone-200 dark:bg-stone-700" />
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {detail.techStack.flatMap((stack) =>
-              stack.items.map((item) => (
-                <span
-                  key={item}
-                  className="px-3 py-1.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-sm font-medium rounded-lg border border-stone-200 dark:border-stone-700"
-                >
-                  {item}
-                </span>
-              )),
-            )}
-          </div>
-        </motion.section>
-
         {/* Next Project - PDF에서 제외 */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
@@ -554,7 +717,9 @@ export default function ProjectDetailPage({ params }: PageProps) {
               >
                 {nextProject.title}
               </h3>
-              <p className="text-stone-600 dark:text-stone-400">{nextProject.subtitle}</p>
+              <p className="text-stone-600 dark:text-stone-400">
+                {nextProject.subtitle}
+              </p>
             </div>
             <div className="w-14 h-14 rounded-full border-2 border-stone-200 dark:border-stone-700 group-hover:border-stone-900 dark:group-hover:border-amber-500 group-hover:bg-stone-900 dark:group-hover:bg-amber-500 flex items-center justify-center transition-all duration-300">
               <ArrowRight

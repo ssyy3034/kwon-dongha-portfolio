@@ -8,6 +8,10 @@ import React from "react";
  */
 export default function FormattedText({ text }: { text: string }) {
   if (!text) return null;
+  if (typeof text !== "string") {
+    console.error("FormattedText received invalid input:", text);
+    return <span>{JSON.stringify(text)}</span>;
+  }
 
   const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g);
 
@@ -16,7 +20,10 @@ export default function FormattedText({ text }: { text: string }) {
       {parts.map((part, i) => {
         if (part.startsWith("**") && part.endsWith("**")) {
           return (
-            <strong key={i} className="font-bold text-stone-900 dark:text-stone-100">
+            <strong
+              key={i}
+              className="font-bold text-stone-900 dark:text-stone-100"
+            >
               {part.slice(2, -2)}
             </strong>
           );

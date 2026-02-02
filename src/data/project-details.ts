@@ -3,19 +3,18 @@ import { ProjectDetail } from "@/types/project";
 export const projectDetails: Record<string, ProjectDetail> = {
   stolink: {
     id: "stolink",
-    tagline:
-      "SVG→Canvas 마이그레이션으로 INP 16배 개선, 번들 최적화로 초기 로딩 60% 단축",
+    tagline: "Canvas 마이그레이션을 통한 렌더링 최적화 및 End-to-End 성능 개선",
     overview:
-      "5인 개발팀의 웹소설 작가용 플랫폼에서 프론트엔드 전체를 담당했습니다. 노드 30개에서 멈추던 관계도 그래프를 600개 이상 처리 가능하도록 Canvas로 전환하고, Vite 번들 최적화로 초기 로딩을 60% 단축했습니다.",
+      "사용자 경험 향상을 위해 브라우저 렌더링 병목 해결부터 백엔드 쿼리 최적화까지, 서비스 전반의 기술적 난제를 End-to-End로 해결했습니다.",
 
     keyFocus: {
       headline: "핵심 성과 (Chrome DevTools 측정)",
       points: [
         {
           icon: "zap",
-          title: "INP 16.3배 향상",
+          title: "렌더링 성능 최적화",
           description:
-            "SVG→Canvas 마이그레이션으로 응답 속도 1,048ms → 64ms 개선. Style Recalculation 935ms/frame을 0ms로 완전 제거했습니다.",
+            "SVG 기반 렌더링을 Canvas API로 전환하여 대규모 데이터 상황에서의 인터랙션 성능을 획기적으로 개선했습니다.",
         },
         {
           icon: "layers",
@@ -25,12 +24,101 @@ export const projectDetails: Record<string, ProjectDetail> = {
         },
       ],
     },
+    decisions: [
+      {
+        id: "001",
+        type: "initial",
+        decision: "React 19 + Vite (SPA)",
+        reason:
+          "SEO가 필요 없는 편집 도구 특성상 Next.js의 SSR 오버헤드보다는 SPA가 적합하다고 판단했습니다.",
+        tradeoff:
+          "빌드 속도 10배 개선을 얻었으나, 초기 로드 최적화(청크 분할) 과제가 추가되었습니다.",
+      },
+      {
+        id: "002",
+        type: "initial",
+        decision: "Tailwind + shadcn/ui",
+        reason:
+          "외부 패키지에 의존하기보다 코드를 직접 소유하고 수정할 수 있는 shadcn의 방식을 택했습니다.",
+        tradeoff:
+          "유틸리티 클래스로 인한 코드 복잡도는 높아졌지만, Paper 스타일의 미세 조정이 가능해졌습니다.",
+      },
+      {
+        id: "003",
+        type: "initial",
+        decision: "Zustand + React Query",
+        reason:
+          "서버 데이터(캐싱 필요)와 UI 상태(경량 필요)를 분할하여 Redux 대비 보일러플레이트를 80% 줄였습니다.",
+        tradeoff: "두 가지 도구를 모두 학습해야 하는 팀 비용이 발생했습니다.",
+      },
+      {
+        id: "004",
+        type: "initial",
+        decision: "Tiptap (ProseMirror)",
+        reason:
+          "단순 텍스트를 넘어 #복선, @캐릭터 같은 커스텀 문법을 구현하기 위해 ProseMirror 기반 확장성이 필수였습니다.",
+        tradeoff:
+          "Draft.js나 Quill보다 학습 곡선이 매우 높지만, 자유로운 토큰 렌더링이 가능해졌습니다.",
+      },
+      {
+        id: "005",
+        type: "initial",
+        decision: "Spring Boot + FastAPI (Polyglot)",
+        reason:
+          "안정적인 비즈니스 로직(Spring)과 최신 AI 생태계 활용(FastAPI)을 위해 역할을 분리했습니다.",
+        tradeoff:
+          "두 가지 언어 스택을 유지보수해야 하는 인프라 복잡도가 증가했습니다.",
+      },
+      {
+        id: "006",
+        type: "initial",
+        decision: "PostgreSQL + Neo4j (Hybrid)",
+        reason:
+          "정형 데이터의 무결성과 복잡한 인물 관계(Graph) 탐색 성능을 동시에 확보하고자 했습니다.",
+        tradeoff: "서로 다른 두 DB 간의 데이터 동기화 전략이 중요해졌습니다.",
+      },
+      {
+        id: "007",
+        type: "development",
+        decision: "RabbitMQ 기반 비동기 메시징",
+        reason:
+          "무거운 AI 분석 작업을 HTTP 동기 요청으로 처리할 때 발생하는 타임아웃과 스레드 고갈을 해결했습니다.",
+        tradeoff:
+          "메시지 브로커 운영 비용과 최종 일관성(Eventual Consistency) 처리가 필요합니다.",
+      },
+      {
+        id: "008",
+        type: "development",
+        decision: "D3.js Force Simulation",
+        reason:
+          "수동으로 노드를 배치하는 React Flow와 달리, 물리 시뮬레이션으로 관계를 유기적으로 배치했습니다.",
+        tradeoff:
+          "번들 크기를 59% 절감했으나, 5개의 커스텀 훅으로 시뮬레이션을 정밀 제어해야 하는 복잡도가 생겼습니다.",
+      },
+      {
+        id: "009",
+        type: "development",
+        decision: "LangGraph AI Pipeline",
+        reason:
+          "글쓰기 과정에서 설정을 자동 추출하여 작가의 데이터 관리 부담을 제거하고 핵심 가치를 구현했습니다.",
+        tradeoff: "",
+      },
+      {
+        id: "010",
+        type: "development",
+        decision: "13개 Vendor 청크 분할",
+        reason:
+          "90%의 사용자가 쓰지 않는 1.25MB의 Export 라이브러리가 초기 로딩을 방해하는 문제를 발견했습니다.",
+        tradeoff:
+          "빌드 시간은 9% 늘어났지만 초기 번들 로딩 속도를 1.5초(Fast 3G) 단축했습니다.",
+      },
+    ],
 
     sections: [
       {
         id: "canvas-migration",
-        title: "SVG → Canvas 마이그레이션",
-        subtitle: "렌더링 성능 16배 개선",
+        title: "도메인 시각화 엔진 최적화",
+        subtitle: "Canvas API 마이그레이션",
         challenge:
           "D3.js 기반 캐릭터 관계도에서 노드가 30개를 넘어서자 줌/팬 조작 시 FPS가 10 미만으로 하락했습니다. Chrome DevTools 프로파일링 결과, 매 프레임마다 수백 개 DOM 요소의 Style Recalculation에 935ms가 소요되고 있었습니다.",
         solution:
@@ -90,18 +178,69 @@ export const projectDetails: Record<string, ProjectDetail> = {
       },
       {
         id: "tree-memoization",
-        title: "트리 변환 메모이제이션",
-        subtitle: "O(n log n) → O(1)",
+        title: "트리 조립 로직 및 메모이제이션 최적화",
+        subtitle: "O(n^2) → O(n) → O(1)",
         challenge:
-          "문서 트리 사이드바에서 노드 클릭/호버마다 Flat Array → Nested Tree 변환 함수(buildTree)가 매번 실행되었습니다. Map 생성 O(n) + 관계 연결 O(n) + 정렬 O(n log n) 과정으로, 문서 수백 개일 때 단순 클릭에도 15~20ms 연산이 발생하여 UI 반응성이 저하되었습니다.",
+          "문서 트리 사이드바에서 노드 클릭/호버마다 Flat Array → Nested Tree 변환 함수(buildTree)가 매번 실행되었습니다. 초기 로직은 재귀 기반의 O(n^2) 연산으로, 문서 수백 개일 때 UI 반응성이 급격히 저하되었습니다.",
         solution:
-          "useMemo와 참조 동등성(Referential Equality)을 활용하여 데이터가 실제로 변경되었을 때만 트리 변환을 수행하도록 최적화했습니다.",
+          "HashMap 기반의 O(n) 트리 조립 로직을 도입하고, useMemo와 참조 동등성을 활용하여 데이터 변경 시에만 재연산하도록 최적화했습니다.",
         details: [
           "Before: 렌더링마다 buildTree(documents) 실행 → 매번 15~20ms 소요",
           "After: useMemo(() => buildTree(documents), [documents]) → 참조 변경 시에만 재연산",
           "불변성(Immutability) 원칙 덕분에 내용이 같으면 참조도 같음이 보장됨",
         ],
-        impact: "연산 비용 제거 (O(n log n) → O(1)), 반응성 극대화",
+        impact: "연산 비용 제거 (O(n^2) → O(1)), 반응성 극대화",
+        codeExample: {
+          language: "typescript",
+          caption: "HashMap 기반 O(n) 트리 조립 (Frontend)",
+          code: `// O(n^2) 재귀 대신 HashMap을 사용하여 O(n)으로 변환
+const buildTree = (docs: Document[]) => {
+  const map = new Map<string, TreeItem>();
+  const roots: TreeItem[] = [];
+
+  // 1. 모든 노드를 Map에 등록 (O(n))
+  docs.forEach(doc => map.set(doc.id, { ...doc, children: [] }));
+
+  // 2. Map 참조를 통해 부모-자식 관계 연결 (O(n))
+  docs.forEach(doc => {
+    const item = map.get(doc.id)!;
+    if (!doc.parentId) roots.push(item);
+    else map.get(doc.parentId)?.children.push(item);
+  });
+  return roots;
+};`,
+        },
+      },
+      {
+        id: "backend-optimization",
+        title: "API 응답 성능 최적화",
+        subtitle: "N+1 쿼리 해결 및 트리 구조 개선",
+        challenge:
+          "계층형 문서 구조를 조회할 때, 각 문서의 부모를 찾기 위해 Lazy Loading이 발생하여 문서 100개 조회 시 101번의 쿼리가 실행되는 N+1 문제가 발생했습니다. 이로 인해 API 응답 속도가 450ms까지 저하되었습니다.",
+        solution:
+          "JPA의 JOIN FETCH를 사용하여 연관된 부모 엔티티를 단일 쿼리로 조회하고, DB 부하를 줄이기 위해 애플리케이션 메모리(HashMap)에서 O(N)으로 트리를 조립하는 방식으로 변경했습니다.",
+        details: [
+          "**Fetch Join**: `LEFT JOIN FETCH d.parent`로 N+1 문제 원천 차단 (쿼리 1회로 감소)",
+          "**In-Memory Tree**: `HashMap<UUID, DTO>`를 활용하여 O(N^2) 중첩 루프를 제거하고 O(N)으로 최적화",
+          "**Role Separation**: DB는 단순 조회, 복잡한 연산은 WAS가 담당하여 스케일 아웃이 용이한 구조 확립",
+        ],
+        impact: "쿼리 99% 감소, 응답 속도 18배(450ms → 25ms) 개선",
+        codeExample: {
+          language: "java",
+          caption: "JPA Fetch Join & In-Memory Tree Assembly",
+          code: `// 1. Repository: Fetch Join으로 N+1 해결 (Query 101회 -> 1회)
+@Query("SELECT d FROM Document d LEFT JOIN FETCH d.parent WHERE d.project = :p")
+List<Document> findAllWithParent(@Param("p") Project project);
+
+// 2. Service: In-Memory Tree Assembly (O(N))
+Map<UUID, DocumentDto> dtoMap = docs.stream()
+    .collect(Collectors.toMap(Document::getId, DocumentDto::from));
+
+docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
+    if (doc.getParent() == null) roots.add(dtoMap.get(doc.getId()));
+    else dtoMap.get(doc.getParent().getId()).children.add(dtoMap.get(doc.getId()));
+});`,
+        },
       },
       {
         id: "ai-workflow",
@@ -124,10 +263,10 @@ export const projectDetails: Record<string, ProjectDetail> = {
 
     achievements: [
       {
-        metric: "1048 → 64ms",
-        label: "드래그 응답 시간",
+        metric: "FPS 개선",
+        label: "렌더링 성능",
         description:
-          "SVG→Canvas 전환으로 DOM 조작 제거, Chrome DevTools Performance 탭에서 측정",
+          "Canvas API 전환을 통한 대규모 노드 환경에서의 인터랙션 지연 제거",
       },
       {
         metric: "450 → 190KB",
@@ -142,24 +281,40 @@ export const projectDetails: Record<string, ProjectDetail> = {
           "useRef 패턴으로 부모 리렌더링에도 Tiptap 인스턴스 유지, 커서 튐 현상 해결",
       },
       {
-        metric: "O(n log n) → O(1)",
-        label: "트리 변환 최적화",
-        description: "useMemo + 참조 동등성으로 데이터 변경 시에만 트리 재구성",
+        metric: "O(n^2) → O(1)",
+        label: "트리 최적화",
+        description:
+          "HashMap 기반 O(n) 조립 + useMemo로 데이터 변경 시에만 재구성",
       },
     ],
 
     techStack: [
-      { category: "Core", items: ["React 19", "TypeScript 5.7", "Vite"] },
-      { category: "State", items: ["Zustand (17 stores)", "TanStack Query"] },
+      {
+        category: "Backend",
+        items: ["Spring Boot 3.4", "FastAPI", "RabbitMQ"],
+      },
+      {
+        category: "Frontend",
+        items: [
+          "React 19",
+          "TypeScript 5.9",
+          "Vite",
+          "Zustand",
+          "TanStack Query",
+        ],
+      },
       {
         category: "Visualization",
         items: ["Canvas API", "D3.js", "react-force-graph-2d"],
       },
       {
         category: "Editor",
-        items: ["Tiptap (16개 커스텀 익스텐션)", "ProseMirror"],
+        items: ["Tiptap", "ProseMirror"],
       },
-      { category: "Storage", items: ["IndexedDB (idb-keyval)"] },
+      {
+        category: "AI / Database",
+        items: ["LangGraph", "PostgreSQL", "Neo4j"],
+      },
     ],
   },
 
@@ -168,7 +323,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
     tagline:
       "Spring Boot + Python Flask 마이크로서비스, Docker Compose로 6개 컨테이너 구성",
     overview:
-      "AI 기반 육아 기록 플랫폼의 전체 스택을 담당했습니다. 프론트엔드에서는 Zustand + Custom Hooks로 상태를 관리하고, 백엔드에서는 Spring Boot와 Python Flask를 분리하여 AI 연산과 비즈니스 로직을 분리했습니다.",
+      "AI 기반 육아 기록 플랫폼의 기획부터 배포까지 담당했습니다. 프론트엔드에서는 사용자 UX를 고려한 상태 관리를, 백엔드에서는 Spring Boot와 Flask를 활용한 AI 파이프라인 아키텍처를 설계하여 대규모 연산 부하를 효율적으로 분산했습니다.",
 
     keyFocus: {
       headline: "핵심 구현",
@@ -190,8 +345,8 @@ export const projectDetails: Record<string, ProjectDetail> = {
 
     sections: [
       {
-        id: "frontend-state",
-        title: "프론트엔드 상태 관리 구조화",
+        id: "client-state",
+        title: "클라이언트 상태 관리 아키텍처",
         subtitle: "Zustand + Custom Hooks",
         challenge:
           "다수의 useState와 prop drilling으로 인해 상태 흐름을 파악하기 어려웠습니다. 같은 데이터를 여러 컴포넌트에서 중복 관리하고 있었습니다.",
@@ -263,7 +418,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
         items: ["Java 17", "Spring Boot 3.4", "Python 3.9", "Flask"],
       },
       {
-        category: "Frontend",
+        category: "Client-side",
         items: ["React 18", "TypeScript", "Zustand", "TailwindCSS"],
       },
       { category: "Database", items: ["MariaDB"] },

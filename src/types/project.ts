@@ -40,6 +40,14 @@ export interface Achievement {
   description: string;
 }
 
+export interface Decision {
+  id: string;
+  type: "initial" | "development";
+  decision: string;
+  reason: string;
+  tradeoff?: string;
+}
+
 export interface ProjectDetail {
   id: string;
   // 확장된 개요
@@ -48,6 +56,9 @@ export interface ProjectDetail {
 
   // 핵심 포커스 (선택적 - 주요 프로젝트용)
   keyFocus?: KeyFocus;
+
+  // 기술적 의사 결정 (ADR 요약)
+  decisions?: Decision[];
 
   // 문제 해결 섹션들
   sections: ProblemSolution[];

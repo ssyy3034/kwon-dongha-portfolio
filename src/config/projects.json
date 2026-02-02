@@ -2,10 +2,10 @@
   {
     "id": "stolink",
     "title": "StoLink",
-    "subtitle": "웹소설 작가용 에디터 프론트엔드",
-    "role": "Frontend Developer",
+    "subtitle": "웹소설 작가용 에디터 성능 최적화",
+    "role": "Software Engineer",
     "period": "2025.12 - 2026.01",
-    "team": "5인 팀 (FE 전담)",
+    "team": "5인 팀 (Software Engineering / Performance)",
     "description": "D3.js 그래프 Canvas 전환(INP 16배 개선) 및 AI 에이전트 기반 개발 워크플로우 자동화. Vite 번들 최적화로 초기 로딩 60% 단축.",
     "metrics": [
       { "value": "1048 → 64ms", "label": "드래그 응답 (INP)" },
@@ -21,7 +21,7 @@
     "id": "aidiary",
     "title": "Aidiary",
     "subtitle": "AI 기반 육아 기록 플랫폼",
-    "role": "Full-stack Developer",
+    "role": "Software Engineer",
     "period": "2025.03 - 2025.06",
     "team": "3인 팀",
     "description": "Spring Boot + Python Flask 마이크로서비스 구조로 AI 연산 분리. Zustand로 전역 상태 관리, Docker Compose로 전체 서비스 구성.",
