@@ -21,9 +21,13 @@ export default function Mermaid({ chart }: MermaidProps) {
     if (ref.current) {
       ref.current.removeAttribute("data-processed");
       // Use mermaid.run to process specific nodes after hydration
-      mermaid.run({
-        nodes: [ref.current],
-      });
+      try {
+        mermaid.run({
+          nodes: [ref.current],
+        });
+      } catch (err) {
+        console.error("Mermaid rendering error:", err);
+      }
     }
   }, [chart]);
 

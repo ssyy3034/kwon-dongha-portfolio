@@ -430,19 +430,19 @@ export default function ProjectDetailPage({ params }: PageProps) {
                               {item.reason}
                             </p>
                           </div>
-                          {item.tradeoff && (
+                          {item.result && (
                             <div
                               className={`p-5 rounded-2xl ${colors.light} border ${colors.border} border-dashed`}
                             >
                               <p
                                 className={`text-[10px] font-black ${colors.text} uppercase tracking-widest mb-2`}
                               >
-                                Trade-off & Result
+                                Result
                               </p>
                               <p
                                 className={`text-sm ${colors.text} leading-relaxed opacity-90 break-keep font-medium`}
                               >
-                                {item.tradeoff}
+                                {item.result}
                               </p>
                             </div>
                           )}
@@ -489,19 +489,19 @@ export default function ProjectDetailPage({ params }: PageProps) {
                               {item.reason}
                             </p>
                           </div>
-                          {item.tradeoff && (
+                          {item.result && (
                             <div
                               className={`p-5 rounded-2xl ${colors.light} border ${colors.border} border-dashed`}
                             >
                               <p
                                 className={`text-[10px] font-black ${colors.text} uppercase tracking-widest mb-2`}
                               >
-                                Trade-off & Result
+                                Result
                               </p>
                               <p
                                 className={`text-sm ${colors.text} leading-relaxed opacity-90 break-keep font-medium`}
                               >
-                                {item.tradeoff}
+                                {item.result}
                               </p>
                             </div>
                           )}

@@ -329,10 +329,10 @@ export default function PortfolioPrint() {
                               <p className="text-[10px] text-stone-600 leading-relaxed mb-1.5">
                                 {item.reason}
                               </p>
-                              {item.tradeoff && (
+                              {item.result && (
                                 <p className="text-[10px] text-amber-700 font-bold leading-tight border-t border-amber-100/50 pt-1.5 mt-1.5 flex gap-1">
                                   <span className="shrink-0">→</span>
-                                  <span>{item.tradeoff}</span>
+                                  <span>{item.result}</span>
                                 </p>
                               )}
                             </div>
