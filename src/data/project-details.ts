@@ -306,7 +306,7 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
     tagline:
       "Spring Boot + Flask Polyglot 아키텍처로 AI 연산 분리 및 파이프라인 구축",
     overview:
-      "AI 기반 육아 기록 플랫폼의 기획부터 배포까지 담당했습니다. AI 이미지 생성이 30초 이상 소요되는 문제를 해결하기 위해 Spring Boot와 Flask를 분리하여 메인 서버 블로킹을 방지했고, 얼굴 특징 추출부터 DALL-E 3 이미지 생성까지 이어지는 AI 파이프라인을 구축했습니다.",
+      "AI 기반 육아 기록 플랫폼의 기획부터 개발까지 담당했습니다. AI 이미지 생성이 30초 이상 소요되는 문제를 해결하기 위해 Spring Boot와 Flask를 분리하여 메인 서버 블로킹을 방지했고, 얼굴 특징 추출부터 DALL-E 3 이미지 생성까지 이어지는 AI 파이프라인을 구축했습니다.",
 
     keyFocus: {
       headline: "핵심 구현",
@@ -385,7 +385,8 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
       {
         metric: "4단계",
         label: "AI 파이프라인",
-        description: "얼굴 분석 → 특징 추출 → 프롬프트 생성 → 이미지 생성 자동화",
+        description:
+          "얼굴 분석 → 특징 추출 → 프롬프트 생성 → 이미지 생성 자동화",
       },
       {
         metric: "Zustand",
@@ -405,14 +406,16 @@ docs.forEach(doc -> { // HashMap 참조로 부모-자식 연결 비용 최소화
         items: ["React 18", "TypeScript", "Zustand", "TailwindCSS"],
       },
       { category: "Database", items: ["MariaDB"] },
-      { category: "AI/ML", items: ["OpenAI API (DALL-E 3, GPT-4)", "AILab Tools API"] },
+      {
+        category: "AI/ML",
+        items: ["OpenAI API (DALL-E 3, GPT-4)", "AILab Tools API"],
+      },
       {
         category: "Infra",
         items: ["Docker", "Docker Compose"],
       },
     ],
   },
-
 };
 
 export function getProjectDetail(id: string): ProjectDetail | undefined {
