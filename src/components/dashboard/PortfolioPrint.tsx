@@ -316,7 +316,7 @@ export default function PortfolioPrint() {
                               className="p-3 border border-stone-100 rounded-xl bg-stone-50/30"
                             >
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[9px] font-black bg-stone-200 text-stone-800 px-1.5 py-0.5 rounded leading-none">
+                                <span className="text-[9px] font-black bg-stone-200 text-stone-800 px-1.5 py-0.5 rounded leading-none whitespace-nowrap shrink-0">
                                   {item.id}
                                 </span>
                                 <span className="text-xs font-black text-stone-900">

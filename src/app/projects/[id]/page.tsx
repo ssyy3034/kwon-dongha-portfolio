@@ -415,7 +415,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                       >
                         <div className="flex items-center gap-4 mb-6">
                           <span
-                            className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${colors.light} ${colors.text} text-[10px] font-black border ${colors.border}`}
+                            className={`inline-flex items-center justify-center w-auto px-2 h-8 rounded-lg ${colors.light} ${colors.text} text-[10px] font-black border ${colors.border} whitespace-nowrap`}
                           >
                             {item.id}
                           </span>
@@ -474,7 +474,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                       >
                         <div className="flex items-center gap-4 mb-6">
                           <span
-                            className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${colors.light} ${colors.text} text-[10px] font-black border ${colors.border}`}
+                            className={`inline-flex items-center justify-center w-auto px-2 h-8 rounded-lg ${colors.light} ${colors.text} text-[10px] font-black border ${colors.border} whitespace-nowrap`}
                           >
                             {item.id}
                           </span>
