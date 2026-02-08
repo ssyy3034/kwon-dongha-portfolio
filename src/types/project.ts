@@ -28,7 +28,14 @@ export interface ProblemSolution {
 export interface KeyFocus {
   headline: string;
   points: {
-    icon: "layers" | "zap" | "shield" | "target" | "cpu" | "database";
+    icon:
+      | "layers"
+      | "zap"
+      | "shield"
+      | "target"
+      | "cpu"
+      | "database"
+      | "smartphone";
     title: string;
     description: string;
   }[];
