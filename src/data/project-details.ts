@@ -6,14 +6,14 @@ export const projectDetails: Record<string, ProjectDetail> = {
     tagline:
       "웹소설 작가를 위한 세컨드 브레인 서비스입니다. 에디터에서 집필하면 AI가 글을 분석하고, 월드 페이지에서 인물·관계·사건을 시각화해 볼 수 있습니다. 작성한 글을 바로 배포할 수 있는 sto-read 서비스도 함께 제공해, 독자가 접속해 읽을 수 있습니다.",
     overview:
-      "5인 팀에서 프론트엔드를 담당했습니다. 인물 관계도 응답속도를 420ms에서 64ms로 개선하고, 초기 번들을 58% 줄여 첫 로딩을 빠르게 만들었습니다. Git 워크플로우 자동화 도구를 만들어 팀 전체의 개발 효율도 높였습니다.",
+      "5인 팀에서 프론트엔드를 담당했습니다. 인물 관계도 응답속도를 420 ms에서 64 ms로 개선하고, 초기 번들을 58% 줄여 첫 로딩을 빠르게 만들었습니다. Git 워크플로우 자동화 도구를 만들어 팀 전체의 개발 효율도 높였습니다.",
 
     keyFocus: {
       headline: "내가 해결한 문제들",
       points: [
         {
           icon: "zap",
-          title: "인물 관계도 응답속도 420ms → 64ms",
+          title: "인물 관계도 응답속도 420 ms → 64 ms",
           description:
             "등장인물이 많아지면 관계도 화면이 멈추는 문제가 있었습니다. 그리는 방식을 SVG에서 Canvas로 바꿔서 해결했습니다.",
         },
@@ -81,7 +81,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
         reason:
           "처음에 React Flow로 인물 관계도를 만들었는데, 등장인물이 많아지면 SVG DOM이 늘어나 느려지고 레이아웃 제어에도 한계가 있었습니다.",
         result:
-          "Canvas 전환으로 응답속도가 420ms → 64ms로 개선됐고, D3.js 물리 엔진으로 인물들이 자연스럽게 배치되도록 만들 수 있었습니다.",
+          "Canvas 전환으로 응답속도가 420 ms → 64 ms로 개선됐고, D3.js 물리 엔진으로 인물들이 자연스럽게 배치되도록 만들 수 있었습니다.",
       },
       {
         id: "ADR-006",
@@ -106,7 +106,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
         type: "development",
         decision: "Feature-Slice 폴더 구조",
         reason:
-          "코드가 늘어나면서 기능 간 의존이 얽히기 시작했습니다. 도메인별로 관심사를 격리해야 기능 추가가 편해질 것으로 판단했습니다.",
+          "코드가 늘어나면서 기능 간 의존이 얽히기 시작했습니다. 도메인별로 관심사를 분리해야 기능 추가가 편해질 것으로 판단했습니다.",
         result:
           "UI, 로직, 데이터 레이어를 분리한 덕분에 새 기능을 추가할 때 기존 코드를 건드릴 일이 줄었습니다.",
       },
@@ -122,7 +122,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
         solution:
           "React Flow를 걷어내고 D3.js Force Simulation + Canvas로 교체했습니다. SVG → Canvas 전환으로 렌더링 성능이 크게 개선됐고, useRef로 물리 상태를 React 렌더링 바깥에 두고 관심사별로 훅을 분리했습니다.",
         details: [
-          "**SVG → Canvas**: 노드마다 DOM을 만들던 방식에서 Canvas에 한꺼번에 그리는 방식으로 전환 → 420ms → 64ms (성능 개선의 핵심)",
+          "**SVG → Canvas**: 노드마다 DOM을 만들던 방식에서 Canvas에 한꺼번에 그리는 방식으로 전환 → 420 ms → 64 ms (성능 개선의 핵심)",
           "**물리 엔진 격리**: D3.js 시뮬레이션 상태를 useRef로 React 렌더링 사이클 밖에서 처리",
           "**훅 분리**: 시뮬레이션, 드래그, 줌, 리사이즈를 각각 전용 훅으로 나눠서 기능 추가·수정이 서로 영향 없이 가능",
         ],
@@ -158,7 +158,7 @@ const { zoomTransform } = useCharacterGraphZoom();`,
           caption: "훅 기반 지식 그래프 엔진 구조",
         },
         impact:
-          "등장인물 650명 기준 응답속도 420ms → 64ms 개선, 인물 간 관계에 따라 자연스럽게 배치되는 관계도 구현",
+          "등장인물 650명 기준 응답속도 420 ms → 64 ms 개선, 인물 간 관계에 따라 자연스럽게 배치되는 관계도 구현",
       },
       {
         id: "bundle-optimization",
@@ -248,12 +248,12 @@ const editor = useEditor({
 
     achievements: [
       {
-        metric: "420ms → 64ms",
+        metric: "420 ms → 64 ms",
         label: "관계도 응답속도",
         description: "등장인물 650명 기준, SVG → Canvas 전환으로 개선",
       },
       {
-        metric: "450KB → 187KB",
+        metric: "450 KB → 187 KB",
         label: "초기 JS 번들",
         description: "manualChunks로 용도별 청크 분리",
       },
