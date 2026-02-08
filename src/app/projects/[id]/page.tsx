@@ -638,6 +638,15 @@ export default function ProjectDetailPage({ params }: PageProps) {
                           ))}
                         </div>
                       )}
+
+                      {/* Code Snippet */}
+                      {section.codeSnippet && (
+                        <div className="mt-8 p-6 bg-stone-900 rounded-2xl overflow-x-auto">
+                          <pre className="text-sm font-mono text-stone-200 leading-relaxed">
+                            <code>{section.codeSnippet}</code>
+                          </pre>
+                        </div>
+                      )}
                     </div>
 
                     {/* Diagram */}

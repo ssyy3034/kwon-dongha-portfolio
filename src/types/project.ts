@@ -17,6 +17,7 @@ export interface ProblemSolution {
     code: string;
     caption?: string;
   };
+  codeSnippet?: string; // 간단한 코드 스니펫 (마크다운 포맷)
   diagram?: {
     type: "mermaid" | "image";
     content: string;
