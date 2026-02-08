@@ -97,12 +97,7 @@
           "color": "3178C6",
           "description": "타입 시스템으로 런타임 오류를 줄이고 협업 시 코드 의도를 명확히 전달하는 데 활용합니다."
         },
-        {
-          "name": "Next.js",
-          "slug": "nextdotjs",
-          "color": "000000",
-          "description": "App Router 기반으로 이 포트폴리오를 직접 구축하며 SSR과 RSC 개념을 익히고 있습니다."
-        },
+
         {
           "name": "Zustand",
           "slug": "react",
