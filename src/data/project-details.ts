@@ -70,9 +70,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
         type: "development",
         decision: "Tiptap (ProseMirror)",
         reason:
-          "#복선, @캐릭터 멘션 등 커스텀 문법 확장이 필요했습니다. 유사 서비스 레퍼런스를 조사한 결과 확장성과 React 통합이 가장 좋았습니다.",
+          "#복선, @캐릭터 멘션 등 커스텀 문법이 필요했습니다. React 생태계 중 확장성이 가장 뛰어난 라이브러리라 선택했습니다.",
         result:
-          "커스텀 익스텐션으로 작가 전용 편집 환경을 만들 수 있었습니다. 다만 인스턴스 안정화 이슈가 있어 별도로 해결해야 했습니다.",
+          "커스텀 익스텐션을 만들어 작가에게 꼭 필요한 집필 도구를 구현했습니다.",
       },
       {
         id: "ADR-005",
