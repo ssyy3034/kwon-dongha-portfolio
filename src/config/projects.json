@@ -5,11 +5,11 @@
     "subtitle": "Canvas 기반 지식 그래프 렌더링 최적화",
     "role": "Frontend Engineer",
     "period": "2025.12 - 2026.02",
-    "team": "5인 팀 (Fullstack)",
-    "description": "SVG 렌더링 한계를 Canvas(Immediate Mode) 전환으로 극복하여 650+ 노드 환경의 INP를 85% 개선. Vite manualChunks로 초기 번들 58% 감량.",
+    "team": "5인 팀",
+    "description": "SVG 렌더링 방식을 Canvas API로 전환해 650개 노드 환경의 INP를 85% 개선했습니다. 초기 번들 용량도 58% 줄였습니다.",
     "metrics": [
-      { "value": "420 ms → 64 ms", "label": "렌더링 지연 (INP)" },
-      { "value": "187 KB", "label": "초기 번들 (gzip)" },
+      { "value": "420 ms → 64 ms", "label": "관계도 응답 속도" },
+      { "value": "187 KB", "label": "초기 JS 번들" },
       { "value": "Integrity", "label": "결제 금액 위변조 방지" }
     ],
     "tech": ["React", "TypeScript", "Canvas API", "Vite", "Zustand", "TanStack Query"],
