@@ -76,13 +76,6 @@ export default function Nav() {
       icon: Github,
       external: true,
     },
-    {
-      name: "블로그",
-      href: profile.social.blog,
-      icon: Globe,
-      external: true,
-    },
-    // { name: "이력서", href: "/resume", icon: FileText, external: true },
   ];
 
   return (

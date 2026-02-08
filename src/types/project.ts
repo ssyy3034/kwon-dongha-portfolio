@@ -35,7 +35,8 @@ export interface KeyFocus {
       | "target"
       | "cpu"
       | "database"
-      | "smartphone";
+      | "smartphone"
+      | "trending-up";
     title: string;
     description: string;
   }[];

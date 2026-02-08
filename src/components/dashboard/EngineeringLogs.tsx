@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FileText, ChevronRight } from "lucide-react";
 
 interface EngineeringLogsProps {
@@ -18,7 +19,9 @@ export default function EngineeringLogs({ recentPosts }: EngineeringLogsProps) {
             <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-stone-400">
               최근 학습
             </h2>
-            <p className="text-sm font-bold text-stone-800 dark:text-stone-200">학습 기록</p>
+            <p className="text-sm font-bold text-stone-800 dark:text-stone-200">
+              학습 기록
+            </p>
           </div>
         </div>
         <div className="px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded-lg text-[9px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
@@ -27,10 +30,11 @@ export default function EngineeringLogs({ recentPosts }: EngineeringLogsProps) {
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar print:overflow-visible">
         {recentPosts.map((node, idx) => (
-          <button
+          <Link
             key={node.id}
+            href={`/study/${node.id}`}
             style={{ animationDelay: `${idx * 100}ms` }}
-            className="w-full text-left group px-8 py-7 border-b border-stone-100/30 dark:border-stone-700/30 last:border-0 hover:bg-stone-50/80 dark:hover:bg-stone-800/80 transition-all duration-500 animate-fade-in-up opacity-0"
+            className="block w-full text-left group px-8 py-7 border-b border-stone-100/30 dark:border-stone-700/30 last:border-0 hover:bg-stone-50/80 dark:hover:bg-stone-800/80 transition-all duration-500 animate-fade-in-up opacity-0"
           >
             <div className="flex justify-between items-center mb-3">
               <span className="text-[10px] font-black text-amber-600 dark:text-amber-500 tracking-[0.15em] uppercase px-2 py-0.5 bg-amber-50 dark:bg-amber-900/30 rounded">
@@ -50,7 +54,7 @@ export default function EngineeringLogs({ recentPosts }: EngineeringLogsProps) {
             <p className="text-xs text-stone-400 dark:text-stone-500 line-clamp-2 leading-relaxed font-medium group-hover:text-stone-500 dark:group-hover:text-stone-400 transition-colors duration-300">
               {node.preview}
             </p>
-          </button>
+          </Link>
         ))}
       </div>
     </section>

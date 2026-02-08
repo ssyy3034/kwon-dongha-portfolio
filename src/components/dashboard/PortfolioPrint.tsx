@@ -25,9 +25,6 @@ export default function PortfolioPrint() {
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-stone-600">
           <span>{profile.social.email}</span>
           <span>{profile.social.github.replace("https://", "")}</span>
-          {profile.social.blog && (
-            <span>{profile.social.blog.replace("https://", "")}</span>
-          )}
         </div>
       </header>
 

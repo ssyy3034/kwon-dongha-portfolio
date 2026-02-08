@@ -2,19 +2,19 @@
   {
     "id": "stolink",
     "title": "StoLink",
-    "subtitle": "웹소설 작가용 에디터 성능 최적화",
-    "role": "Software Engineer",
-    "period": "2025.12 - 2026.01",
+    "subtitle": "Canvas 기반 지식 그래프 렌더링 최적화",
+    "role": "Frontend Engineer",
+    "period": "2025.12 - 2026.02",
     "team": "5인 팀 (Fullstack)",
-    "description": "D3.js 그래프 Canvas 전환(INP 16.3배 개선) 및 AI 에이전트 기반 개발 워크플로우 자동화. Vite 번들 최적화로 초기 로딩 58% 단축.",
+    "description": "SVG 렌더링 한계를 Canvas(Immediate Mode) 전환으로 극복하여 650+ 노드 환경의 INP를 85% 개선. Vite manualChunks로 초기 번들 58% 감량.",
     "metrics": [
-      { "value": "1048 → 64ms", "label": "드래그 응답 (INP)" },
-      { "value": "CLI & Agent", "label": "워크플로우 자동화" },
-      { "value": "450 → 190KB", "label": "초기 번들 (gzip)" }
+      { "value": "420 → 64ms", "label": "렌더링 지연 (INP)" },
+      { "value": "187KB", "label": "초기 번들 (gzip)" },
+      { "value": "Integrity", "label": "결제 금액 위변조 방지" }
     ],
-    "tech": ["React", "TypeScript", "Canvas API", "AI Agent", "Zustand", "TanStack Query"],
+    "tech": ["React", "TypeScript", "Canvas API", "Vite", "Zustand", "TanStack Query"],
     "link": "/projects/stolink",
-    "github": "https://github.com/stolink",
+    "github": "https://github.com/ssyy3034/stolink",
     "color": "amber"
   },
   {

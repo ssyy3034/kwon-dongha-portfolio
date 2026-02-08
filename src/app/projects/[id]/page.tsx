@@ -48,6 +48,8 @@ const focusIcons = {
   target: Target,
   cpu: Cpu,
   database: Database,
+  smartphone: Layout,
+  "trending-up": Zap,
 };
 
 const accentColors = {
