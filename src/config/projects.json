@@ -8,8 +8,8 @@
     "team": "5인 팀 (Fullstack)",
     "description": "SVG 렌더링 한계를 Canvas(Immediate Mode) 전환으로 극복하여 650+ 노드 환경의 INP를 85% 개선. Vite manualChunks로 초기 번들 58% 감량.",
     "metrics": [
-      { "value": "420 → 64ms", "label": "렌더링 지연 (INP)" },
-      { "value": "187KB", "label": "초기 번들 (gzip)" },
+      { "value": "420 ms → 64 ms", "label": "렌더링 지연 (INP)" },
+      { "value": "187 KB", "label": "초기 번들 (gzip)" },
       { "value": "Integrity", "label": "결제 금액 위변조 방지" }
     ],
     "tech": ["React", "TypeScript", "Canvas API", "Vite", "Zustand", "TanStack Query"],
