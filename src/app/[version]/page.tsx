@@ -1,14 +1,14 @@
-import { fetchDashboardData } from '@/lib/graph-loader';
+import { fetchGitHubStreak } from '@/lib/github-fetcher';
 import Dashboard from '@/components/Dashboard';
 
 export const revalidate = 3600;
 
 export default async function VersionedHome() {
-  const data = await fetchDashboardData();
+  const streakData = await fetchGitHubStreak();
 
   return (
     <main>
-      <Dashboard data={data} />
+      <Dashboard streakData={streakData} />
     </main>
   );
 }

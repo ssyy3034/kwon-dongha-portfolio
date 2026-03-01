@@ -2,33 +2,33 @@
   {
     "id": "stolink",
     "title": "StoLink",
-    "subtitle": "Canvas 기반 지식 그래프 렌더링 최적화",
-    "role": "Frontend Engineer",
+    "subtitle": "N+1 쿼리 최적화 · 결제 동시성 제어",
+    "role": "Fullstack Developer",
     "period": "2025.12 - 2026.02",
     "team": "5인 팀",
-    "description": "SVG 렌더링 방식을 Canvas API로 전환해 650개 노드 환경의 INP를 85% 개선했습니다. 초기 번들 용량도 58% 줄였습니다.",
+    "description": "웹소설 작가를 위한 지식 관리 플랫폼의 백엔드와 프론트엔드를 담당했습니다. 계층형 문서 조회의 N+1 문제를 해결하고, 테스트 결제 환경에서 커넥션 풀 격리와 동시성 제어를 설계했습니다.",
     "metrics": [
-      { "value": "420 ms → 64 ms", "label": "관계도 응답 속도" },
-      { "value": "187 KB", "label": "초기 JS 번들" }
+      { "value": "450ms → 25ms", "label": "API 응답 (18배 개선)" },
+      { "value": "61개 → 1개", "label": "N+1 쿼리 수" }
     ],
-    "tech": ["React", "TypeScript", "Canvas API", "Vite", "Zustand", "TanStack Query"],
+    "tech": ["Spring Boot", "JPA", "PostgreSQL", "Testcontainers", "React", "TypeScript"],
     "link": "/projects/stolink",
-    "github": "https://github.com/ssyy3034/stolink",
+    "github": "https://github.com/stolink",
     "color": "amber"
   },
   {
     "id": "aidiary",
     "title": "Aidiary",
-    "subtitle": "AI 기반 육아 기록 플랫폼",
-    "role": "Full-stack Developer",
-    "period": "2025.03 - 2025.06",
+    "subtitle": "RabbitMQ 비동기 전환 · 다층 캐시 아키텍처",
+    "role": "Fullstack Developer",
+    "period": "2025.04 - 2026.02",
     "team": "2인 팀",
-    "description": "Spring Boot + Python Flask 마이크로서비스 구조로 AI 연산 분리. Zustand로 전역 상태 관리, Docker Compose로 전체 서비스 구성.",
+    "description": "산모를 위한 AI 감정 일기 서비스의 백엔드·프론트엔드·인프라를 담당했습니다. ML 연산 블로킹을 메시지 큐로 해결하고, 쿼리 최적화와 캐싱으로 API 성능을 개선했습니다.",
     "metrics": [
-      { "value": "30초+ 블로킹 방지", "label": "AI 연산 서비스 분리" },
-      { "value": "4단계 파이프라인", "label": "얼굴분석→이미지생성 자동화" }
+      { "value": "1.16 → 1,949 TPS", "label": "처리량 TPS (RabbitMQ)" },
+      { "value": "487ms → 3ms", "label": "AI 날짜 API (Redis)" }
     ],
-    "tech": ["React", "Zustand", "Spring Boot", "Python", "Docker"],
+    "tech": ["Spring Boot", "RabbitMQ", "Redis", "JPA", "MariaDB", "Docker", "React"],
     "link": "/projects/aidiary",
     "github": "https://github.com/ssyy3034/aidiary-main",
     "color": "red"

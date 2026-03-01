@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,10 +8,6 @@ import FormattedText from "@/components/common/FormattedText";
 import {
   ArrowLeft,
   ArrowRight,
-  Code2,
-  Cpu,
-  Database,
-  Layout,
   ExternalLink,
   ChevronRight,
   Trophy,
@@ -23,11 +19,11 @@ import {
   AlertCircle,
   Lightbulb,
   CheckCircle2,
-  MessageSquare,
 } from "lucide-react";
 import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
 import { ProblemSolution } from "@/types/project";
+import { getProjectColors, getProjectIcon } from "@/config/project-theme";
 import Nav from "@/components/dashboard/Nav";
 import Mermaid from "@/components/common/Mermaid";
 
@@ -35,88 +31,27 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-const icons = {
-  stolink: Code2,
-  pintos: Cpu,
-  aidiary: Database,
-  garden: Layout,
-};
-
-const accentColors = {
-  amber: {
-    bg: "bg-amber-500",
-    light: "bg-amber-50 dark:bg-amber-900/30",
-    border: "border-amber-200 dark:border-amber-700",
-    text: "text-amber-600 dark:text-amber-500",
-    gradient: "from-amber-500 to-orange-600",
-    tab: "border-amber-500 text-amber-600 dark:text-amber-400",
-  },
-  emerald: {
-    bg: "bg-emerald-500",
-    light: "bg-emerald-50 dark:bg-emerald-900/30",
-    border: "border-emerald-200 dark:border-emerald-700",
-    text: "text-emerald-600 dark:text-emerald-500",
-    gradient: "from-emerald-500 to-teal-600",
-    tab: "border-emerald-500 text-emerald-600 dark:text-emerald-400",
-  },
-  indigo: {
-    bg: "bg-indigo-500",
-    light: "bg-indigo-50 dark:bg-indigo-900/30",
-    border: "border-indigo-200 dark:border-indigo-700",
-    text: "text-indigo-600 dark:text-indigo-500",
-    gradient: "from-indigo-500 to-purple-600",
-    tab: "border-indigo-500 text-indigo-600 dark:text-indigo-400",
-  },
-  rose: {
-    bg: "bg-rose-500",
-    light: "bg-rose-50 dark:bg-rose-900/30",
-    border: "border-rose-200 dark:border-rose-700",
-    text: "text-rose-600 dark:text-rose-500",
-    gradient: "from-rose-500 to-pink-600",
-    tab: "border-rose-500 text-rose-600 dark:text-rose-400",
-  },
-  red: {
-    bg: "bg-red-600",
-    light: "bg-red-50 dark:bg-red-900/30",
-    border: "border-red-300 dark:border-red-700",
-    text: "text-red-600 dark:text-red-500",
-    gradient: "from-red-600 to-red-800",
-    tab: "border-red-500 text-red-600 dark:text-red-400",
-  },
-};
-
 const steps = [
   {
     key: "problem" as const,
-    label: "문제 발견 및 정의",
+    label: "Problem",
     icon: AlertCircle,
     color: "text-red-500 dark:text-red-400",
-    bg: "bg-red-50 dark:bg-red-900/20",
-    border: "border-l-red-400",
+    dot: "bg-red-500",
   },
   {
     key: "approach" as const,
-    label: "해결방법 모색 및 결정",
+    label: "Approach",
     icon: Lightbulb,
     color: "text-amber-500 dark:text-amber-400",
-    bg: "bg-amber-50 dark:bg-amber-900/20",
-    border: "border-l-amber-400",
+    dot: "bg-amber-500",
   },
   {
     key: "result" as const,
-    label: "적용 및 개선 결과",
+    label: "Result",
     icon: CheckCircle2,
     color: "text-emerald-500 dark:text-emerald-400",
-    bg: "bg-emerald-50 dark:bg-emerald-900/20",
-    border: "border-l-emerald-400",
-  },
-  {
-    key: "retrospective" as const,
-    label: "아쉬운점 및 개선 가능한 점",
-    icon: MessageSquare,
-    color: "text-blue-500 dark:text-blue-400",
-    bg: "bg-blue-50 dark:bg-blue-900/20",
-    border: "border-l-blue-400",
+    dot: "bg-emerald-500",
   },
 ] as const;
 
@@ -127,64 +62,73 @@ function SectionCard({
 }: {
   section: ProblemSolution;
   idx: number;
-  colors: (typeof accentColors)[keyof typeof accentColors];
+  colors: ReturnType<typeof getProjectColors>;
 }) {
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: idx * 0.08 }}
-      className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden shadow-sm"
+      className="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden print:border print:shadow-none print:break-inside-avoid"
     >
       {/* 헤더 */}
-      <div className={`px-8 py-6 border-b border-stone-100 dark:border-stone-800 ${colors.light}`}>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
+      <div className="px-5 sm:px-7 py-4 sm:py-5 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+          <div className="min-w-0">
             {section.subtitle && (
-              <p className={`text-xs font-bold ${colors.text} uppercase tracking-wider mb-1`}>
+              <p className={`text-[10px] sm:text-xs font-bold ${colors.text} tracking-wider mb-1`}>
                 {section.subtitle}
               </p>
             )}
-            <h3 className="text-xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
+            <h3 className="text-lg sm:text-xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
               {section.title}
             </h3>
           </div>
           {section.impact && (
-            <span className={`shrink-0 px-4 py-2 rounded-xl ${colors.bg} text-white text-sm font-bold`}>
+            <span className={`shrink-0 self-start px-3 py-1.5 rounded-lg ${colors.bg} text-white text-xs sm:text-sm font-bold print:text-stone-900 print:bg-stone-100 print:border`}>
               {section.impact}
             </span>
           )}
         </div>
       </div>
 
-      {/* 4단계 */}
-      <div className="px-8 py-6 space-y-6">
-        {steps.map((step) => {
-          const value = section[step.key];
-          if (!value) return null;
-          const StepIcon = step.icon;
-          return (
-            <div key={step.key} className={`border-l-4 ${step.border} pl-5`}>
-              <div className="flex items-center gap-2 mb-2">
-                <StepIcon size={15} className={step.color} />
-                <p className={`text-xs font-bold ${step.color} uppercase tracking-wider`}>
+      {/* 3단계 타임라인 — 배경색 없이 여백으로 구분 */}
+      <div className="px-5 sm:px-7 py-5 sm:py-7">
+        <div className="space-y-6 sm:space-y-8">
+          {steps.map((step, stepIdx) => {
+            const value = section[step.key];
+            if (!value) return null;
+            const StepIcon = step.icon;
+            const isLast = stepIdx === steps.length - 1 || !section[steps[stepIdx + 1]?.key];
+            return (
+              <div key={step.key} className="relative pl-7 sm:pl-8">
+                {/* 타임라인 세로선 */}
+                {!isLast && (
+                  <div className="absolute left-[9px] sm:left-[11px] top-7 bottom-[-24px] sm:bottom-[-32px] w-px bg-stone-200 dark:bg-stone-700 print:bg-stone-300" />
+                )}
+                {/* 타임라인 도트 */}
+                <div className={`absolute left-0 top-[3px] w-[19px] h-[19px] sm:w-[23px] sm:h-[23px] rounded-full border-2 border-white dark:border-stone-900 ${step.dot} flex items-center justify-center print:border-stone-200`}>
+                  <StepIcon size={10} className="text-white sm:w-3 sm:h-3" />
+                </div>
+                {/* 라벨 + 본문 */}
+                <p className={`text-[11px] sm:text-xs font-bold ${step.color} uppercase tracking-wider mb-1.5 sm:mb-2`}>
                   {step.label}
                 </p>
+                <p className="text-stone-700 dark:text-stone-300 leading-[1.85] text-[13.5px] sm:text-[15px] break-keep print:text-stone-800 print:text-[12px] print:leading-[1.7]">
+                  <FormattedText text={value} />
+                </p>
               </div>
-              <p className="text-stone-700 dark:text-stone-300 leading-relaxed text-[15px]">
-                <FormattedText text={value} />
-              </p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
-        {/* 세부 bullet */}
+        {/* 세부사항 */}
         {section.details && section.details.length > 0 && (
-          <div className="pt-2 space-y-2 border-t border-stone-100 dark:border-stone-800">
+          <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-stone-100 dark:border-stone-800 space-y-2.5">
             {section.details.map((d, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <ChevronRight size={15} className={`${colors.text} shrink-0 mt-0.5`} />
-                <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">
+              <div key={i} className="flex items-start gap-2.5">
+                <ChevronRight size={13} className={`${colors.text} shrink-0 mt-0.5`} />
+                <p className="text-[13px] sm:text-sm text-stone-600 dark:text-stone-400 leading-relaxed break-keep print:text-stone-700 print:text-[11px]">
                   <FormattedText text={d} />
                 </p>
               </div>
@@ -194,8 +138,8 @@ function SectionCard({
 
         {/* 코드 스니펫 */}
         {section.codeSnippet && (
-          <div className="mt-2 p-5 bg-stone-900 rounded-xl overflow-x-auto">
-            <pre className="text-sm font-mono text-stone-200 leading-relaxed">
+          <div className="mt-5 sm:mt-6 p-3 sm:p-4 bg-stone-900 rounded-lg sm:rounded-xl overflow-x-auto print:bg-stone-100 print:border print:border-stone-300">
+            <pre className="text-[11px] sm:text-sm font-mono text-stone-200 leading-relaxed print:text-stone-800">
               <code>{section.codeSnippet}</code>
             </pre>
           </div>
@@ -203,9 +147,11 @@ function SectionCard({
 
         {/* 다이어그램 */}
         {section.diagram?.type === "mermaid" && (
-          <div className="mt-2 p-5 bg-stone-100/70 dark:bg-stone-800/70 rounded-xl border border-stone-200 dark:border-stone-700">
+          <div className="mt-5 sm:mt-6 p-3 sm:p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-700 overflow-x-auto">
             {section.diagram.caption && (
-              <p className="text-xs text-stone-500 font-semibold mb-3">{section.diagram.caption}</p>
+              <p className="text-[10px] sm:text-xs text-stone-500 font-semibold mb-3">
+                {section.diagram.caption}
+              </p>
             )}
             <Mermaid chart={section.diagram.content} />
           </div>
@@ -229,8 +175,8 @@ export default function ProjectDetailPage({ params }: PageProps) {
 
   const [activeTab, setActiveTab] = useState<"backend" | "frontend">(defaultTab);
 
-  const Icon = icons[project.id as keyof typeof icons] || Code2;
-  const colors = accentColors[project.color as keyof typeof accentColors] || accentColors.amber;
+  const Icon = getProjectIcon(project.id);
+  const colors = getProjectColors(project.color);
 
   const currentIndex = projects.findIndex((p) => p.id === id);
   const nextProject = projects[(currentIndex + 1) % projects.length];
@@ -243,17 +189,17 @@ export default function ProjectDetailPage({ params }: PageProps) {
       <Nav />
 
       {/* Hero */}
-      <header className="relative pt-32 pb-16 overflow-hidden">
+      <header className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
           <div
             className={`absolute -top-1/2 -right-1/4 w-[700px] h-[700px] rounded-full bg-gradient-to-br ${colors.gradient} opacity-[0.04] dark:opacity-[0.08] blur-3xl`}
           />
         </div>
 
-        <div className="max-w-[1100px] mx-auto px-6 md:px-10 relative z-10">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 relative z-10">
           <Link
             href="/#projects"
-            className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors mb-10 group text-sm font-medium"
+            className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors mb-8 sm:mb-10 group text-sm font-medium"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             프로젝트 목록
@@ -264,61 +210,61 @@ export default function ProjectDetailPage({ params }: PageProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <span className={`px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${colors.gradient}`}>
                 Project
               </span>
-              <span className="text-stone-400 text-sm">{project.period}</span>
+              <span className="text-stone-400 text-xs sm:text-sm">{project.period}</span>
             </div>
             <h1
-              className="text-5xl md:text-6xl font-black text-stone-900 dark:text-stone-100 tracking-tight mb-4"
+              className="text-3xl sm:text-5xl md:text-6xl font-black text-stone-900 dark:text-stone-100 tracking-tight mb-3 sm:mb-4"
               style={{ fontFamily: "var(--font-editorial)" }}
             >
               {project.title}
             </h1>
-            <p className="text-lg text-stone-600 dark:text-stone-400 max-w-2xl leading-relaxed">
+            <p className="text-base sm:text-lg text-stone-600 dark:text-stone-400 max-w-2xl leading-relaxed">
               {detail.tagline}
             </p>
           </motion.div>
         </div>
       </header>
 
-      <main className="max-w-[1100px] mx-auto px-6 md:px-10 pb-32">
+      <main className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 pb-24 sm:pb-32">
         {/* README 카드 */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-10"
+          className="mb-8 sm:mb-10"
         >
-          <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 p-8 shadow-sm">
+          <div className="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl border border-stone-200 dark:border-stone-700 p-4 sm:p-6 md:p-8 shadow-sm">
             {/* 메타 정보 */}
-            <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-stone-100 dark:border-stone-800">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                  <Briefcase size={15} className="text-stone-500" />
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-6 mb-5 sm:mb-6 pb-5 sm:pb-6 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0">
+                  <Briefcase size={13} className="text-stone-500" />
                 </div>
-                <div>
-                  <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Role</p>
-                  <p className="text-sm font-bold text-stone-800 dark:text-stone-200">{project.role}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                  <Calendar size={15} className="text-stone-500" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Period</p>
-                  <p className="text-sm font-bold text-stone-800 dark:text-stone-200">{project.period}</p>
+                <div className="min-w-0">
+                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">Role</p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200 truncate">{project.role}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                  <Users size={15} className="text-stone-500" />
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0">
+                  <Calendar size={13} className="text-stone-500" />
                 </div>
-                <div>
-                  <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Team</p>
-                  <p className="text-sm font-bold text-stone-800 dark:text-stone-200">{project.team}</p>
+                <div className="min-w-0">
+                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">Period</p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200">{project.period}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0">
+                  <Users size={13} className="text-stone-500" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">Team</p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200">{project.team}</p>
                 </div>
               </div>
               {project.github && (
@@ -326,7 +272,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                   href={project.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`ml-auto flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r ${colors.gradient} text-white text-sm font-bold shadow-sm hover:shadow-md transition-shadow`}
+                  className={`col-span-2 sm:col-span-1 sm:ml-auto flex items-center justify-center sm:justify-start gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r ${colors.gradient} text-white text-sm font-bold shadow-sm hover:shadow-md transition-shadow`}
                 >
                   GitHub
                   <ExternalLink size={13} />
@@ -335,7 +281,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
             </div>
 
             {/* 개요 */}
-            <p className="text-base text-stone-700 dark:text-stone-300 leading-relaxed mb-6">
+            <p className="text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-[1.8] mb-5 sm:mb-6">
               <FormattedText text={detail.overview} />
             </p>
 
@@ -345,7 +291,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
                 s.items.map((item) => (
                   <span
                     key={item}
-                    className="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-xs font-bold rounded-lg border border-stone-200 dark:border-stone-700"
+                    className="px-2.5 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] sm:text-xs font-bold rounded-lg border border-stone-200 dark:border-stone-700"
                   >
                     {item}
                   </span>

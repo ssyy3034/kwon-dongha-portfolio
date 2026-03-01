@@ -38,7 +38,7 @@ export const PROJECTS: Project[] = [
     id: "stolink",
     title: "StoLink",
     description: "웹 소설 작가를 위한 세계관 설정 및 관계도 시각화 플랫폼",
-    period: "2025.12 - 2026.01",
+    period: "2025.12 - 2026.02",
     role: "Frontend Sole Developer",
     techStack: [
       "React 19",

@@ -6,7 +6,6 @@ import {
   Github,
   Home,
   FileDown,
-  Globe,
   Moon,
   Sun,
 } from "lucide-react";
@@ -26,7 +25,6 @@ export default function Nav() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line
     setMounted(true);
   }, []);
 
@@ -48,19 +46,13 @@ export default function Nav() {
     (e: React.MouseEvent, href: string) => {
       if (href.startsWith("/#")) {
         e.preventDefault();
-        const hash = href.slice(1); // "/#projects" -> "#projects"
+        const hash = href.slice(1);
 
         if (pathname === "/") {
-          // 같은 페이지면 바로 스크롤
           const element = document.querySelector(hash);
           element?.scrollIntoView({ behavior: "smooth" });
         } else {
-          // 다른 페이지면 홈으로 이동 후 스크롤
-          router.push("/");
-          setTimeout(() => {
-            const element = document.querySelector(hash);
-            element?.scrollIntoView({ behavior: "smooth" });
-          }, 100);
+          router.push(href);
         }
       }
     },
@@ -114,23 +106,26 @@ export default function Nav() {
               const isActive =
                 pathname === item.href || (isProjectsLink && isProjectDetail);
 
-              const Component = item.external ? "a" : Link;
-              const props = item.external
-                ? {
-                    href: item.href,
-                    target: "_blank",
-                    rel: "noopener noreferrer",
-                  }
-                : { href: item.href };
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm font-bold transition-all duration-300 relative py-2 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
+                  >
+                    <Icon size={16} />
+                    {item.name}
+                  </a>
+                );
+              }
 
               return (
-                // @ts-ignore
-                <Component
+                <Link
                   key={item.name}
-                  {...props}
-                  onClick={(e: React.MouseEvent) =>
-                    handleHashClick(e, item.href)
-                  }
+                  href={item.href}
+                  onClick={(e) => handleHashClick(e, item.href)}
                   className={clsx(
                     "flex items-center gap-2 text-sm font-bold transition-all duration-300 relative py-2",
                     isActive
@@ -146,7 +141,7 @@ export default function Nav() {
                   {isActive && (
                     <span className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-amber-600 rounded-full" />
                   )}
-                </Component>
+                </Link>
               );
             })}
           </div>
@@ -179,7 +174,7 @@ export default function Nav() {
             {/* PDF Button */}
             <button
               onClick={handlePrintPDF}
-              className="hidden lg:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-stone-900 dark:bg-amber-600 text-white hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
+              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-stone-900 dark:bg-amber-600 text-white hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
             >
               <FileDown size={18} />
               <span className="text-sm font-bold">PDF 저장</span>
@@ -199,23 +194,26 @@ export default function Nav() {
               const isActive =
                 pathname === item.href || (isProjectsLink && isProjectDetail);
 
-              const Component = item.external ? "a" : Link;
-              const props = item.external
-                ? {
-                    href: item.href,
-                    target: "_blank",
-                    rel: "noopener noreferrer",
-                  }
-                : { href: item.href };
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all duration-300 text-stone-400 hover:text-white"
+                  >
+                    <Icon size={20} />
+                    <span className="text-[10px] font-bold">{item.name}</span>
+                  </a>
+                );
+              }
 
               return (
-                // @ts-ignore
-                <Component
+                <Link
                   key={item.name}
-                  {...props}
-                  onClick={(e: React.MouseEvent) =>
-                    handleHashClick(e, item.href)
-                  }
+                  href={item.href}
+                  onClick={(e) => handleHashClick(e, item.href)}
                   className={clsx(
                     "flex-1 flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all duration-300",
                     isActive
@@ -225,7 +223,7 @@ export default function Nav() {
                 >
                   <Icon size={20} />
                   <span className="text-[10px] font-bold">{item.name}</span>
-                </Component>
+                </Link>
               );
             })}
           </div>

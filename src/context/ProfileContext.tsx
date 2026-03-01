@@ -30,9 +30,6 @@ export function ProfileProvider({
     setProfile(defaultProfile);
   };
 
-  // Debug: Log profile to check if avatar is present
-  console.log("Current Profile Context:", profile);
-
   return (
     <ProfileContext.Provider value={{ profile, updateProfile, resetProfile }}>
       {children}

@@ -5,13 +5,12 @@ import {
   Folder,
   Github,
   Mail,
-  BookOpen,
   Code,
   Lightbulb,
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import { useState } from "react";
 import { useProfile } from "@/context/ProfileContext";
 import { Typewriter } from "@/components/ui/Typewriter";
 
@@ -23,10 +22,10 @@ export default function Hero({
   heatmapData,
 }: {
   streak: number;
-  heatmapData: any[];
+  heatmapData: { date: string; count: number }[];
 }) {
   const { profile } = useProfile();
-  const [tooltip, setTooltip] = React.useState<{
+  const [tooltip, setTooltip] = useState<{
     show: boolean;
     data: any;
     x: number;
@@ -34,14 +33,14 @@ export default function Hero({
   }>({ show: false, data: null, x: 0, y: 0 });
 
   return (
-    <header className="max-w-[1400px] mx-auto px-6 md:px-10 pt-16 pb-12 md:pt-24 md:pb-20">
-      {/* 1. HEADER SECTION (Full Width) */}
-      <div className="max-w-4xl mb-12 lg:mb-16">
+    <header className="max-w-[1400px] mx-auto px-5 sm:px-6 md:px-10 pt-12 pb-8 md:pt-24 md:pb-20">
+      {/* 1. HEADER SECTION */}
+      <div className="max-w-4xl mb-10 lg:mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200/50 dark:border-amber-700/50 text-amber-700 dark:text-amber-400 mb-6">
           <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="text-xs font-bold">{profile.bio.badge}</span>
         </div>
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9]">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9]">
           I&apos;m{" "}
           <Typewriter
             words={[profile.name]}
@@ -50,11 +49,9 @@ export default function Hero({
           />
           , a<br />
           <span className="inline-grid pb-2">
-            {/* Ghost text for layout */}
             <span className="invisible col-start-1 row-start-1 font-black leading-[0.9] tracking-tight pb-2">
-              {profile.role}|
+              Software Engineer|
             </span>
-            {/* Actual text with gradient */}
             <span className="col-start-1 row-start-1 bg-clip-text text-transparent bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 font-black leading-[0.9] tracking-tight pb-2">
               <Typewriter
                 words={["Software Engineer", "Problem Solver", "Team Player"]}
@@ -67,17 +64,16 @@ export default function Hero({
             </span>
           </span>
         </h1>
-        <p className="mt-8 text-xl md:text-2xl text-stone-600 dark:text-stone-400 font-medium max-w-2xl leading-relaxed">
+        <p className="mt-6 md:mt-8 text-lg sm:text-xl md:text-2xl text-stone-600 dark:text-stone-400 font-medium max-w-2xl leading-relaxed">
           {profile.bio.headline.replace("{name}", profile.name)}
         </p>
       </div>
 
       {/* 2. CONTENT COLUMNS */}
-      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10 lg:gap-20">
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8 lg:gap-16">
         {/* LEFT COLUMN: Intro Cards */}
         <div className="flex-1 max-w-2xl">
-          {/* Data-driven Persona */}
-          <div className="space-y-6 mb-10">
+          <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-10">
             {profile.bio.paragraphs.map((p, i) => {
               const titles = [
                 {
@@ -105,27 +101,27 @@ export default function Hero({
               return (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-5 sm:p-6 rounded-3xl bg-white/40 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 hover:bg-white/80 dark:hover:bg-stone-800/80 hover:border-stone-300 dark:hover:border-stone-600 hover:shadow-xl dark:hover:shadow-stone-900/50 transition-all duration-500 group relative overflow-hidden"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-5 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white/40 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 hover:bg-white/80 dark:hover:bg-stone-800/80 hover:border-stone-300 dark:hover:border-stone-600 hover:shadow-xl dark:hover:shadow-stone-900/50 transition-all duration-500 group relative overflow-hidden"
                 >
                   <div
-                    className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${info.bg} border flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}
+                    className={`shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl ${info.bg} border flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}
                   >
                     <Icon
-                      className={`${info.color} w-6 h-6 sm:w-[26px] sm:h-[26px]`}
+                      className={`${info.color} w-5 h-5 sm:w-[26px] sm:h-[26px]`}
                     />
                   </div>
                   <div className="relative z-10 min-w-0">
-                    <h3 className={`font-black text-lg mb-2 ${info.color}`}>
+                    <h3 className={`font-black text-base sm:text-lg mb-1.5 sm:mb-2 ${info.color}`}>
                       {info.label}
                     </h3>
-                    <p className="text-stone-900 dark:text-stone-100 font-bold mb-2 text-[15px]">
+                    <p className="text-stone-900 dark:text-stone-100 font-bold mb-1.5 sm:mb-2 text-sm sm:text-[15px]">
                       {p.slogan}
                     </p>
-                    <ul className="space-y-1.5">
+                    <ul className="space-y-1 sm:space-y-1.5">
                       {p.points.map((point, idx) => (
                         <li
                           key={idx}
-                          className="flex gap-2 text-stone-600 dark:text-stone-400 text-[14px] leading-relaxed font-medium"
+                          className="flex gap-2 text-stone-600 dark:text-stone-400 text-[13px] sm:text-[14px] leading-relaxed font-medium"
                         >
                           <span className="shrink-0 text-amber-500">•</span>
                           <span>{point}</span>
@@ -138,31 +134,21 @@ export default function Hero({
             })}
           </div>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             <Link
               href="/#projects"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-stone-900 dark:bg-amber-600 text-white rounded-2xl text-base font-black hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 group"
+              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-stone-900 dark:bg-amber-600 text-white rounded-2xl text-sm sm:text-base font-black hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 group"
             >
               <Folder
-                size={20}
+                size={18}
                 className="group-hover:scale-110 transition-transform"
               />
               프로젝트 둘러보기
               <ArrowRight
-                size={18}
+                size={16}
                 className="group-hover:translate-x-2 transition-transform"
               />
             </Link>
-            {/* <Link
-              href="/resume"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-200 text-stone-900 rounded-2xl text-base font-black hover:bg-stone-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 group"
-            >
-              <FileText
-                size={20}
-                className="group-hover:scale-110 transition-transform text-amber-600"
-              />
-              이력서 보기
-            </Link> */}
             <a
               href={profile.cta.secondary.href}
               target="_blank"
@@ -174,110 +160,98 @@ export default function Hero({
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Profile & Stats */}
-        <div className="flex flex-col gap-5 shrink-0 w-full lg:w-auto">
+        {/* RIGHT COLUMN: Profile & Streak */}
+        <div className="flex flex-col gap-4 sm:gap-5 shrink-0 w-full lg:w-auto">
           {/* Profile Card */}
-          <div className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-2xl border border-stone-200 dark:border-stone-700 rounded-[32px] p-8 premium-shadow group hover:-translate-y-1.5 transition-all duration-500 w-full lg:w-[520px] relative overflow-hidden">
-            {/* Decorative Background */}
+          <div className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-2xl border border-stone-200 dark:border-stone-700 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 premium-shadow group hover:-translate-y-1.5 transition-all duration-500 w-full lg:w-[480px] relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 dark:bg-amber-500/10 blur-[80px] rounded-full -mr-10 -mt-10" />
 
-            <div className="flex items-start gap-8 relative z-10">
-              {/* Avatar Slot */}
-              <div className="w-40 min-h-[160px] shrink-0 rounded-2xl overflow-hidden border border-stone-100 dark:border-stone-700 shadow-inner bg-stone-100 dark:bg-stone-800 relative group-hover:scale-[1.02] transition-transform duration-500 flex items-center justify-center">
-                <div className="absolute inset-0 bg-stone-200 dark:bg-stone-700 flex items-center justify-center pointer-events-none">
-                  <span className="text-6xl text-stone-400 dark:text-stone-500">
-                    👤
-                  </span>
-                </div>
-                {/* Fallback pattern if no image, or actual image */}
+            <div className="flex items-start gap-5 sm:gap-8 relative z-10">
+              {/* Avatar */}
+              <div className="w-24 sm:w-36 min-h-[96px] sm:min-h-[144px] shrink-0 rounded-xl sm:rounded-2xl overflow-hidden border border-stone-100 dark:border-stone-700 shadow-inner bg-stone-200 dark:bg-stone-700 relative group-hover:scale-[1.02] transition-transform duration-500 flex items-center justify-center">
+                <span className="text-4xl sm:text-5xl text-stone-400 dark:text-stone-500 absolute">
+                  👤
+                </span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={profile.avatar || "/images/me.jpg"}
                   alt={profile.name}
-                  className="w-full h-auto relative z-10"
+                  className="w-full h-full object-cover relative z-10"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
                   }}
                 />
               </div>
 
-              {/* Personal Info */}
+              {/* Info */}
               <div className="flex-1 pt-1 min-w-0">
-                <div>
-                  <h3 className="text-3xl font-black text-stone-900 dark:text-stone-100 leading-tight mb-1 truncate">
-                    {profile.name}
-                  </h3>
-                  <p className="text-sm font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider mb-5">
-                    {profile.role}
-                  </p>
+                <h3 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 leading-tight mb-1 truncate">
+                  {profile.name}
+                </h3>
+                <p className="text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider mb-4 sm:mb-5">
+                  {profile.role}
+                </p>
 
-                  {/* Social Links (Repo/Blog/Mail) */}
-                  <div className="flex gap-3 mb-6">
-                    <a
-                      href={profile.social.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-900 dark:hover:bg-stone-100 hover:text-white dark:hover:text-stone-900 hover:scale-110 transition-all duration-300 shadow-sm"
-                      aria-label="GitHub"
-                    >
-                      <Github size={18} />
-                    </a>
-                    <a
-                      href={`mailto:${profile.social.email}`}
-                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-blue-500 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
-                      aria-label="Email"
-                    >
-                      <Mail size={18} />
-                    </a>
-                  </div>
+                {/* Social Links */}
+                <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <a
+                    href={profile.social.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-900 dark:hover:bg-stone-100 hover:text-white dark:hover:text-stone-900 hover:scale-110 transition-all duration-300 shadow-sm"
+                    aria-label="GitHub"
+                  >
+                    <Github size={16} />
+                  </a>
+                  <a
+                    href={`mailto:${profile.social.email}`}
+                    className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-blue-500 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
+                    aria-label="Email"
+                  >
+                    <Mail size={16} />
+                  </a>
                 </div>
 
-                <div className="space-y-4">
-                  {/* Now Learning (Interests) */}
+                {/* Interests */}
+                {profile.interests && profile.interests.length > 0 && (
                   <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
-                    <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 mb-2 pl-1">
+                    <p className="text-[10px] sm:text-xs font-semibold text-stone-500 dark:text-stone-400 mb-2 pl-1">
                       최근 관심 분야
                     </p>
                     <div className="flex flex-wrap gap-1.5">
-                      {profile.skills
-                        .find((s) => s.category === "관심 분야")
-                        ?.items.map((skill) => (
-                          <span
-                            key={skill.slug}
-                            className="px-2 py-1 rounded-md bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wide flex items-center gap-1.5"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                            {skill.name}
-                          </span>
-                        ))}
+                      {profile.interests.map((interest) => (
+                        <span
+                          key={interest.slug}
+                          className="px-2 py-1 rounded-md bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] sm:text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wide flex items-center gap-1.5"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                          {interest.name}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Stats Row (Full Width Streak) */}
-          <div className="w-full bg-stone-900 rounded-[32px] p-6 shadow-2xl text-white group hover:-translate-y-1 transition-all duration-500 overflow-hidden relative">
+          {/* GitHub Streak Heatmap */}
+          <div className="w-full bg-stone-900 rounded-2xl sm:rounded-[32px] p-4 sm:p-6 shadow-2xl text-white group hover:-translate-y-1 transition-all duration-500 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full -mr-20 -mt-20 animate-pulse" />
 
-            {/* Header - 숫자보다 메시지와 그래프 비주얼 강조 */}
-            <div className="flex items-center justify-between mb-4 relative z-10">
+            <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                <p className="text-xs font-bold text-stone-300 uppercase tracking-widest">
+                <p className="text-[10px] sm:text-xs font-bold text-stone-300 uppercase tracking-widest">
                   Consistency is Key
                 </p>
               </div>
-              <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="text-stone-500">Streak</span>
-                  <span className="font-bold text-emerald-400">{streak}일</span>
-                </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-stone-500">Streak</span>
+                <span className="font-bold text-emerald-400">{streak}일</span>
               </div>
             </div>
 
-            {/* Heatmap Container */}
             <div className="relative z-10 opacity-90 mix-blend-screen w-full overflow-hidden">
               <CalendarHeatmap
                 startDate={
@@ -293,8 +267,7 @@ export default function Hero({
                 }}
                 onMouseOver={(event: any, value: any) => {
                   if (!value) return;
-                  // @ts-ignore
-                  const rect = event.target.getBoundingClientRect();
+                  const rect = (event.target as HTMLElement).getBoundingClientRect();
                   setTooltip({
                     show: true,
                     data: value,
@@ -303,7 +276,7 @@ export default function Hero({
                   });
                 }}
                 onMouseLeave={() => {
-                  setTooltip({ ...tooltip, show: false });
+                  setTooltip((prev) => ({ ...prev, show: false }));
                 }}
               />
             </div>
@@ -311,22 +284,16 @@ export default function Hero({
             {/* Tooltip */}
             {tooltip.show && tooltip.data && (
               <div
-                className="fixed z-50 bg-stone-950/90 backdrop-blur-md border border-stone-700 text-white text-[10px] px-3 py-2 rounded-xl shadow-xl space-y-1 pointer-events-none transform -translate-x-1/2 -translate-y-full mt-[-8px]"
+                className="fixed z-50 bg-stone-950/90 backdrop-blur-md border border-stone-700 text-white text-[10px] px-3 py-2 rounded-xl shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-full mt-[-8px]"
                 style={{ top: tooltip.y, left: tooltip.x }}
               >
                 <p className="font-bold text-stone-300 border-b border-stone-800 pb-1 mb-1">
                   {tooltip.data.date}
                 </p>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-stone-400">Commits</span>
+                  <span className="text-stone-400">Contributions</span>
                   <span className="font-bold text-emerald-400">
-                    {tooltip.data.commits || 0}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-stone-400">Posts</span>
-                  <span className="font-bold text-amber-400">
-                    {tooltip.data.posts || 0}
+                    {tooltip.data.count || 0}
                   </span>
                 </div>
               </div>

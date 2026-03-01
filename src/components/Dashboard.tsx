@@ -1,28 +1,25 @@
 "use client";
 
-import { DashboardData } from "@/lib/graph-loader";
 import { useRef } from "react";
+import { GitHubStreakData } from "@/lib/github-fetcher";
 import Nav from "./dashboard/Nav";
 import Hero from "./dashboard/Hero";
 import Skills from "./dashboard/Skills";
 import ProjectList from "./dashboard/ProjectList";
-import EngineeringLogs from "./dashboard/EngineeringLogs";
 import PortfolioPrint from "./dashboard/PortfolioPrint";
 import { useProfile } from "@/context/ProfileContext";
 import { ChevronDown } from "lucide-react";
 
 export default function Dashboard({
-  data,
-  hideNav = false,
+  streakData,
 }: {
-  data: DashboardData;
-  hideNav?: boolean;
+  streakData: GitHubStreakData;
 }) {
   const { profile } = useProfile();
-  const projectsRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLElement>(null);
 
-  const scrollToProjects = () => {
-    projectsRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToContent = () => {
+    contentRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -32,21 +29,18 @@ export default function Dashboard({
         <PortfolioPrint />
       </div>
 
-      {/* 웹 전용 콘텐츠 */}
-      {!hideNav && <Nav />}
+      <Nav />
 
-      {/* ═══════════════════════════════════════════════════════════════
-          SECTION 1: HERO - 임팩트 있는 첫인상 (Full Viewport)
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* HERO */}
       <section className="min-h-[100svh] flex flex-col no-print relative">
         <div className="flex-1 animate-fade-in-up opacity-0 fill-mode-forwards">
-          <Hero streak={data.streak} heatmapData={data.heatmap} />
+          <Hero streak={streakData.streak} heatmapData={streakData.heatmap} />
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator — hidden on mobile when hero overflows */}
         <button
-          onClick={scrollToProjects}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors group cursor-pointer"
+          onClick={scrollToContent}
+          className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-stone-400 hover:text-amber-600 transition-colors group cursor-pointer"
         >
           <span className="text-[10px] font-bold uppercase tracking-[0.2em]">
             Scroll to explore
@@ -58,55 +52,45 @@ export default function Dashboard({
         </button>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          SECTION 2: PROJECTS - 핵심 프로젝트 (가장 중요)
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* SKILLS */}
       <section
-        ref={projectsRef}
-        id="projects"
-        className="py-24 md:py-32 bg-white dark:bg-stone-900 border-y border-stone-100 dark:border-stone-800 animate-fade-in-up opacity-0 delay-100 fill-mode-forwards no-print"
+        ref={contentRef}
+        id="skills"
+        className="py-24 md:py-32 bg-white dark:bg-stone-900 border-y border-stone-100 dark:border-stone-800 no-print"
       >
-        <ProjectList />
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          SECTION 3: SKILLS - 접이식 패널로 정보 밀도 완화
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-32 no-print">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <Skills />
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          SECTION 4: RECENT LOGS - 최근 학습 기록
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-32 bg-white dark:bg-stone-900 border-t border-stone-100 dark:border-stone-800 no-print">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-10">
-          <EngineeringLogs recentPosts={data.recentPosts} />
-        </div>
+      {/* PROJECTS */}
+      <section
+        id="projects"
+        className="py-24 md:py-32 bg-stone-50/50 dark:bg-stone-950 border-b border-stone-100 dark:border-stone-800 no-print"
+      >
+        <ProjectList />
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          FOOTER - 미니멀하게 정리
-      ═══════════════════════════════════════════════════════════════ */}
-      <footer className="py-16 border-t border-stone-100 dark:border-stone-800 no-print">
+      {/* FOOTER */}
+      <footer className="py-16 no-print">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div>
               <p className="text-sm font-black text-stone-900 dark:text-stone-100 mb-1">
                 {profile.name}
               </p>
-              <p className="text-xs text-stone-400">
-                Engineering Knowledge Garden
-              </p>
+              <p className="text-xs text-stone-400">{profile.role}</p>
             </div>
 
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-500 font-bold">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                Live
-              </div>
+              <a
+                href={profile.social.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
+              >
+                GitHub
+              </a>
               <a
                 href={`mailto:${profile.social.email}`}
                 className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
@@ -116,11 +100,10 @@ export default function Dashboard({
             </div>
           </div>
 
-          <div className="mt-10 pt-6 border-t border-stone-50 dark:border-stone-800 flex justify-between text-[10px] text-stone-300 dark:text-stone-600">
+          <div className="mt-10 pt-6 border-t border-stone-100 dark:border-stone-800 text-center text-[10px] text-stone-300 dark:text-stone-600">
             <span>
               &copy; {new Date().getFullYear()} {profile.name}
             </span>
-            <span>v1.5.0</span>
           </div>
         </div>
       </footer>

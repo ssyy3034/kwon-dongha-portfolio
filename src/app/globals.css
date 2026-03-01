@@ -134,39 +134,34 @@
   }
 }
 
-/* --- Calendar Heatmap: Warm Amber/Orange Palette --- */
+/* --- Calendar Heatmap --- */
 .color-empty {
-  fill: #f4f4f5; /* zinc-100 */
+  fill: #f4f4f5;
 }
 .color-scale-1 {
-  fill: #fef3c7; /* amber-100 */
+  fill: #fef3c7;
 }
 .color-scale-2 {
-  fill: #fcd34d; /* amber-300 */
+  fill: #fcd34d;
 }
 .color-scale-3 {
-  fill: #f59e0b; /* amber-500 */
+  fill: #f59e0b;
 }
 .color-scale-4 {
-  fill: #d97706; /* amber-600 */
+  fill: #d97706;
 }
-
 .color-empty-dark {
-  fill: #44403c; /* stone-700 */
+  fill: #44403c;
 }
-
-/* Dark mode heatmap colors */
 :root.dark .color-empty,
 .dark .color-empty {
-  fill: #292524; /* stone-800 */
+  fill: #292524;
 }
-
 .react-calendar-heatmap rect {
   rx: 3px;
   ry: 3px;
   transition: all 0.2s ease;
 }
-
 .react-calendar-heatmap rect:hover {
   @apply opacity-80;
   cursor: pointer;

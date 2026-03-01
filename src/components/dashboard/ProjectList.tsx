@@ -3,93 +3,17 @@
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
-  Code2,
-  Cpu,
-  Database,
-  Layout,
   Calendar,
   Users,
   Briefcase,
 } from "lucide-react";
 import Link from "next/link";
 import projects from "@/config/projects.json";
-
-const icons = {
-  stolink: Code2,
-  pintos: Cpu,
-  aidiary: Database,
-  garden: Layout,
-};
-
-const accentColors = {
-  amber: {
-    bg: "bg-amber-500",
-    text: "text-amber-700 dark:text-amber-400",
-    border: "border-amber-200 dark:border-amber-700",
-    light: "bg-amber-50 dark:bg-amber-900/30",
-    gradient: "from-amber-500 to-orange-600",
-  },
-  emerald: {
-    bg: "bg-emerald-500",
-    text: "text-emerald-700 dark:text-emerald-400",
-    border: "border-emerald-200 dark:border-emerald-700",
-    light: "bg-emerald-50 dark:bg-emerald-900/30",
-    gradient: "from-emerald-500 to-teal-600",
-  },
-  indigo: {
-    bg: "bg-indigo-500",
-    text: "text-indigo-700 dark:text-indigo-400",
-    border: "border-indigo-200 dark:border-indigo-700",
-    light: "bg-indigo-50 dark:bg-indigo-900/30",
-    gradient: "from-indigo-500 to-purple-600",
-  },
-  rose: {
-    bg: "bg-rose-500",
-    text: "text-rose-700 dark:text-rose-400",
-    border: "border-rose-200 dark:border-rose-700",
-    light: "bg-rose-50 dark:bg-rose-900/30",
-    gradient: "from-rose-500 to-pink-600",
-  },
-  // 부드러운 세이지 그린
-  sage: {
-    bg: "bg-lime-600",
-    text: "text-lime-700 dark:text-lime-400",
-    border: "border-lime-200 dark:border-lime-700",
-    light: "bg-lime-50 dark:bg-lime-900/30",
-    gradient: "from-lime-500 to-green-600",
-  },
-  // 따뜻한 피치/살구색
-  peach: {
-    bg: "bg-orange-300",
-    text: "text-orange-600 dark:text-orange-400",
-    border: "border-orange-200 dark:border-orange-700",
-    light: "bg-orange-50 dark:bg-orange-900/30",
-    gradient: "from-rose-300 to-orange-400",
-  },
-  // 하늘색
-  sky: {
-    bg: "bg-sky-400",
-    text: "text-sky-700 dark:text-sky-400",
-    border: "border-sky-200 dark:border-sky-700",
-    light: "bg-sky-50 dark:bg-sky-900/30",
-    gradient: "from-sky-400 to-cyan-500",
-  },
-  // 빨강
-  red: {
-    bg: "bg-red-600",
-    text: "text-red-800 dark:text-red-400",
-    border: "border-red-300 dark:border-red-700",
-    light: "bg-red-50 dark:bg-red-900/30",
-    gradient: "from-red-600 to-red-800",
-  },
-};
+import { getProjectColors, getProjectIcon } from "@/config/project-theme";
 
 export default function ProjectList() {
   return (
-    <section
-      id="projects"
-      className="py-12 md:py-20 max-w-[1400px] mx-auto px-5 md:px-10 scroll-mt-16"
-    >
+    <div className="py-12 md:py-20 max-w-[1400px] mx-auto px-5 md:px-10 scroll-mt-16">
       {/* Section Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -106,9 +30,8 @@ export default function ProjectList() {
       {/* Projects Grid */}
       <div className="grid md:grid-cols-2 gap-6">
         {projects.map((project, index) => {
-          const Icon = icons[project.id as keyof typeof icons] || Code2;
-          const colors =
-            accentColors[project.color as keyof typeof accentColors];
+          const Icon = getProjectIcon(project.id);
+          const colors = getProjectColors(project.color);
 
           return (
             <motion.article
@@ -116,27 +39,27 @@ export default function ProjectList() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: Math.min(index * 0.1, 0.3) }}
             >
               <Link href={project.link} className="group block h-full">
                 <div className="h-full bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden transition-all duration-300 hover:shadow-xl dark:hover:shadow-stone-900/50 hover:border-stone-300 dark:hover:border-stone-600 hover:-translate-y-1">
                   {/* Accent Bar */}
                   <div className={`h-1 bg-gradient-to-r ${colors.gradient}`} />
 
-                  <div className="p-6">
+                  <div className="p-5 sm:p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-10 h-10 rounded-xl ${colors.light} ${colors.border} border flex items-center justify-center`}
+                          className={`w-10 h-10 rounded-xl ${colors.light} ${colors.border} border flex items-center justify-center shrink-0`}
                         >
                           <Icon size={20} className={colors.text} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <h3 className="text-xl font-bold text-stone-900 dark:text-stone-100 group-hover:text-stone-700 dark:group-hover:text-stone-300 transition-colors">
                             {project.title}
                           </h3>
-                          <p className="text-sm text-stone-500 dark:text-stone-400">
+                          <p className="text-sm text-stone-500 dark:text-stone-400 truncate">
                             {project.subtitle}
                           </p>
                         </div>
@@ -168,7 +91,7 @@ export default function ProjectList() {
                       {project.description}
                     </p>
 
-                    {/* Metrics - 수치화된 성과 */}
+                    {/* Metrics */}
                     {project.metrics && (
                       <div className="flex gap-3 mb-4">
                         {project.metrics.map(
@@ -214,6 +137,6 @@ export default function ProjectList() {
           );
         })}
       </div>
-    </section>
+    </div>
   );
 }
