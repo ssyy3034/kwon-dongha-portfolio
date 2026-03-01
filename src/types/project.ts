@@ -1,23 +1,15 @@
-// 프로젝트 상세 페이지용 타입 정의
-
-export interface TechDecision {
-  category: string;
-  items: string[];
-}
-
 export interface ProblemSolution {
   id: string;
   title: string;
   subtitle?: string;
-  challenge: string;
-  solution: string;
+  // 4단계 스토리텔링
+  problem: string;         // 문제 발견 및 정의
+  approach: string;        // 해결방법 모색 및 결정
+  result: string;          // 적용 및 개선 결과
+  retrospective?: string;  // 아쉬운점 및 개선 가능한 점
+  // 보조 자료
   details?: string[];
-  codeExample?: {
-    language: string;
-    code: string;
-    caption?: string;
-  };
-  codeSnippet?: string; // 간단한 코드 스니펫 (마크다운 포맷)
+  codeSnippet?: string;
   diagram?: {
     type: "mermaid" | "image";
     content: string;
@@ -26,55 +18,23 @@ export interface ProblemSolution {
   impact?: string;
 }
 
-export interface KeyFocus {
-  headline: string;
-  points: {
-    icon:
-      | "layers"
-      | "zap"
-      | "shield"
-      | "target"
-      | "cpu"
-      | "database"
-      | "smartphone"
-      | "trending-up";
-    title: string;
-    description: string;
-  }[];
-}
-
 export interface Achievement {
   metric?: string;
   label: string;
   description: string;
 }
 
-export interface Decision {
-  id: string;
-  type: "initial" | "development";
-  decision: string;
-  reason: string;
-  result?: string;
-}
-
 export interface ProjectDetail {
   id: string;
-  // 확장된 개요
-  tagline: string; // 한 줄 요약 (인용문 스타일)
-  overview: string; // 상세 개요
-
-  // 핵심 포커스 (선택적 - 주요 프로젝트용)
-  keyFocus?: KeyFocus;
-
-  // 기술적 의사 결정 (ADR 요약)
-  decisions?: Decision[];
-
-  // 문제 해결 섹션들
-  sections: ProblemSolution[];
-
-  // 성과
+  tagline: string;
+  overview: string;
+  sections: {
+    backend?: ProblemSolution[];
+    frontend?: ProblemSolution[];
+  };
   achievements: Achievement[];
-
-  // 기술 스택 상세
-  techStack: TechDecision[];
+  techStack: {
+    category: string;
+    items: string[];
+  }[];
 }

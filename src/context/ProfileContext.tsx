@@ -13,8 +13,14 @@ interface ProfileContextType {
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
-export function ProfileProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<ProfileData>(defaultProfile);
+export function ProfileProvider({
+  children,
+  initialProfile = defaultProfile,
+}: {
+  children: ReactNode;
+  initialProfile?: ProfileData;
+}) {
+  const [profile, setProfile] = useState<ProfileData>(initialProfile);
 
   const updateProfile = (newData: Partial<ProfileData>) => {
     setProfile((prev) => ({ ...prev, ...newData }));

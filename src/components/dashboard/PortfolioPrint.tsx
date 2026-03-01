@@ -290,64 +290,16 @@ export default function PortfolioPrint() {
               </section>
             </div>
 
-            {/* Technical Decisions (ADR) - Compact Row Based Layout */}
-            {detail.decisions && (
-              <section className="mb-10 break-inside-avoid">
-                <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
-                  Architectural Decision Records
-                </h3>
-                <div className="space-y-3">
-                  {/* Category Sections as Compact Headers */}
-                  {[
-                    { key: "initial", label: "Initial Framework & Core" },
-                    { key: "development", label: "Development & Optimization" },
-                  ].map((cat) => (
-                    <div key={cat.key} className="mb-6">
-                      <h4 className="text-[11px] font-black text-stone-900 mb-3 flex items-center gap-2">
-                        <span className="w-1 h-3 bg-stone-300 rounded-full" />
-                        {cat.label}
-                      </h4>
-                      <div className="grid grid-cols-2 gap-3">
-                        {detail
-                          .decisions!.filter((d) => d.type === cat.key)
-                          .map((item) => (
-                            <div
-                              key={item.id}
-                              className="p-3 border border-stone-100 rounded-xl bg-stone-50/30"
-                            >
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[9px] font-black bg-stone-200 text-stone-800 px-1.5 py-0.5 rounded leading-none whitespace-nowrap shrink-0">
-                                  {item.id}
-                                </span>
-                                <span className="text-xs font-black text-stone-900">
-                                  {item.decision}
-                                </span>
-                              </div>
-                              <p className="text-[10px] text-stone-600 leading-relaxed mb-1.5">
-                                {item.reason}
-                              </p>
-                              {item.result && (
-                                <p className="text-[10px] text-amber-700 font-bold leading-tight border-t border-amber-100/50 pt-1.5 mt-1.5 flex gap-1">
-                                  <span className="shrink-0">→</span>
-                                  <span>{item.result}</span>
-                                </p>
-                              )}
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
             {/* Technical Deep Dive - Structured & Scannable */}
             <section className="break-inside-avoid">
               <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
                 Technical Deep Dive (Case Studies)
               </h3>
               <div className="space-y-4">
-                {detail.sections.map((section, idx) => (
+                {[
+                  ...(detail.sections.backend ?? []),
+                  ...(detail.sections.frontend ?? []),
+                ].map((section, idx) => (
                   <div
                     key={idx}
                     className="border border-stone-200 rounded-2xl overflow-hidden break-inside-avoid"
@@ -365,18 +317,18 @@ export default function PortfolioPrint() {
                     <div className="p-5 grid grid-cols-[1fr_1.5fr] gap-6">
                       <div>
                         <p className="text-[9px] font-black text-red-600 uppercase mb-2">
-                          Challenge
+                          Problem
                         </p>
                         <p className="text-[11px] text-stone-700 leading-relaxed font-medium">
-                          <FormattedText noDark text={section.challenge} />
+                          <FormattedText noDark text={section.problem} />
                         </p>
                       </div>
                       <div>
                         <p className="text-[9px] font-black text-emerald-600 uppercase mb-2">
-                          Solution & Implementation
+                          Approach & Result
                         </p>
                         <p className="text-[11px] text-stone-900 leading-relaxed font-bold mb-3">
-                          <FormattedText noDark text={section.solution} />
+                          <FormattedText noDark text={section.approach} />
                         </p>
                         {section.details && (
                           <div className="space-y-1.5">
