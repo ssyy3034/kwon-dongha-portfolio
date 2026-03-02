@@ -4,7 +4,7 @@
     "title": "StoLink",
     "subtitle": "N+1 쿼리 최적화 · 결제 동시성 제어",
     "role": "Fullstack Developer",
-    "period": "2025.12 - 2026.02",
+    "period": "2025.12 - 2026.01",
     "team": "5인 팀",
     "description": "웹소설 작가를 위한 지식 관리 플랫폼의 백엔드와 프론트엔드를 담당했습니다. 계층형 문서 조회의 N+1 문제를 해결하고, 테스트 결제 환경에서 커넥션 풀 격리와 동시성 제어를 설계했습니다.",
     "metrics": [
@@ -21,7 +21,7 @@
     "title": "Aidiary",
     "subtitle": "RabbitMQ 비동기 전환 · 다층 캐시 개인화 · N+1 해결",
     "role": "Fullstack Developer",
-    "period": "2025.04 - 2026.02",
+    "period": "2025.04 - 2025.06 (개인 개선 2026.02)",
     "team": "2인 팀",
     "description": "산모를 위한 AI 감정 일기 서비스의 백엔드·프론트엔드·인프라를 담당했습니다. ML 연산 블로킹을 메시지 큐로 해결하고, 쿼리 최적화와 캐싱으로 API 성능을 개선했습니다.",
     "metrics": [

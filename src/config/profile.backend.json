@@ -24,7 +24,7 @@
         "slogan": "같이 일하는 경험을 더 좋게 만들고 싶습니다",
         "points": [
           "3년간 서비스직 아르바이트에서 다양한 팀원들과 일하며, 불편함이 보이면 먼저 개선 방법을 찾아 제안하는 습관이 생겼습니다.",
-          "개발 팀에서도 같은 태도로, 커밋·PR 작성이 팀 병목임을 파악하고 자동화 커맨드(Antigravity)를 만들어 과정 내 타 팀까지 확산시켰습니다.",
+          "개발 팀에서도 같은 태도로, 커밋·PR 작성이 팀 병목임을 파악하고 Antigravity의 커스텀 커맨드를 활용해 Git 컨벤션 자동화를 구축하고, 과정 내 타 팀까지 확산시켰습니다.",
           "기술적인 내용도 듣는 사람이 이해하기 쉽도록 맥락을 함께 전달하려고 합니다."
         ]
       }
@@ -114,7 +114,7 @@
           "name": "PostgreSQL / MariaDB",
           "slug": "postgresql",
           "color": "4169E1",
-          "description": "Fetch Join과 DTO Projection으로 쿼리를 최적화하고, 비관적·낙관적 락으로 결제 동시성을 제어했습니다."
+          "description": "StoLink에서 PostgreSQL, Aidiary에서 MariaDB를 사용했습니다."
         },
         {
           "name": "Neo4j",
@@ -125,19 +125,31 @@
       ]
     },
     {
-      "category": "기반 지식",
+      "category": "Frontend & 기반 지식",
       "items": [
         {
-          "name": "C",
-          "slug": "c",
-          "color": "A8B9CC",
-          "description": "Pintos에서 스케줄러와 가상 메모리를 구현하며 시스템 동작 원리를 배웠습니다."
+          "name": "React",
+          "slug": "react",
+          "color": "61DAFB",
+          "description": "두 프로젝트에서 프론트엔드 UI를 설계하고 구현했습니다."
+        },
+        {
+          "name": "Zustand",
+          "slug": "zustand",
+          "color": "453F39",
+          "description": "전역 상태 관리 단일화로 Prop Drilling을 제거하고 상태 불일치를 해소했습니다."
         },
         {
           "name": "TypeScript",
           "slug": "typescript",
           "color": "3178C6",
           "description": "타입 시스템으로 런타임 오류를 줄이고 협업 시 코드 의도를 명확히 전달하는 데 활용합니다."
+        },
+        {
+          "name": "C",
+          "slug": "c",
+          "color": "A8B9CC",
+          "description": "Pintos에서 스케줄러와 가상 메모리를 구현하며 시스템 동작 원리를 배웠습니다."
         }
       ]
     },
@@ -171,7 +183,7 @@
           "name": "AI Agents",
           "slug": "openai",
           "color": "10A37F",
-          "description": "Claude Code CLI 기반의 Git 컨벤션 자동화 커스텀 커맨드 `antigravity`를 개발해 팀에 도입했습니다."
+          "description": "Claude Code CLI의 Skill·커스텀 커맨드·MCP 플러그인을 활용해 개발 워크플로우를 자동화하고 있습니다."
         }
       ]
     }

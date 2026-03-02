@@ -26,6 +26,7 @@ import { ProblemSolution } from "@/types/project";
 import { getProjectColors, getProjectIcon } from "@/config/project-theme";
 import Nav from "@/components/dashboard/Nav";
 import Mermaid from "@/components/common/Mermaid";
+import CodeBlock from "@/components/common/CodeBlock";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -136,18 +137,19 @@ function SectionCard({
           </div>
         )}
 
-        {/* 코드 스니펫 */}
-        {section.codeSnippet && (
-          <div className="mt-5 sm:mt-6 p-3 sm:p-4 bg-stone-900 rounded-lg sm:rounded-xl overflow-x-auto print:bg-stone-100 print:border print:border-stone-300">
-            <pre className="text-[11px] sm:text-sm font-mono text-stone-200 leading-relaxed print:text-stone-800">
-              <code>{section.codeSnippet}</code>
-            </pre>
-          </div>
-        )}
+      </div>
 
-        {/* 다이어그램 */}
-        {section.diagram?.type === "mermaid" && (
-          <div className="mt-5 sm:mt-6 p-3 sm:p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-700 overflow-x-auto">
+      {/* 코드 스니펫 — 카드 하단에 풀 너비로 */}
+      {section.codeSnippet && (
+        <div className="px-5 sm:px-7 pb-5 sm:pb-7">
+          <CodeBlock code={section.codeSnippet} />
+        </div>
+      )}
+
+      {/* 다이어그램 — 카드 하단에 풀 너비로 */}
+      {section.diagram?.type === "mermaid" && (
+        <div className="px-5 sm:px-7 pb-5 sm:pb-7">
+          <div className="p-3 sm:p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-700 overflow-x-auto">
             {section.diagram.caption && (
               <p className="text-[10px] sm:text-xs text-stone-500 font-semibold mb-3">
                 {section.diagram.caption}
@@ -155,8 +157,8 @@ function SectionCard({
             )}
             <Mermaid chart={section.diagram.content} />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </motion.article>
   );
 }

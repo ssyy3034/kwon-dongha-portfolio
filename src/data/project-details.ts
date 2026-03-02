@@ -6,7 +6,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
     tagline:
       "웹소설 작가를 위한 세컨드 브레인 서비스입니다. 에디터에서 집필하면 AI가 글을 분석하고, 월드 페이지에서 인물·관계·사건을 시각화합니다. 독자는 StoRead에서 관계도와 함께 작품을 열람할 수 있습니다.",
     overview:
-      "크래프톤 정글 최종 프로젝트, 5인 팀. 프론트엔드 전체(에디터·관계도·사이드바·대시보드)와 백엔드 일부(OAuth2 인증·문서 CRUD·결제 시스템)를 담당했습니다. 가장 도전적이었던 부분은 인물이 수백 명으로 늘어도 버티는 관계도 렌더링과, 테스트 결제 환경에서의 동시성 제어 및 잔액 정합성이었습니다.",
+      "크래프톤 정글 최종 프로젝트, 5인 팀. 프론트엔드 일부(에디터·관계도·사이드바·대시보드)와 백엔드 일부(OAuth2 인증·문서 CRUD·결제 시스템)를 담당했습니다. 가장 도전적이었던 부분은 인물이 수백 명으로 늘어도 버티는 관계도 렌더링과, 테스트 결제 환경에서의 동시성 제어 및 잔액 정합성이었습니다.",
 
     sections: {
       backend: [
@@ -15,19 +15,17 @@ export const projectDetails: Record<string, ProjectDetail> = {
           title: "계층형 문서 조회 N+1 쿼리",
           subtitle: "API 응답 450ms → 25ms (18배 개선)",
           problem:
-            "**사이드바 문서 목록 조회에서 쿼리 61개가 발생하고, 응답시간이 450ms까지 느려졌습니다.**\n문서 30개를 조회할 때 '문서 1번 → 태그 30번 → 카테고리 30번' 패턴으로 총 61개 쿼리가 나가고 있었습니다. JPA Lazy Loading 특성상 데이터가 적을 때는 드러나지 않다가, 문서가 쌓이면서 전형적인 N+1 패턴이 표면화된 것입니다.\n- 실측 응답시간 **450ms**, 사이드바 열 때 뚜렷한 지연 체감\n- 쿼리 로그 확인 후 원인 특정",
+            "**사이드바 문서 목록 조회에서 쿼리 61개가 발생하고, 응답시간이 450ms까지 느려졌습니다.**\n문서 30개를 조회할 때 '문서 1번 → 태그 30번 → 카테고리 30번' 패턴으로 총 61개 쿼리가 나가고 있었습니다. JPA Lazy Loading 특성상 데이터가 적을 때는 드러나지 않다가, 문서가 늘어나면서 N+1 문제가 드러났습니다.\n- 실측 응답시간 **450ms**, 사이드바 열 때 뚜렷한 지연 체감\n- 쿼리 로그 확인 후 원인 특정",
           approach:
             "**DTO Projection으로 엔티티 그래프를 우회하고, JPA Fetch Join과 In-Memory 트리 구성을 통해 계층 구조를 효율적으로 조회했습니다.**\n원인은 문서를 조회한 뒤 각 문서의 태그와 카테고리를 개별 SELECT로 가져오는 구조였습니다. `@BatchSize`로 IN 쿼리 묶음을 먼저 시도했지만 2-3회 왕복이 여전했고, Fetch Join은 OneToMany + Pageable 조합에서 HHH90003004 경고(메모리 전체 로딩)가 발생해 쓸 수 없었습니다. 결국 JPQL 생성자 표현식으로 필요 컬럼만 DTO에 직접 매핑하는 방식으로 전환해 N+1을 구조적으로 차단했습니다.\n- 폴더 트리는 Fetch Join으로 전체 데이터를 조회한 뒤 메모리에서 Map을 활용해 O(n)으로 조립\n- `@BatchSize` → Fetch Join → In-Memory 트리 구성 순서로 접근법 비교 후 결정",
           result:
-            "**쿼리 61개 → 1개, 응답 450ms → 25ms로 18배 개선됐습니다.**\n사이드바 체감 속도가 달라지는 걸 팀원들도 바로 느꼈습니다. 쿼리 수가 줄면서 DB 부하 자체가 낮아져 전체 시스템 안정성도 높아졌습니다.",
+            "**쿼리 61개 → 1개, 응답 450ms → 25ms로 18배 개선됐습니다.**\nChrome DevTools Network 탭에서 응답 시간을 측정해 개선 폭을 확인했습니다.",
           retrospective:
             "Fetch Join의 페이지네이션 제약을 미리 알았다면 처음부터 DTO Projection으로 설계했을 텐데, 이미 엔티티 기반으로 짜인 코드를 전부 DTO로 바꾸는 데 예상보다 시간이 많이 들었습니다. 초기에는 Recursive CTE를 검토했으나, DB 벤더 간 문법 차이와 쿼리 복잡성을 고려하여 최종적으로 'Fetch Join + In-Memory 조립' 방식을 채택했습니다. 이 과정에서 기술적 트레이드오프(쿼리 단순성 vs 메모리 사용량)를 깊이 고민해 볼 수 있었습니다. 앞으로는 데이터 규모와 요구사항에 따라 QueryDSL이나 네이티브 쿼리 등 최적의 도구를 유연하게 선택하는 역량을 더 키우고자 합니다.",
           details: [
-            "**문제 감지**: API 모니터링 로그에서 단일 엔드포인트에 60+ 쿼리 발생 확인",
-            "**@BatchSize 시도**: IN 쿼리로 묶어도 2-3회 왕복 발생, 근본 해결 아님",
+            "**@BatchSize 시도**: IN 쿼리로 묶어도 2-3회 왕복이 여전 → 쿼리 수를 1로 줄이는 건 불가능",
             "**Fetch Join 함정**: OneToMany + Pageable 조합에서 HHH90003004 경고 → 메모리 전체 로딩 위험",
-            "**DTO Projection 전환**: JPQL 생성자 표현식으로 필요 컬럼만 직접 매핑, N+1 구조적 차단",
-            "**In-Memory 트리 구성**: Fetch Join으로 로드된 Flat 데이터를 메모리에서 O(n) 트리로 조립",
+            "**In-Memory 트리 구성**: Fetch Join으로 Flat 데이터 로드 후 메모리에서 O(n) 트리 조립 (Recursive CTE 대비 DB 벤더 독립적)",
           ],
           impact: "450ms → 25ms (18배)",
         },
@@ -38,17 +36,64 @@ export const projectDetails: Record<string, ProjectDetail> = {
           problem:
             "**트랜잭션 안에서 PG API를 호출하는 구조로, 동시 결제 10건이면 커넥션 풀이 고갈될 위험이 있었습니다.**\n결제 승인 로직이 '트랜잭션 안에서 PG API 호출 → DB 저장'을 하나의 흐름으로 묶고 있었습니다. HikariCP 기본 풀은 10개인데 토스페이먼츠 테스트 API 응답시간이 1-2초라, 결제 10건만 동시에 들어오면 모든 커넥션이 PG 응답을 기다리는 상태로 묶입니다. 일반 API(문서 조회, 에디터 저장)까지 `Connection is not available` 오류가 발생할 수 있는 구조였습니다.\n- 코드 리뷰 중 이 구조적 위험을 발견",
           approach:
-            "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\n수정된 흐름은 이렇습니다: ① 먼저 PG API를 호출해 승인 결과를 받고(트랜잭션 없음), ② 승인 성공 확인 후 트랜잭션을 열어 크레딧을 처리합니다. ③ PG가 성공인데 DB 처리가 실패하는 엣지 케이스를 위해 PG 취소 API를 보상 트랜잭션으로 준비했습니다. 외부 API가 아무리 느려도 DB 커넥션을 물고 있지 않으니, 결제 지연이 다른 기능으로 전파되지 않습니다.",
+            "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\n수정된 흐름은 이렇습니다: ① TX1에서 결제 정보를 검증하고 상태를 IN_PROGRESS로 전환한 뒤 커밋합니다(커넥션 즉시 반환). ② 트랜잭션 밖에서 PG API를 호출합니다(커넥션 미점유). ③ TX2에서 승인 결과를 반영하고 크레딧을 지급합니다. PG 승인 후 TX2가 실패하는 엣지 케이스는 보상 트랜잭션(PaymentCompensation)으로 대비했습니다. 외부 API가 아무리 느려도 DB 커넥션을 물고 있지 않으니, 결제 지연이 다른 기능으로 전파되지 않습니다.",
           result:
             "**PG 응답 지연이 DB 커넥션 풀에 영향을 주지 않는 구조로 전환됐습니다.**\n테스트 환경에서 결제 API에 지연을 주입해도 문서 조회, 에디터 저장 같은 일반 API가 정상 동작하는 것을 확인했습니다. 장애의 파급 범위가 결제 기능에만 격리되는 설계입니다.",
           retrospective:
             "'트랜잭션 안에서 외부 API 호출 금지'는 백엔드 설계의 기본 원칙인데, 초기 구현에서 놓쳤다가 코드 리뷰 과정에서 발견해 수정했습니다. 현재 구조에서도 PG사가 완전히 다운됐을 때를 대비한 회로 차단기(Circuit Breaker)가 없습니다. Resilience4j를 적용해 PG 연속 실패 시 빠른 실패(Fail Fast)와 사용자에게 명확한 안내 메시지를 주는 것이 다음 단계입니다.",
           details: [
-            "**원인 분석**: HikariCP 기본 풀(10개) × PG 응답대기(1-2s) = 10건 동시 결제 시 풀 고갈",
-            "**분리 원칙**: @Transactional 범위 밖에서 PG API 호출 완료 후 트랜잭션 시작",
-            "**보상 트랜잭션**: PG 승인 후 DB 실패 시 PG 취소 API 호출로 정합성 확보",
-            "**장애 격리 검증**: 결제 API 지연 중 일반 API 정상 응답 직접 확인",
+            "**보상 트랜잭션**: PG 승인 후 TX2 실패 시 PG 취소 API 호출로 정합성 확보 — 분리 구조의 엣지 케이스 대응",
+            "**장애 격리 검증**: 결제 API에 지연 주입 후 일반 API(문서 조회·에디터 저장) 정상 응답 직접 확인",
           ],
+          diagram: {
+            type: "mermaid",
+            content: `sequenceDiagram
+  participant C as Client
+  participant W as WAS (Spring Boot)
+  participant PG as 토스페이먼츠 API
+  participant DB as DB (PostgreSQL)
+
+  rect rgb(254, 226, 226)
+  Note over W,DB: Before — 트랜잭션 안에서 PG 호출
+  C->>+W: POST /payments/confirm
+  W->>+DB: BEGIN TX + SELECT FOR UPDATE
+  W->>+PG: confirmPayment (1~2s 대기)
+  Note over DB: ⚠️ 커넥션 점유 중
+  PG-->>-W: 승인 결과
+  W->>DB: credit.charge() + COMMIT
+  DB-->>-W: OK
+  W-->>-C: 200 OK
+  end
+
+  rect rgb(220, 252, 231)
+  Note over W,DB: After — 트랜잭션 밖에서 PG 호출
+  C->>+W: POST /payments/confirm
+  W->>+DB: TX1: 검증 + 상태 IN_PROGRESS
+  DB-->>-W: COMMIT (즉시 반환)
+  W->>+PG: confirmPayment (커넥션 미점유)
+  PG-->>-W: 승인 결과
+  W->>+DB: TX2: credit.charge() + 완료 처리
+  DB-->>-W: COMMIT
+  W-->>-C: 200 OK
+  Note over W: PG 실패 시 TX2에서 fail 처리
+  end`,
+            caption:
+              "트랜잭션-외부 API 분리 — PG 응답 대기 중 DB 커넥션을 점유하지 않음",
+          },
+          codeSnippet: `// PaymentService.java — TX1 → PG 호출(Non-TX) → TX2 분리 흐름
+// ① TX1: 검증만 수행하고 커넥션 즉시 반환
+Payment payment = transactionTemplate.execute(status -> {  // ← 짧은 TX
+    Payment p = paymentRepository.findByOrderIdWithLock(orderId);
+    p.markAsInProgress(paymentKey);
+    return p;
+});  // ← COMMIT — 여기서 커넥션 반납
+
+// ② Non-TX: PG API 호출 — DB 커넥션을 점유하지 않음
+tossResponse = tossPaymentClient.confirmPayment(  // ← 1~2초 대기해도 안전
+        paymentKey, orderId, amount, orderId);
+
+// ③ TX2: PG 승인 결과를 DB에 반영
+return completePaymentProcess(orderId, paymentKey, tossResponse.method());`,
           impact: "결제 장애 → 전체 서비스 전파 차단",
         },
         {
@@ -58,18 +103,30 @@ export const projectDetails: Record<string, ProjectDetail> = {
           problem:
             "**동시 결제 시 Race Condition으로 잔액이 음수가 되거나, 네트워크 재시도로 이중 차감이 발생할 수 있는 구조였습니다.**\n잔액 100크레딧 상태에서 50크레딧 결제가 동시에 두 건 들어오면, 둘 다 '100 읽음 → 50 차감 → 50 저장'을 실행해 잔액이 음수가 될 수 있습니다. 또한 네트워크 불안정으로 클라이언트가 같은 결제를 재시도하면 이중 차감이 발생할 위험도 있었습니다. 테스트 결제 환경이지만 실서비스와 동일한 수준의 정합성을 목표로 설계했습니다.",
           approach:
-            "**비관적 락 + 낙관적 락으로 경쟁 조건을, 멱등키(Redis)로 중복 결제를 각각 방어했습니다.**\n문제의 성격이 달라서 방어 레이어를 나눴습니다. `SELECT FOR UPDATE`로 잔액 행을 잠가 동시 읽기를 직렬화하고, Version 컬럼으로 쓰기 충돌을 감지합니다. 중복 결제는 클라이언트 고유 키를 Redis에 저장해 DB 진입 전에 차단합니다.\n- **Testcontainers**로 실제 PostgreSQL을 띄워 검증 (Mock DB에서는 락 동작 신뢰 불가)\n- 100 스레드 동시 차감 시나리오를 10회 반복 실행",
+            "**비관적 락(`SELECT FOR UPDATE`)으로 동시 접근을 직렬화하고, 멱등키로 중복 결제를 방어했습니다.**\n`SELECT FOR UPDATE`로 잔액 행을 잠가서 같은 행에 대한 동시 접근을 순차 처리되도록 했습니다. 행 단위 잠금만으로 충분하기 때문에 낙관적 락(@Version)은 사용하지 않았고, 엔티티 변경은 `@Transactional` 커밋 시 JPA Dirty Checking에 맡겼습니다. 중복 결제는 멱등키에 DB UNIQUE 제약을 걸어 같은 요청이 두 번 처리되지 않도록 방어했습니다.\n- **Testcontainers**로 실제 PostgreSQL을 띄워 검증 (Mock DB에서는 락 동작 신뢰 불가)\n- 100 스레드 동시 차감 시나리오를 10회 반복 실행",
           result:
             "**100개 스레드 동시 차감에서 10회 반복 모두 잔액 정합성 100%를 확인했습니다.**\n동일 멱등키로 들어오는 중복 요청은 DB 트랜잭션 시작 전에 즉시 차단됩니다. 이 테스트 코드가 CI에 포함되어 결제 코드 변경 시 회귀를 자동으로 감지합니다.",
           retrospective:
-            "비관적 락과 낙관적 락을 같이 쓰는 구조가 처음 보는 사람에게는 복잡하게 느껴질 수 있습니다. 두 락의 역할이 각각 '동시 읽기 방지'와 '쓰기 충돌 감지'로 다르다 보니 함께 필요했는데, 주석과 문서를 더 꼼꼼히 달았어야 했습니다. 서비스가 멀티 인스턴스로 Scale-out 되면 단일 DB 비관적 락으로는 한계가 생기는 문제도 있습니다. 이때는 Redis 기반 분산 락으로 전환하거나 결제를 별도 서비스로 분리하는 방향을 검토해야 합니다.",
+            "처음에는 비관적 락과 낙관적 락(@Version)을 함께 사용했는데, 비관적 락이 행 단위 배타적 접근을 이미 보장하므로 @Version은 충돌을 감지할 일이 없는 죽은 코드였습니다. 리뷰를 통해 이를 인지하고 @Version을 제거했으며, JPA Dirty Checking으로 명시적 save() 호출도 제거했습니다. 서비스가 멀티 인스턴스로 Scale-out 되면 단일 DB 비관적 락으로는 한계가 생기는 문제도 있습니다. 이때는 Redis 기반 분산 락으로 전환하거나 결제를 별도 서비스로 분리하는 방향을 검토해야 합니다.",
           details: [
-            "**비관적 락**: `SELECT ... FOR UPDATE`로 잔액 행 잠금 → 동시 읽기 자체를 직렬화",
-            "**낙관적 락**: Version 컬럼으로 동시 쓰기 충돌 감지 → 충돌 시 재시도",
-            "**멱등키**: 클라이언트 고유 키를 Redis에 저장, 중복 요청은 DB 진입 전 차단",
-            "**Testcontainers**: 실제 PostgreSQL + 100 스레드 동시 요청으로 정합성 검증 (Mock DB 불신뢰)",
-            "**CI 통합**: 동시성 테스트를 파이프라인에 포함해 결제 코드 변경 시 회귀 자동 감지",
+            "**Dirty Checking**: 비관적 락 안에서 엔티티 변경 → 커밋 시 자동 UPDATE, 명시적 save() 불필요",
+            "**Testcontainers**: 실제 PostgreSQL + 100 스레드 동시 요청으로 정합성 검증",
           ],
+          codeSnippet: `// CreditService.java — 비관적 락 + Dirty Checking
+@Transactional
+public CreditResponse useCredit(UUID userId, CreditUseRequest request) {
+
+    // ① SELECT FOR UPDATE → 다른 TX가 같은 행을 읽지도 쓰지도 못하게 잠금
+    Credit credit = creditRepository.findByUserIdWithLock(userId);  // ← 비관적 락
+
+    // ② 엔티티 상태 변경만 하면 커밋 시 자동 UPDATE (Dirty Checking)
+    credit.use(request.amount());  // ← balance -= amount, save() 불필요
+}
+
+// CreditRepository.java
+@Lock(LockModeType.PESSIMISTIC_WRITE)  // ← SELECT c FROM Credit c ... FOR UPDATE
+@Query("SELECT c FROM Credit c WHERE c.userId = :userId")
+Optional<Credit> findByUserIdWithLock(UUID userId);`,
           impact: "100 스레드 동시 / 잔액 정합성 100%",
         },
       ],
@@ -87,10 +144,8 @@ export const projectDetails: Record<string, ProjectDetail> = {
           retrospective:
             "Canvas 렌더링의 단점이 하나 있습니다. SVG와 달리 Canvas 위의 요소는 DOM이 아니라서 스크린 리더가 읽지 못합니다. 지금은 접근성 지원이 없는 상태인데, ARIA live region이나 Canvas 위에 투명한 DOM 레이어를 올리는 방식으로 보완이 필요합니다. 또 Canvas 위에서 특정 노드를 클릭할 때 좌표 계산을 직접 해야 해서, 이 로직에 버그가 생기면 잡기가 꽤 까다롭습니다. 히트 테스트 로직을 별도 유닛 테스트로 커버했어야 했는데 시간 부족으로 하지 못했습니다.",
           details: [
-            "**WebGL vs D3+SVG vs D3+Canvas 비교**: 난이도·성능·물리엔진 지원을 기준으로 D3+Canvas 선택",
-            "**DOM 제거**: 650 노드 기준 SVG 650개 → Canvas 픽셀 직접 드로잉으로 렌더링 비용 선형화",
-            "**물리 격리**: useRef로 D3 시뮬레이션 상태를 React 사이클 밖에 두고, rAF으로 Canvas 갱신",
-            "**훅 분리**: useSimulation(물리) / useDrag(이동) / useZoom(확대) / useResize(반응형) 독립 운용",
+            "**WebGL vs D3+SVG vs D3+Canvas 비교**: WebGL(과잉), D3+SVG(DOM 문제 동일) 기각 → D3+Canvas 선택 근거",
+            "**물리 격리**: useRef로 D3 시뮬레이션 상태를 React 사이클 밖에 격리, rAF으로 Canvas 직접 갱신 — React 리렌더링 0",
           ],
           codeSnippet: `// useCharacterGraphSimulation.ts
 // D3 시뮬레이션을 React 사이클 밖에 격리
@@ -123,9 +178,7 @@ useEffect(() => {
             "manualChunks 설정을 파일로 따로 빼지 않고 vite.config.ts 안에 인라인으로 뒀더니, 나중에 패키지가 추가될 때 설정을 업데이트하는 걸 깜빡하는 일이 생겼습니다. 청크 분류 기준을 명확히 문서화하거나, 새 패키지 추가 시 청크 배정을 강제하는 CI 검사를 넣었으면 좋았을 것 같습니다. 또 SSR을 지원했다면 서버에서 HTML을 먼저 내려서 FCP를 더 빠르게 할 수 있었는데, 이 서비스는 에디터와 Canvas 위주의 클라이언트 인터랙션이 많아 SPA로 결정한 것 자체는 맞다고 생각합니다.",
           details: [
             "**병목 발견**: rollup-plugin-visualizer로 번들 시각화 → jspdf+docx가 초기 번들의 57% 차지 확인",
-            "**React.lazy 시도**: 라우트 기준 스플리팅 시 라이브러리 중복 번들 발생, manualChunks로 전환",
-            "**청크 분류**: vendor-core(React), vendor-ui(Radix), vendor-editor(Tiptap), vendor-export(jspdf/docx), vendor-graph(d3)",
-            "**Prefetch 적용**: 라우트 hover 시 해당 청크 미리 로드, 코드 스플리팅 지연감 제거",
+            "**React.lazy 시도 → 한계**: 라우트 기준 스플리팅 시 라이브러리 중복 번들 발생 → manualChunks로 전환한 이유",
           ],
           impact: "450KB → 187KB / FCP 4.2s → 1.8s",
         },
@@ -169,7 +222,7 @@ const editor = useEditor({
       {
         metric: "100스레드 / 100%",
         label: "결제 잔액 정합성",
-        description: "비관/낙관적 락 + 멱등키, Testcontainers 검증",
+        description: "비관적 락 + 멱등키, Testcontainers 검증",
       },
       {
         metric: "420ms → 64ms",
@@ -203,11 +256,11 @@ const editor = useEditor({
       },
       {
         category: "테스트",
-        items: ["JUnit 5", "Testcontainers", "Toss Payments SDK"],
+        items: ["JUnit 5", "Testcontainers"],
       },
       {
         category: "Tools",
-        items: ["Git", "GitHub Actions"],
+        items: ["Git", "GitHub Actions", "Toss Payments MCP"],
       },
     ],
   },
@@ -224,21 +277,19 @@ const editor = useEditor({
         {
           id: "rabbitmq-async",
           title: "AI 이미지 합성 동기 블로킹 → RabbitMQ 비동기 전환",
-          subtitle: "WAS 수락률 1.16 → 1,949 TPS, 202 응답 30s → 4.9ms",
+          subtitle: "WAS 처리량 1.16 → 1,949 TPS, 202 응답 30s → 4.9ms",
           problem:
             "**ML 이미지 합성(~30초)이 Tomcat I/O 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비되는 Cascade Failure가 발생했습니다.**\nFlask ML 추론을 `RestTemplate`으로 동기 호출하는 구조에서, `ThreadPoolTaskExecutor`의 maxPool(10)이 30초씩 점유됩니다. queue(25)까지 포화되면 `CallerRunsPolicy`가 발동되어 Tomcat 스레드마저 Flask를 직접 호출하게 됩니다.\n- k6 부하 테스트 실측 최대 처리량: **1.16 TPS**\n- 이미지 합성 외 일기 작성·건강 기록 등 무관한 API까지 전부 무응답",
           approach:
             "**RabbitMQ로 WAS와 AI 처리를 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`으로 시도했지만 두 가지 구조적 한계가 드러났습니다. WAS 힙에 상태를 저장하면 Scale-out 시 인스턴스 간 불일치가 발생하고, 결과 조회 후에도 Map에서 `byte[]`를 제거하지 않아 GC 후에도 +28MB가 잔류하는 메모리 누수도 확인했습니다. 상태 관리를 외부 시스템에 위임해야 한다는 결론에 도달해 RabbitMQ를 도입했습니다.\n- Spring Boot(Producer): 큐 발행 → 즉시 202 Accepted (4.9ms)\n- Python Worker(Consumer): `prefetch_count=1` + 수동 ACK로 큐 소비 → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존\n- at-least-once delivery 대응: Worker → Controller → Store 3중 멱등성 가드",
           result:
-            "**WAS 수락률 1.16 → 1,949 TPS (1,680배), 202 응답 레이턴시 30,000ms → 4.9ms**\nAI 처리가 아무리 오래 걸려도 WAS는 영향받지 않습니다. 서버 재시작 시에도 큐에 남은 메시지가 보존돼 작업이 유실되지 않습니다.\n- 500 VU 부하에서 p95 318ms, 에러율 **0%**\n- 총 175,463건 처리, API 수락률 100%",
+            "**WAS 처리량 1.16 → 1,949 TPS (1,680배), 202 응답 레이턴시 30,000ms → 4.9ms**\nAI 처리가 아무리 오래 걸려도 WAS는 영향받지 않습니다. 서버 재시작 시에도 큐에 남은 메시지가 보존돼 작업이 유실되지 않습니다.\n- 500 VU 부하에서 p95 318ms, 에러율 **0%**\n- 총 175,463건 처리, API 처리량 100%",
           retrospective:
             "Webhook 방식을 채택하다 보니 클라이언트가 주기적으로 상태를 폴링해야 합니다. UX 관점에서는 '생성 요청 → 기다림 → 완료 알림'이 깔끔하지 않고, 폴링 요청도 불필요하게 생깁니다. SSE(Server-Sent Events)나 WebSocket으로 서버에서 직접 완료 이벤트를 푸시하는 방식이 더 나았을 것 같습니다. 또 Python Worker 프로세스에 대한 헬스 체크나 모니터링이 없어서, Worker가 죽어도 바로 알 수 없는 약점이 있습니다. Prometheus + Grafana 같은 모니터링 스택을 붙이면 이 부분을 보완할 수 있습니다.",
           details: [
-            "**@Async 시도 → 한계**: ConcurrentHashMap 메모리 누수(GC 후 +28MB 잔류) + Scale-out 시 상태 불일치",
-            "**Producer(Spring Boot)**: 요청 수신 → 큐 발행 → 즉시 202 Accepted (4.9ms)",
-            "**Consumer(Python Worker)**: prefetch_count=1 + 수동 ACK, MediaPipe → AI 이미지 생성 → Webhook 콜백",
-            "**DLQ**: 처리 실패 메시지 별도 보관, 장애 복구 후 수동 재처리",
-            "**3중 멱등성**: Worker 중복 소비 차단 → Controller 중복 webhook 차단 → Store 최후 방어선",
+            "**@Async 시도 → 한계**: ConcurrentHashMap 메모리 누수(GC 후 +28MB 잔류) + Scale-out 시 상태 불일치 → MQ 도입 근거",
+            "**DLQ**: 처리 실패 메시지 별도 보관, Worker 장애 시 메시지 유실 방지 → 장애 복구 후 수동 재처리",
+            "**3중 멱등성 가드**: Worker 중복 소비 차단 → Controller 중복 webhook 차단 → Store 최후 방어선 (at-least-once 대응)",
           ],
           diagram: {
             type: "mermaid",
@@ -247,13 +298,13 @@ const editor = useEditor({
   participant W as WAS (Spring Boot)
   participant Q as RabbitMQ
   participant P as Python Worker
-  C->>+W: POST /characters/generate
+  C->>+W: POST /api/images/analyze
   W->>Q: 작업 메시지 발행
   W-->>-C: 202 Accepted (4.9ms)
   Q->>+P: 메시지 소비 (prefetch=1)
   Note over P: MediaPipe 특징 추출<br/>AI 이미지 생성 (~30s)
   P->>P: basic_ack()
-  P->>-W: POST /webhook/character (완료 콜백)
+  P->>-W: POST /api/images/webhook (완료 콜백)
   W->>C: 폴링으로 완료 알림`,
             caption: "RabbitMQ 비동기 처리 흐름 — WAS와 AI 처리 분리",
           },
@@ -264,19 +315,17 @@ const editor = useEditor({
           title: "JPA N+1과 순환 참조가 겹쳐 발생한 API 무응답",
           subtitle: "쿼리 21개 → 1개 단축, StackOverflowError 해결",
           problem:
-            "**`Diary` 엔티티를 API 응답에 직접 반환하면서 순환 참조(StackOverflowError)와 N+1(21쿼리)이 동시에 터져 API가 무응답이 됐습니다.**\n`Diary.user`가 `FetchType.EAGER`로 설정되어 있어, 일기 10건 조회 시 diary 1 + user 10 + child 10 = 총 21쿼리가 발생했습니다. 동시에 양방향 연관관계를 Jackson이 무한히 따라가며 직렬화를 시도해 서버가 비정상 종료됐습니다.\n- `Diary → User → List<Diary> → User → ...` 순환 참조로 StackOverflowError\n- 도메인 엔티티가 API 경계를 넘는 설계 문제가 두 이슈의 근본 원인",
+            "**`Diary` 엔티티를 API 응답에 직접 반환하면서 순환 참조(StackOverflowError)와 N+1(21쿼리)이 동시에 터져 API가 무응답이 됐습니다.**\n`Diary.user`가 `FetchType.EAGER`로 설정되어 있어, 일기 10건 조회 시 diary 1 + user 10 + child 10 = 총 21쿼리가 발생했습니다. 동시에 Lombok `@Data`가 생성한 `toString()`이 양방향 연관관계를 무한히 따라가고, Jackson 직렬화도 같은 경로로 순환해 서버가 비정상 종료됐습니다.\n- `Diary → User → List<Diary> → User → ...` 순환 참조로 StackOverflowError\n- `@Data`의 `toString()` + Jackson 직렬화 두 경로 모두에서 순환 발생\n- 도메인 엔티티가 API 경계를 넘는 설계 문제가 두 이슈의 근본 원인",
           approach:
-            "**Response DTO로 계층 책임을 분리하고, DTO Projection + `default_batch_fetch_size` 안전망을 적용했습니다.**\n`@JsonIgnore`로 순환을 억제하는 건 증상 완화일 뿐이라 기각하고, 엔티티가 API 경계를 넘지 않도록 전용 DTO를 분리했습니다. 전 연관관계를 `FetchType.LAZY`로 전환하고, JPQL 생성자 표현식으로 필요 컬럼만 DTO에 직접 매핑해 엔티티 그래프를 타지 않도록 했습니다.\n- 소유자 검증(수정·삭제)에만 `@EntityGraph`로 명시적 Fetch Join\n- `default_batch_fetch_size=100`으로 DTO Projection 미적용 경로의 안전망 확보",
+            "**Response DTO로 계층 책임을 분리하고, DTO Projection + `default_batch_fetch_size` 안전망을 적용했습니다.**\n`@JsonIgnore`로 순환을 억제하는 건 증상 완화일 뿐이라 기각하고, `@Data`를 `@Getter`로 교체해 `toString()` 순환을 제거한 뒤, 엔티티가 API 경계를 넘지 않도록 전용 DTO를 분리했습니다. 전 연관관계를 `FetchType.LAZY`로 전환하고, JPQL 생성자 표현식으로 필요 컬럼만 DTO에 직접 매핑해 엔티티 그래프를 타지 않도록 했습니다.\n- 소유자 검증(수정·삭제)에만 `@EntityGraph`로 명시적 Fetch Join\n- `default_batch_fetch_size=100`으로 DTO Projection 미적용 경로의 안전망 확보",
           result:
             "**쿼리 21개 → 1개(필요 컬럼만 SELECT, JOIN 없음), StackOverflowError 해결**\nDTO 반환으로 응답 payload 크기도 줄어들었고, 응답 스키마 변경 시 DTO만 수정하면 되는 구조로 유지보수성이 향상됐습니다.\n- 엔티티 전 필드 노출 위험(password 등) → DTO에 명시한 필드만 노출\n- 엔티티가 Jackson에 의존하는 구조 → DTO로 분리",
           retrospective:
             "JPA 엔티티를 API 응답에 그대로 노출하는 패턴의 위험성을 실제 장애를 통해 배웠습니다. 처음부터 엔티티와 DTO를 분리해 설계했으면 이 두 문제 모두 생기지 않았을 것입니다. 사실 양방향 관계 자체를 최대한 피하고 단방향으로만 설계하는 것이 더 안전합니다. 조회가 복잡해지는 경우에는 QueryDSL을 쓰거나, 아예 읽기 전용 Repository를 분리하는 방향(CQRS 패턴의 간소화 버전)도 고려해볼 만합니다.",
           details: [
-            "**문제 발견**: JPA SQL 로그로 10건 조회 시 21쿼리 확인 + StackOverflowError 발생",
-            "**@JsonIgnore 검토 후 기각**: 엔티티가 Jackson에 의존하는 증상 완화, 근본 해결 아님",
-            "**DTO Projection**: JPQL 생성자 표현식으로 필요 컬럼만 직접 매핑 → 순환 참조 구조 제거",
-            "**@EntityGraph**: 소유자 검증(수정·삭제)에만 명시적 Fetch Join 사용",
-            "**전역 안전망**: `default_batch_fetch_size=100`으로 미적용 경로의 N+1 배치 변환",
+            "**@JsonIgnore 기각**: 엔티티가 Jackson에 의존하는 증상 완화일 뿐 → DTO 분리가 근본 해결인 이유",
+            "**@EntityGraph**: 소유자 검증(수정·삭제)에만 명시적 Fetch Join — DTO Projection과 사용 시점 구분",
+            "**전역 안전망**: `default_batch_fetch_size=100`으로 DTO Projection 미적용 경로의 N+1 배치 변환",
           ],
           impact: "쿼리 21개 → 1개 / StackOverflowError 해결",
         },
@@ -285,7 +334,7 @@ const editor = useEditor({
           title: "주차별 맞춤 정보 — 컨텍스트 기반 개인화 + 다층 캐시",
           subtitle: "Caffeine + Redis + DB 3계층 캐시, 사용자별 맞춤 응답",
           problem:
-            "**임신 주차 정보가 모든 산모에게 동일한 응답을 반환해, 개인화된 서비스를 제공하지 못하고 있었습니다.**\n기존 구현은 주차 번호만으로 Gemini를 호출해 42주 고정 콘텐츠를 생성하는 구조였습니다. 같은 20주차라도 최근 감정이 불안한 산모와 안정적인 산모가 동일한 정보를 받고 있었고, 체중·혈압 등 건강 데이터도 반영되지 않았습니다. 42주 고정 콘텐츠는 DB에 저장하면 끝이라 캐시 계층의 근거도 약했습니다.",
+            "**임신 주차 정보가 모든 산모에게 동일한 응답을 반환해, 개인화된 서비스를 제공하지 못하고 있었습니다.**\n기존 구현은 주차 번호만으로 Gemini를 호출해 42주 고정 콘텐츠를 생성하는 구조였습니다. 같은 20주차라도 최근 감정이 불안한 산모와 안정적인 산모가 동일한 정보를 받고 있었고, 체중·혈압 등 건강 데이터도 반영되지 않았습니다.",
           approach:
             "**산모의 일기 감정 분석 이력과 건강 기록을 Gemini 프롬프트에 주입해 개인화하고, 사용자×주차×컨텍스트 조합의 다양성에 대응하는 3계층 캐시를 설계했습니다.**\n`UserContextService`가 최근 7일 일기 감정 빈도와 최신 건강 기록을 수집해 요약 텍스트를 생성합니다. 이 컨텍스트를 SHA-256으로 해싱해 캐시 키(`userId:contextHash`)로 사용합니다. 동일한 컨텍스트(감정·건강 상태 변화 없음)에는 캐시가 HIT되고, 일기를 쓰거나 건강 기록이 바뀌면 해시가 달라져 자동으로 새 Gemini 호출이 발생합니다.\n- **L1 Caffeine**: 200 엔트리, 2분 TTL — 동일 사용자 반복 조회 시 네트워크 홉 없이 응답\n- **L2 Redis**: 24h + Jitter TTL — 서버 간 공유, 캐시 스탬피드 방지\n- **L3 DB**: `PersonalizedWeekContent` 엔티티로 영속화 — 서버 재시작·Redis 장애 시에도 유실 없음\n- 컨텍스트 미입력 사용자는 기존 42주 공통 캐시로 Fallback",
           result:
@@ -293,34 +342,65 @@ const editor = useEditor({
           retrospective:
             "컨텍스트 해시가 감정·건강 데이터의 정확한 값에 의존하기 때문에, 체중이 0.1kg만 변해도 새 캐시 엔트리가 생깁니다. 값을 구간(예: 60~62kg)으로 양자화하면 캐시 히트율을 높일 수 있었을 것입니다. 또한 현재는 L3 DB 조회가 contextHash 기반 단건 조회라 인덱스만으로 충분하지만, 사용자 수가 크게 늘면 오래된 엔트리를 주기적으로 정리하는 배치가 필요합니다.",
           details: [
-            "**컨텍스트 수집**: 최근 7일 일기 감정 빈도 + 최신 체중·혈압 → 요약 텍스트 생성",
-            "**캐시 키 설계**: SHA-256(userId + week + emotions + healthData) → 상태 변화 시 자동 무효화",
-            "**L1 Caffeine**: maximumSize 200, 2분 TTL — 활성 사용자 반복 조회 최적화",
-            "**L2 Redis**: 24h + 2h Jitter TTL — 서버 간 공유, 캐시 스탬피드 방지",
-            "**L3 DB 영속화**: PersonalizedWeekContent 엔티티, 서버 재시작·Redis 장애 복원용",
-            "**Fallback 전략**: 컨텍스트 미입력 → 42주 공통 캐시, Redis 장애 → DB → Gemini 직접 호출",
+            "**캐시 키 설계**: SHA-256(userId + week + emotions + healthData) → 감정·건강 변화 시 해시 자동 변경으로 무효화",
+            "**Fallback 전략**: 컨텍스트 미입력 → 42주 공통 캐시 / Redis 장애 → DB → Gemini 직접 호출 (graceful degradation)",
           ],
+          diagram: {
+            type: "mermaid",
+            content: `flowchart LR
+  REQ["요청<br/>(userId + week)"] --> L1{"L1 Caffeine<br/>2min TTL"}
+  L1 -- HIT --> RES["응답 반환"]
+  L1 -- MISS --> L2{"L2 Redis<br/>24h + Jitter"}
+  L2 -- HIT --> FILL1["L1에 적재"] --> RES
+  L2 -- MISS --> L3{"L3 DB<br/>PersonalizedWeekContent"}
+  L3 -- HIT --> FILL2["L1 + L2에 적재"] --> RES
+  L3 -- MISS --> API["Flask → Gemini API"]
+  API --> FILL3["L1 + L2 + DB에 저장"] --> RES
+
+  style L1 fill:#fff3cd,stroke:#f6b800
+  style L2 fill:#fce4ec,stroke:#dc382d
+  style L3 fill:#e3f2fd,stroke:#4169e1
+  style API fill:#e8f5e9,stroke:#6db33f`,
+            caption:
+              "3계층 캐시 조회 흐름 — 상위 계층 HIT 시 하위 호출을 건너뜀",
+          },
+          codeSnippet: `// PregnancyWeekCacheService.java — L1 → L2 → L3 → Gemini 순차 조회
+String cacheKey = ctx.userId() + ":" + ctx.contextHash();  // ← 감정·건강 변화 시 해시 변경
+
+// L1: Caffeine (JVM 내 캐시, 네트워크 홉 없음)
+PregnancyWeekDTO dto = localCache.getIfPresent(cacheKey);  // ← L1
+if (dto != null) return dto;
+
+// L2: Redis (서버 간 공유, JSON 역직렬화 필요)
+String json = redisTemplate.opsForValue().get(redisKey);   // ← L2
+if (json != null) {
+    dto = objectMapper.readValue(json, PregnancyWeekDTO.class);
+    localCache.put(cacheKey, dto);   // L1 승격
+    return dto;
+}
+
+// L3: DB → L1+L2 승격 / MISS → Gemini 호출 → 전 계층 저장
+// (이하 동일 패턴: 역직렬화 → populateCache → return)`,
           impact: "개인화 응답 + Gemini API 호출 최소화",
         },
         {
           id: "redis-cache",
           title: "오늘의 질문 — 매 요청 Gemini API 호출 → Redis 날짜 기반 캐싱",
-          subtitle: "응답 487ms → 3ms (히트율 99.99%)",
+          subtitle: "응답 487ms → 3ms, Gemini 호출 일 1회 고정",
           problem:
             "**'오늘의 질문'이 요청마다 Gemini API를 호출해 매번 다른 질문을 생성하는 기능 결함이 있었고, 응답도 avg 487ms로 느렸습니다.**\n기획 의도는 하루에 하나의 질문을 모든 산모가 공유하는 것이었는데, 구현을 확인해보니 요청마다 Flask → Gemini API를 동기 호출하고 있었습니다.\n- 같은 날인데 요청마다 다른 질문 생성 → '오늘의 질문' 기능 의미 자체가 무너짐\n- API 비용이 요청 수에 비례해 선형 증가 (사용자 100명 = Gemini 100번 호출)",
           approach:
             "**날짜 자체를 Redis 키로, 자정까지 남은 시간을 TTL로 설정해 하루 1회만 Gemini API를 호출하도록 했습니다.**\n`daily_question:{yyyyMMdd}` 형태로 키를 설계하면 날짜가 바뀌는 순간 자동으로 만료되어, 별도 스케줄러 없이 다음 날 첫 요청이 새 질문을 생성합니다.\n- HIT 시 Redis에서 ~1ms 즉시 반환, AI API 호출 없음\n- MISS(하루 첫 요청)에만 Flask → Gemini 호출 (~500ms, 하루 1번만)\n- 캐시 무효화 전략이 필요 없음 — 날짜 변경 자체가 무효화",
           result:
-            "**응답 487ms → 3ms (162배 개선), 실측 히트율 99.99% (hits 8,294 / misses 1)**\n모든 산모가 같은 날 동일한 질문을 받아 기능 일관성이 확보됐습니다.\n- Gemini API 호출: 요청 수 비례(N:N) → **일 1회로 고정**\n- 기능 결함(요청마다 다른 질문)도 캐싱으로 동시 수정",
+            "**응답 487ms → 3ms, Gemini API 호출이 요청 수 비례(N회) → 일 1회로 고정됐습니다.**\n모든 산모가 같은 날 동일한 질문을 받아 기능 일관성이 확보됐고, 기능 결함(요청마다 다른 질문)도 캐싱으로 동시에 해결됐습니다.",
           retrospective:
             "자정에 키가 만료되면서 첫 번째 요청이 Gemini API를 호출하게 됩니다. 이 시점에 동시 요청이 있으면 Cache Thundering Herd 문제가 발생할 수 있습니다. 자정 직전에 다음 날 질문을 미리 캐싱하는 스케줄러를 붙였으면 더 안전했을 것입니다. 또 Redis가 다운될 때를 대비한 fallback 전략이 없어서, Gemini API를 직접 호출하는 graceful degradation을 추가하면 장애 전파를 방지할 수 있습니다.",
           details: [
-            "**기능 결함 발견**: 같은 날인데 요청마다 다른 질문 생성 → 캐싱으로 기능 결함과 성능을 동시에 해결",
-            "**키 설계**: `daily_question:{yyyyMMdd}`, TTL = 자정까지 남은 초",
-            "**자동 무효화**: 날짜 변경 자체가 캐시 무효화 → 스케줄러 불필요",
-            "**실측**: keyspace_hits 8,294 / keyspace_misses 1 (히트율 99.99%)",
+            "**기능 결함 발견**: 같은 날인데 요청마다 다른 질문 생성 → 캐싱이 기능 결함과 성능을 동시에 해결",
+            "**키 설계**: `daily_question:{yyyyMMdd}`, TTL = 자정까지 남은 초 — 날짜 변경 자체가 무효화, 스케줄러 불필요",
+            "**Gemini 호출 절감**: 요청 수 비례(N회) → 일 1회 고정, API 비용 선형 증가 구조 제거",
           ],
-          impact: "487ms → 3ms (히트율 99.99%)",
+          impact: "487ms → 3ms / Gemini 일 1회",
         },
       ],
       frontend: [
@@ -331,17 +411,14 @@ const editor = useEditor({
           problem:
             "**사진 2장을 Canvas API로 압축하는 동안 메인 스레드가 최대 2초간 블록되어, UI 전체가 멈추고 로딩 애니메이션도 정지했습니다.**\n부모 사진 2장(각 3-5MB)을 AI 서버로 보내기 전에 리사이즈·압축하는 로직이 메인 스레드에서 동기로 실행되고 있었습니다. JavaScript는 싱글 스레드라 압축 중 이벤트 루프 전체가 블록됩니다. 로딩 애니메이션까지 멈추기 때문에 앱이 멈춘 것처럼 보이는 문제였고, 모바일에서는 더 심각했습니다.",
           approach:
-            "**Web Worker 2개로 사진을 병렬 압축하여 메인 스레드 블로킹을 제거했습니다.**\nOffscreenCanvas를 먼저 검토했지만 당시 모바일 브라우저 지원이 불충분해 기각했습니다. Worker A(아빠 사진)와 Worker B(엄마 사진)를 동시에 돌려 병렬 압축하고, `postMessage`로 완료된 Blob을 메인 스레드로 전달합니다. `Promise.all`로 두 Worker 완료를 기다렸다가 AI 서버로 전송합니다.",
+            "**Web Worker 2개로 사진을 병렬 압축하여 메인 스레드 블로킹을 제거했습니다.**\nOffscreenCanvas + Worker 조합도 검토했지만, 이미지 리사이즈만 필요한 상황에서 `createImageBitmap` → Canvas drawImage 파이프라인이 더 단순했기 때문에 기각했습니다. Worker A(아빠 사진)와 Worker B(엄마 사진)를 동시에 돌려 병렬 압축하고, `postMessage`로 완료된 Blob을 메인 스레드로 전달합니다. `Promise.all`로 두 Worker 완료를 기다렸다가 AI 서버로 전송합니다.",
           result:
             "**UI Freezing이 해소되고, 로딩 애니메이션이 정상 동작합니다.**\n사진 처리 중에도 다른 UI 조작이 가능하고, 두 사진을 병렬 압축하기 때문에 순차 처리 대비 시간도 단축됐습니다. 모바일에서도 매끄럽게 동작합니다.",
           retrospective:
             "Worker 2개를 항상 생성하는 방식이라 사진이 1장만 업로드될 경우 Worker 하나가 낭비됩니다. 업로드 파일 수에 따라 Worker를 동적으로 생성하거나, Worker Pool을 만들어 재사용하는 게 더 효율적입니다. 또 Worker와 메인 스레드 간 이미지 데이터를 복사하는 과정에서 메모리 사용량이 일시적으로 두 배가 됩니다. `Transferable Objects`를 사용해 복사 대신 소유권을 이전하면 이 오버헤드를 없앨 수 있는데, 당시에는 이 API를 몰라서 적용하지 못했습니다.",
           details: [
-            "**OffscreenCanvas 검토 후 기각**: 모바일 브라우저 지원 불충분 (당시 기준)",
-            "**Worker 2개 병렬**: 아빠 사진 Worker A, 엄마 사진 Worker B 동시 압축",
-            "**postMessage 통신**: 압축 완료된 Blob을 메인 스레드로 전달",
-            "**Promise.all 조합**: 두 Worker 완료를 기다렸다가 AI 서버로 동시 전송",
-            "**개선 여지**: Transferable Objects로 메모리 복사 없이 소유권 이전 가능",
+            "**OffscreenCanvas 기각**: 리사이즈만 필요한 상황에서 과잉 — createImageBitmap → Canvas drawImage로 충분",
+            "**Transferable Objects**: postMessage 시 메모리 복사 대신 소유권 이전으로 오버헤드 제거 가능 (미적용, 개선 여지)",
           ],
           impact: "UI Freezing 2초 → 0 / 병렬 압축으로 처리 시간 단축",
         },
@@ -359,10 +436,7 @@ const editor = useEditor({
             "처음에 도메인 구분 없이 하나의 큰 스토어를 만들었더니, 프로젝트가 커지면서 스토어가 비대해졌습니다. `useCharacterStore`, `useDiaryStore`, `useUserStore`처럼 도메인별로 나눴으면 관심사가 더 명확해졌을 것입니다. 또 Zustand 스토어는 테스트 시 초기화가 번거로울 수 있는데, 각 테스트마다 스토어를 리셋하는 헬퍼 함수를 처음부터 만들어 두었으면 좋았겠습니다.",
           details: [
             "**Redux 기각**: 액션·리듀서·셀렉터 보일러플레이트가 2인 프로젝트 규모에 과잉",
-            "**Context API 기각**: 값 변경 시 구독 컴포넌트 전체 리렌더링 부담",
-            "**Zustand 선택**: 스토어 함수 정의 → 필요한 곳에서 직접 구독, slice 단위 리렌더링",
-            "**서버/클라이언트 상태 분리**: API 응답은 SWR 스타일로, UI 상태만 Zustand 관리",
-            "**커스텀 훅 캡슐화**: useCharacter, useDiary로 비즈니스 로직을 View 밖으로 분리",
+            "**Context API 기각**: 값 변경 시 Provider 하위 구독 컴포넌트 전체 리렌더링 — Zustand slice 구독과 비교",
           ],
           impact: "Prop Drilling 제거 / 상태 불일치 버그 해소",
         },
@@ -372,13 +446,13 @@ const editor = useEditor({
     achievements: [
       {
         metric: "1.16 → 1,949 TPS",
-        label: "WAS 수락률",
+        label: "WAS 처리량",
         description: "RabbitMQ 비동기 전환, 500 VU / p95 318ms / 에러율 0%",
       },
       {
         metric: "487ms → 3ms",
         label: "오늘의 질문 API",
-        description: "Redis 날짜 기반 캐싱, 히트율 99.99%, Gemini 일 1회",
+        description: "Redis 날짜 기반 캐싱, Gemini 호출 일 1회 고정",
       },
       {
         metric: "21쿼리 → 1쿼리",
