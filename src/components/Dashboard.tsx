@@ -17,6 +17,9 @@ export default function Dashboard({
 }) {
   const { profile } = useProfile();
   const contentRef = useRef<HTMLElement>(null);
+  const scrollToContent = () => {
+    contentRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen bg-[#FEFDFB] dark:bg-stone-950 text-stone-900 dark:text-stone-50 font-sans antialiased selection:bg-amber-500 selection:text-white transition-colors duration-300">

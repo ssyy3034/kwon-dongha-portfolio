@@ -80,47 +80,6 @@
     display: block !important;
   }
 
-  /* 페이지 설정 */
-  @page {
-    size: A4;
-    margin: 15mm 18mm 15mm 18mm;
-  }
-
-  /* 페이지 잘림 방지 */
-  article,
-  section,
-  .section-card {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
-    margin-bottom: 2rem !important;
-  }
-
-  /* 텍스트 가독성 */
-  h1 {
-    font-size: 28pt !important;
-    margin-bottom: 10pt !important;
-    color: #000 !important;
-  }
-  h2 {
-    font-size: 18pt !important;
-    margin-top: 20pt !important;
-    margin-bottom: 15pt !important;
-    border-bottom: 1.5pt solid #000 !important;
-    padding-bottom: 5pt !important;
-  }
-  h3 {
-    font-size: 14pt !important;
-    margin-top: 10pt !important;
-    color: #111 !important;
-  }
-  p,
-  div,
-  li {
-    font-size: 10.5pt !important;
-    color: #333 !important;
-    line-height: 1.6 !important;
-  }
-
   /* 링크 스타일 (URL 표시 안함) */
   a {
     text-decoration: none;
@@ -134,41 +93,111 @@
     transition: none !important;
   }
 
-  /* 배경색 및 필터 조정 */
-  .bg-stone-50,
-  .bg-stone-100,
-  .bg-stone-200 {
+  /* 페이지 설정 */
+  @page {
+    size: A4;
+    margin: 20mm 20mm 20mm 20mm;
+  }
+
+  /* 텍스트 가독성 대폭 강화 */
+  h1 {
+    font-size: 32pt !important;
+    margin-bottom: 12pt !important;
+    letter-spacing: -0.02em !important;
+  }
+  h2 {
+    font-size: 20pt !important;
+    margin-top: 30pt !important;
+    margin-bottom: 18pt !important;
+    color: #1c1917 !important;
+    border-bottom: 2pt solid #e7e5e4 !important;
+    padding-bottom: 8pt !important;
+  }
+  h3 {
+    font-size: 15pt !important;
+    margin-top: 15pt !important;
+    color: #44403c !important;
+  }
+  p,
+  div,
+  li {
+    font-size: 11.5pt !important;
+    color: #292524 !important;
+    line-height: 1.7 !important;
+  }
+
+  /* 색감 복구 - 강제 인쇄 설정 */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* 배경색 및 그라디언트 유지 */
+  .bg-white {
+    background-color: #ffffff !important;
+  }
+  .bg-stone-50 {
+    background-color: #fafaf9 !important;
+  }
+  .bg-stone-100 {
     background-color: #f5f5f4 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  }
+  .bg-amber-600 {
+    background-color: #d97706 !important;
+  }
+  .bg-red-600 {
+    background-color: #dc2626 !important;
   }
 
-  /* 코드 블록 인쇄 최적화 (밝은 테마 스타일로 강제 전환) */
-  pre,
-  code,
+  /* 프로젝트별 포인트 컬러 복구 */
+  .text-amber-600 {
+    color: #d97706 !important;
+  }
+  .text-red-600 {
+    color: #dc2626 !important;
+  }
+  .border-amber-200 {
+    border-color: #fde68a !important;
+  }
+  .border-red-200 {
+    border-color: #fecaca !important;
+  }
+
+  /* 코드 블록 - 가독성 위주의 다크 테마 유지 (웹 느낌 그대로) */
   .syntax-highlighter {
-    background-color: #f8f8f8 !important;
-    color: #111 !important;
-    border: 0.5pt solid #ddd !important;
-    font-size: 9pt !important;
-    white-space: pre-wrap !important;
-  }
-
-  /* Mermaid 다이어그램 최적화 */
-  .mermaid {
-    background-color: #fff !important;
-    border: 1pt solid #eee !important;
-    padding: 15pt !important;
+    background-color: #16162a !important;
+    border-radius: 12pt !important;
     margin: 15pt 0 !important;
-    transform: scale(0.95);
-    transform-origin: center;
+    padding: 12pt !important;
+  }
+  .syntax-highlighter code {
+    color: #e2e8f0 !important;
+    font-size: 9.5pt !important;
   }
 
-  /* 특정 요소 강조 */
-  .highlight-print {
-    background-color: #fffbeb !important;
-    border-left: 3pt solid #f59e0b !important;
-    padding: 10pt !important;
+  /* Mermaid 다이어그램 */
+  .mermaid {
+    background-color: #ffffff !important;
+    border: 1pt solid #e7e5e4 !important;
+    border-radius: 16pt !important;
+    padding: 20pt !important;
+    margin: 20pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  /* 페이지 잘림 방지 (여유로운 배치) */
+  section,
+  .section-card,
+  article {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 40pt !important;
+  }
+
+  /* 불필요 요소 제거 */
+  .no-print {
+    display: none !important;
   }
 }
 

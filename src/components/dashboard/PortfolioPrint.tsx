@@ -107,61 +107,43 @@ export default function PortfolioPrint() {
         </div>
       </section>
 
-      {/* Project Summaries */}
-      <section className="mb-8">
-        <h2 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-4">
-          Key Projects
+      {/* Project Summaries (Quick Look) */}
+      <section className="mb-12">
+        <h2 className="text-sm font-black text-stone-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-4">
+          Project Summaries
+          <div className="h-px bg-stone-200 flex-1"></div>
         </h2>
 
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-8">
           {projects.map((project) => (
-            <article key={project.id}>
-              {/* Project Header */}
-              <div className="flex justify-between items-baseline mb-2">
-                <div>
-                  <h3 className="text-base font-bold text-stone-900 inline">
-                    {project.title}
-                  </h3>
-                  <span className="text-sm text-stone-500 ml-2">
-                    — {project.subtitle}
+            <article
+              key={project.id}
+              className="border-l-4 border-stone-100 pl-6 py-2"
+            >
+              <div className="flex justify-between items-baseline mb-3">
+                <h3 className="text-xl font-black text-stone-900">
+                  {project.title}
+                  <span className="text-sm font-medium text-stone-500 ml-3">
+                    {project.subtitle}
                   </span>
-                </div>
-                <span className="text-xs text-stone-500">{project.period}</span>
+                </h3>
+                <span className="text-sm font-bold text-stone-400">
+                  {project.period}
+                </span>
               </div>
-
-              {/* Meta */}
-              <p className="text-xs text-stone-500 mb-2">
-                {project.role} · {project.team}
-                {project.github && (
-                  <span className="ml-2">
-                    · {project.github.replace("https://", "")}
-                  </span>
-                )}
-              </p>
-
-              {/* Description */}
-              <p className="text-sm text-stone-700 leading-relaxed mb-2">
+              <p className="text-sm text-stone-600 leading-relaxed mb-4">
                 <FormattedText noDark text={project.description} />
               </p>
-
-              {/* Key Metrics */}
-              {project.metrics && (
-                <div className="flex flex-wrap gap-3 mb-2">
-                  {project.metrics.map((m, i) => (
-                    <span key={i} className="text-xs">
-                      <span className="font-bold text-amber-600">
-                        {m.value}
-                      </span>
-                      <span className="text-stone-500 ml-1">{m.label}</span>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Tech Stack */}
-              <p className="text-xs text-stone-500">
-                {project.tech.join(" · ")}
-              </p>
+              <div className="flex flex-wrap gap-2">
+                {project.tech.map((t) => (
+                  <span
+                    key={t}
+                    className="px-2 py-0.5 bg-stone-50 text-stone-500 text-[10px] font-bold rounded border border-stone-200"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
             </article>
           ))}
         </div>
@@ -208,149 +190,149 @@ export default function PortfolioPrint() {
         </div>
       </div>
 
-      {/* ===== PROJECT DETAIL PAGES ===== */}
+      {/* ===== PROJECT DETAIL PAGES (Deep Dive) ===== */}
       {projects.map((project) => {
         const detail = getProjectDetail(project.id);
         if (!detail) return null;
 
         return (
-          <div
-            key={`${project.id}-detail`}
-            className="break-before-page pt-10 px-4"
-          >
-            {/* Project Header - More Compact & Professional */}
-            <div className="mb-8 border-l-4 border-stone-900 pl-6 py-2 bg-stone-50/50">
-              <div className="flex justify-between items-baseline mb-2">
+          <div key={`${project.id}-detail`} className="break-before-page pt-12">
+            {/* Project Cover Header */}
+            <div
+              className={`mb-12 p-10 rounded-3xl bg-gradient-to-br ${project.color === "amber" ? "from-amber-50 to-orange-50" : "from-red-50 to-rose-50"} border border-stone-100`}
+            >
+              <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="text-3xl font-black text-stone-900 tracking-tight">
+                  <h2 className="text-4xl font-black text-stone-900 tracking-tight mb-2">
                     {project.title}
                   </h2>
-                  <p className="text-base text-stone-600 font-bold mt-1">
+                  <p
+                    className={`text-lg font-bold ${project.color === "amber" ? "text-amber-600" : "text-red-600"}`}
+                  >
                     {project.subtitle}
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="block text-sm font-black text-stone-900">
+                  <span className="block text-sm font-black text-stone-400 uppercase tracking-widest">
                     {project.period}
                   </span>
-                  <span className="block text-xs font-bold text-amber-600 uppercase tracking-tighter mt-1">
+                  <span className="block text-sm font-bold text-stone-600 mt-1">
                     {project.role}
                   </span>
                 </div>
               </div>
-              <p className="text-sm text-stone-700 leading-relaxed font-medium max-w-3xl">
+              <div className="p-6 bg-white/60 backdrop-blur rounded-2xl border border-white/50 text-base text-stone-700 leading-relaxed font-medium">
                 <FormattedText noDark text={detail.overview} />
-              </p>
+              </div>
             </div>
 
-            {/* Main Content Grid: Results & Tech Stack */}
-            <div className="grid grid-cols-[1fr_250px] gap-8 mb-10 items-start">
-              {/* Key Results - Visual Anchors */}
-              <section className="break-inside-avoid">
-                <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
-                  Core Achievements & Impact
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {detail.achievements.map((ach, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 bg-white border border-stone-100 rounded-2xl shadow-sm"
-                    >
-                      <div className="text-xl font-black text-amber-600 mb-1">
-                        {ach.metric}
-                      </div>
-                      <div className="text-xs font-black text-stone-900 mb-1">
-                        {ach.label}
-                      </div>
-                      <div className="text-[10px] text-stone-500 leading-normal">
-                        {ach.description}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* Tech Stack - Side Column for better space usage */}
-              <section className="break-inside-avoid bg-stone-50 p-4 rounded-2xl border border-stone-100">
-                <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
-                  Tech Stack
-                </h3>
-                <div className="space-y-4">
-                  {detail.techStack.map((stack, idx) => (
-                    <div key={idx}>
-                      <p className="text-[9px] font-black text-stone-500 uppercase mb-1">
-                        {stack.category}
-                      </p>
-                      <p className="text-xs font-bold text-stone-800 leading-tight">
-                        {stack.items.join(", ")}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
-
-            {/* Technical Deep Dive - Structured & Scannable */}
-            <section className="break-inside-avoid">
-              <h3 className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em] mb-4">
-                Technical Deep Dive (Case Studies)
+            {/* Achievements Section */}
+            <section className="mb-12 break-inside-avoid">
+              <h3 className="text-xs font-black text-stone-400 uppercase tracking-[0.3em] mb-6">
+                Key Achievements
               </h3>
-              <div className="space-y-4">
-                {[
-                  ...(detail.sections.backend ?? []),
-                  ...(detail.sections.frontend ?? []),
-                ].map((section, idx) => (
+              <div className="grid grid-cols-2 gap-6">
+                {detail.achievements.map((ach, idx) => (
                   <div
                     key={idx}
-                    className="border border-stone-200 rounded-2xl overflow-hidden break-inside-avoid"
+                    className="p-6 bg-stone-50 border border-stone-100 rounded-2xl"
                   >
-                    <div className="px-5 py-2.5 bg-stone-100 text-stone-900 border-b border-stone-200 flex justify-between items-center">
-                      <h4 className="text-xs font-black tracking-tight">
-                        {idx + 1}. {section.title}
-                      </h4>
-                      {section.impact && (
-                        <span className="text-[9px] font-black bg-white border border-stone-200 px-2 py-0.5 rounded text-stone-700">
-                          RESULT: {section.impact}
-                        </span>
-                      )}
+                    <div
+                      className={`text-2xl font-black ${project.color === "amber" ? "text-amber-600" : "text-red-600"} mb-2`}
+                    >
+                      {ach.metric}
                     </div>
-                    <div className="p-5 grid grid-cols-[1fr_1.5fr] gap-6">
-                      <div>
-                        <p className="text-[9px] font-black text-red-600 uppercase mb-2">
-                          Problem
-                        </p>
-                        <div className="text-[11px] text-stone-700 leading-relaxed font-medium">
-                          <FormattedText noDark text={section.problem} />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black text-emerald-600 uppercase mb-2">
-                          Approach & Result
-                        </p>
-                        <div className="text-[11px] text-stone-900 leading-relaxed font-bold mb-3">
-                          <FormattedText noDark text={section.approach} />
-                        </div>
-                        {section.details && (
-                          <div className="space-y-1.5">
-                            {section.details.map((bullet, i) => (
-                              <div
-                                key={i}
-                                className="flex gap-2 text-[10px] text-stone-600 leading-normal"
-                              >
-                                <span className="text-stone-400 font-black mt-px">
-                                  •
-                                </span>
-                                <FormattedText noDark text={bullet} />
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                    <div className="text-sm font-black text-stone-900 mb-1">
+                      {ach.label}
+                    </div>
+                    <div className="text-xs text-stone-500 leading-relaxed">
+                      {ach.description}
                     </div>
                   </div>
                 ))}
               </div>
             </section>
+
+            {/* Technical Case Studies */}
+            <h3 className="text-xs font-black text-stone-400 uppercase tracking-[0.3em] mb-8">
+              Technical Deep Dive
+            </h3>
+            <div className="space-y-16">
+              {[
+                ...(detail.sections.backend ?? []),
+                ...(detail.sections.frontend ?? []),
+              ].map((section, idx) => (
+                <article key={idx} className="break-inside-avoid space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-white ${project.color === "amber" ? "bg-amber-600" : "bg-red-600"}`}
+                    >
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-black text-stone-900">
+                        {section.title}
+                      </h4>
+                      <p className="text-sm font-bold text-stone-400">
+                        {section.subtitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-8">
+                    {/* Problem - Solution - Result 3단 구성 */}
+                    <div className="flex flex-col gap-6">
+                      <div className="p-6 bg-rose-50/50 border border-rose-100 rounded-2xl">
+                        <p className="text-[10px] font-black text-rose-600 uppercase mb-2 tracking-widest">
+                          The Problem
+                        </p>
+                        <div className="text-sm text-stone-700 leading-relaxed">
+                          <FormattedText noDark text={section.problem} />
+                        </div>
+                      </div>
+
+                      <div className="p-6 bg-emerald-50/50 border border-emerald-100 rounded-2xl">
+                        <p className="text-[10px] font-black text-emerald-600 uppercase mb-2 tracking-widest">
+                          Engineering Approach
+                        </p>
+                        <div className="text-sm text-stone-800 leading-relaxed font-bold mb-4">
+                          <FormattedText noDark text={section.approach} />
+                        </div>
+                        {section.details && (
+                          <ul className="space-y-2">
+                            {section.details.map((bullet, i) => (
+                              <li
+                                key={i}
+                                className="flex gap-3 text-xs text-stone-600 leading-normal"
+                              >
+                                <span className="text-emerald-400 font-black">
+                                  •
+                                </span>
+                                <FormattedText noDark text={bullet} />
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+
+                      {section.retrospective && (
+                        <div className="p-6 bg-amber-50/50 border border-amber-100 rounded-2xl italic">
+                          <p className="text-[10px] font-black text-amber-600 uppercase mb-2 tracking-widest not-italic">
+                            Engineers Perspective & Retrospective
+                          </p>
+                          <div className="text-xs text-stone-600 leading-relaxed">
+                            <FormattedText
+                              noDark
+                              text={section.retrospective}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         );
       })}
