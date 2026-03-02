@@ -19,7 +19,7 @@
   {
     "id": "aidiary",
     "title": "Aidiary",
-    "subtitle": "RabbitMQ 비동기 전환 · 다층 캐시 아키텍처",
+    "subtitle": "RabbitMQ 비동기 전환 · 다층 캐시 개인화 · N+1 해결",
     "role": "Fullstack Developer",
     "period": "2025.04 - 2026.02",
     "team": "2인 팀",

@@ -2,7 +2,7 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import FormattedText from "@/components/common/FormattedText";
 import {
@@ -114,9 +114,9 @@ function SectionCard({
                 <p className={`text-[11px] sm:text-xs font-bold ${step.color} uppercase tracking-wider mb-1.5 sm:mb-2`}>
                   {step.label}
                 </p>
-                <p className="text-stone-700 dark:text-stone-300 leading-[1.85] text-[13.5px] sm:text-[15px] break-keep print:text-stone-800 print:text-[12px] print:leading-[1.7]">
+                <div className="text-stone-700 dark:text-stone-300 leading-[1.85] text-[13.5px] sm:text-[15px] break-keep print:text-stone-800 print:text-[12px] print:leading-[1.7]">
                   <FormattedText text={value} />
-                </p>
+                </div>
               </div>
             );
           })}
@@ -128,9 +128,9 @@ function SectionCard({
             {section.details.map((d, i) => (
               <div key={i} className="flex items-start gap-2.5">
                 <ChevronRight size={13} className={`${colors.text} shrink-0 mt-0.5`} />
-                <p className="text-[13px] sm:text-sm text-stone-600 dark:text-stone-400 leading-relaxed break-keep print:text-stone-700 print:text-[11px]">
+                <div className="text-[13px] sm:text-sm text-stone-600 dark:text-stone-400 leading-relaxed break-keep print:text-stone-700 print:text-[11px]">
                   <FormattedText text={d} />
-                </p>
+                </div>
               </div>
             ))}
           </div>
@@ -163,6 +163,7 @@ function SectionCard({
 
 export default function ProjectDetailPage({ params }: PageProps) {
   const { id } = use(params);
+  const router = useRouter();
   const project = projects.find((p) => p.id === id);
   if (!project) return notFound();
 
@@ -197,13 +198,13 @@ export default function ProjectDetailPage({ params }: PageProps) {
         </div>
 
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 relative z-10">
-          <Link
-            href="/#projects"
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors mb-8 sm:mb-10 group text-sm font-medium"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             프로젝트 목록
-          </Link>
+          </button>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -281,22 +282,29 @@ export default function ProjectDetailPage({ params }: PageProps) {
             </div>
 
             {/* 개요 */}
-            <p className="text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-[1.8] mb-5 sm:mb-6">
+            <div className="text-sm sm:text-base text-stone-700 dark:text-stone-300 leading-[1.8] mb-5 sm:mb-6">
               <FormattedText text={detail.overview} />
-            </p>
+            </div>
 
             {/* 기술 스택 */}
-            <div className="flex flex-wrap gap-1.5">
-              {detail.techStack.flatMap((s) =>
-                s.items.map((item) => (
-                  <span
-                    key={item}
-                    className="px-2.5 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] sm:text-xs font-bold rounded-lg border border-stone-200 dark:border-stone-700"
-                  >
-                    {item}
+            <div className="space-y-3">
+              {detail.techStack.map((group) => (
+                <div key={group.category} className="flex items-start gap-3">
+                  <span className="shrink-0 text-[10px] sm:text-[11px] font-black text-stone-400 dark:text-stone-500 uppercase tracking-wider mt-1.5 w-16 sm:w-20">
+                    {group.category}
                   </span>
-                ))
-              )}
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.items.map((item) => (
+                      <span
+                        key={item}
+                        className="px-2.5 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] sm:text-xs font-bold rounded-lg border border-stone-200 dark:border-stone-700"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </motion.section>

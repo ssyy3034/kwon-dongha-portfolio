@@ -26,7 +26,7 @@
         "slogan": "같이 일하는 경험을 더 좋게 만들고 싶습니다",
         "points": [
           "3년간 서비스직 아르바이트에서 다양한 팀원들과 일하며, 불편함이 보이면 먼저 개선 방법을 찾아 제안하는 습관이 생겼습니다.",
-          "개발 팀에서도 같은 태도로, 커밋·PR 작성이 팀 병목임을 파악하고 자동화 커맨드(Antigravity)를 만들어 과정 내 타 팀까지 확산시켰습니다.",
+          "개발 팀에서도 같은 태도로, 커밋·PR 작성이 팀 병목임을 파악하고 자동화 커스텀 커맨드 `antigravity`를 만들어 과정 내 타 팀까지 확산시켰습니다.",
           "기술적인 내용도 듣는 사람이 이해하기 쉽도록 맥락을 함께 전달하려고 합니다."
         ]
       }
@@ -127,7 +127,7 @@
           "name": "JPA / Hibernate",
           "slug": "hibernate",
           "color": "59666C",
-          "description": "N+1 문제를 Fetch Join·DTO Projection으로 해결하고, Recursive CTE 기반 계층형 구조를 설계한 경험이 있습니다."
+          "description": "N+1 문제를 Fetch Join·DTO Projection으로 해결하고, 엔티티 설계 시 쿼리 성능을 함께 고려합니다."
         },
         {
           "name": "RabbitMQ",
@@ -144,25 +144,19 @@
       ]
     },
     {
-      "category": "기반 지식 & 인프라",
+      "category": "Tools & AI",
       "items": [
         {
-          "name": "C (Pintos)",
-          "slug": "c",
-          "color": "A8B9CC",
-          "description": "스케줄러와 가상 메모리를 직접 구현하며 시스템 동작 원리를 배웠습니다."
+          "name": "Git / GitHub",
+          "slug": "github",
+          "color": "181717",
+          "description": "브랜치 전략 수립, PR 기반 코드 리뷰, 이슈 단위 작업 관리."
         },
         {
-          "name": "Docker",
-          "slug": "docker",
-          "color": "2496ED",
-          "description": "Docker Compose로 6개 서비스를 오케스트레이션하고 운영 환경을 구성한 경험이 있습니다."
-        },
-        {
-          "name": "AWS",
-          "slug": "amazonwebservices",
-          "color": "232F3E",
-          "description": "EC2 배포, S3/CloudFront CDN 구성, GitHub Actions CI/CD 파이프라인 구축 경험이 있습니다."
+          "name": "AI Agents",
+          "slug": "openai",
+          "color": "10A37F",
+          "description": "Claude Code CLI 기반의 Git 컨벤션 자동화 커스텀 커맨드 `antigravity`를 개발해 팀에 도입했습니다."
         }
       ]
     }

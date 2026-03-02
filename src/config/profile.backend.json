@@ -108,19 +108,19 @@
           "name": "Redis",
           "slug": "redis",
           "color": "DC382D",
-          "description": "날짜 키 기반 TTL 캐싱으로 반복 API 호출을 줄이고, Hot Key와 캐시 스탬피드 방어를 설계했습니다."
+          "description": "날짜 키 기반 TTL 캐싱으로 반복 API 호출을 줄이고, Caffeine과 조합한 다층 캐시를 구성했습니다."
         },
         {
           "name": "PostgreSQL / MariaDB",
           "slug": "postgresql",
           "color": "4169E1",
-          "description": "Recursive CTE로 계층형 데이터를 조회하고, 비관적·낙관적 락으로 결제 동시성을 제어했습니다."
+          "description": "Fetch Join과 DTO Projection으로 쿼리를 최적화하고, 비관적·낙관적 락으로 결제 동시성을 제어했습니다."
         },
         {
           "name": "Neo4j",
           "slug": "neo4j",
           "color": "008CC1",
-          "description": "Cypher 쿼리를 활용한 그래프 데이터 모델링 및 관계 조회에 사용했습니다."
+          "description": "인물 관계 데이터를 저장하고 Cypher 쿼리로 조회하는 데 사용했습니다."
         }
       ]
     },
@@ -148,7 +148,7 @@
           "name": "Docker",
           "slug": "docker",
           "color": "2496ED",
-          "description": "Docker Compose로 12개 컨테이너(Spring Boot, Flask, Worker, RabbitMQ, Redis, MariaDB, Grafana, Prometheus 등)를 오케스트레이션하고 모니터링 환경까지 구성했습니다."
+          "description": "Docker Compose로 Spring Boot, Flask, RabbitMQ, Redis 등 멀티 컨테이너 환경을 구성하고 운영했습니다."
         },
         {
           "name": "AWS",
@@ -171,7 +171,7 @@
           "name": "AI Agents",
           "slug": "openai",
           "color": "10A37F",
-          "description": "Claude Code CLI 기반 개발 및 Git 컨벤션 자동화 도구(Antigravity)를 개발해 팀에 도입했습니다."
+          "description": "Claude Code CLI 기반의 Git 컨벤션 자동화 커스텀 커맨드 `antigravity`를 개발해 팀에 도입했습니다."
         }
       ]
     }

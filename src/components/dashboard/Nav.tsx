@@ -44,24 +44,34 @@ export default function Nav() {
 
   const handleHashClick = useCallback(
     (e: React.MouseEvent, href: string) => {
-      if (href.startsWith("/#")) {
-        e.preventDefault();
-        const hash = href.slice(1);
+      const hashIndex = href.indexOf("#");
+      if (hashIndex === -1) return;
 
-        if (pathname === "/") {
-          const element = document.querySelector(hash);
-          element?.scrollIntoView({ behavior: "smooth" });
-        } else {
-          router.push(href);
-        }
+      const hrefBase = href.slice(0, hashIndex) || "/";
+      const hash = href.slice(hashIndex);
+
+      // 현재 같은 베이스 경로에 있으면 스크롤만
+      if (pathname === hrefBase || (pathname === "/" && hrefBase === "/")) {
+        e.preventDefault();
+        const element = document.querySelector(hash);
+        element?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // 다른 경로면 네비게이션
+        e.preventDefault();
+        router.push(href);
       }
     },
     [pathname, router],
   );
 
+  // 해시 경로(/b2e9f4 등)에서 접속한 경우, 홈·프로젝트 링크도 해시 경로 유지
+  const basePath = pathname && pathname !== "/" && !pathname.startsWith("/projects")
+    ? pathname
+    : "/";
+
   const navItems = [
-    { name: "홈", href: "/", icon: Home },
-    { name: "프로젝트", href: "/#projects", icon: Folder },
+    { name: "홈", href: basePath, icon: Home },
+    { name: "프로젝트", href: `${basePath}#projects`, icon: Folder },
     {
       name: "GitHub",
       href: profile.social.github,
@@ -84,7 +94,7 @@ export default function Nav() {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-10 flex justify-between items-center">
           {/* Logo */}
           <Link
-            href="/"
+            href={basePath}
             className="flex items-center gap-3 transition-transform hover:scale-[1.02]"
           >
             <div className="w-10 h-10 bg-stone-900 dark:bg-amber-600 rounded-xl flex items-center justify-center shadow-lg">

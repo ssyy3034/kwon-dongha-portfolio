@@ -1,14 +1,7 @@
-import { fetchGitHubStreak } from '@/lib/github-fetcher';
-import Dashboard from '@/components/Dashboard';
+import { redirect } from 'next/navigation';
 
-export const revalidate = 3600;
+const DEFAULT_HASH = process.env.BACKEND_HASH || 'b2e9f4';
 
-export default async function Home() {
-  const streakData = await fetchGitHubStreak();
-
-  return (
-    <main>
-      <Dashboard streakData={streakData} />
-    </main>
-  );
+export default function Home() {
+  redirect(`/${DEFAULT_HASH}`);
 }

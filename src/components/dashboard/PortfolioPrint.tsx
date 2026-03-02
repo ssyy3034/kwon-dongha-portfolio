@@ -319,17 +319,17 @@ export default function PortfolioPrint() {
                         <p className="text-[9px] font-black text-red-600 uppercase mb-2">
                           Problem
                         </p>
-                        <p className="text-[11px] text-stone-700 leading-relaxed font-medium">
+                        <div className="text-[11px] text-stone-700 leading-relaxed font-medium">
                           <FormattedText noDark text={section.problem} />
-                        </p>
+                        </div>
                       </div>
                       <div>
                         <p className="text-[9px] font-black text-emerald-600 uppercase mb-2">
                           Approach & Result
                         </p>
-                        <p className="text-[11px] text-stone-900 leading-relaxed font-bold mb-3">
+                        <div className="text-[11px] text-stone-900 leading-relaxed font-bold mb-3">
                           <FormattedText noDark text={section.approach} />
-                        </p>
+                        </div>
                         {section.details && (
                           <div className="space-y-1.5">
                             {section.details.map((bullet, i) => (

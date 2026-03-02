@@ -45,12 +45,12 @@ SVG/DOM의 한계를 이해하고 **Canvas 렌더링**으로 전환했습니다.
 - `useMemo`로 데이터 변경 시에만 재연산되도록 최적화
 - React의 **참조 동등성**을 활용해 불필요한 재연산을 제거
 
-백엔드에서도 문서 트리 조회 시 N+1 쿼리가 발생하고 있어 **Fetch Join**으로 해결했습니다.
+폴더 트리 조회 시 발생하는 N+1 쿼리를 **Fetch Join**으로 해결하고, 조회된 데이터를 **In-Memory에서 트리 구조로 조립**하여 응답 성능을 최적화했습니다.
 
 ### 성과
 
 - **O(n²) → O(n) 전환**: 문서 100개 기준 15~20ms → 1ms 이하로 개선
-- **N+1 쿼리 → Fetch Join**: API 응답 450ms → 25ms (18배 개선)
+- **N+1 쿼리 → Fetch Join & In-Memory 조립**: API 응답 450ms → 25ms (18배 개선)
 
 ---
 
@@ -88,11 +88,11 @@ StoRead에서 유료 작품 열람을 위한 크레딧 충전/차감 시스템�
 
 결제 안정성을 위해 동시성 문제를 3가지 계층으로 나누어 해결했습니다.
 
-| 방어 계층 | 적용 대상 | 목적 |
-|:----------|:----------|:-----|
-| **비관적 락** (PESSIMISTIC_WRITE) | 크레딧 잔액 | 경합이 잦은 잔액 차감에서 Race Condition 방지 |
-| **낙관적 락** (@Version) | 결제 상태 변경 | 결제 상태 전이(PENDING → COMPLETED)의 무결성 보장 |
-| **멱등키** (Idempotency Key) | 결제 요청 | 네트워크 재시도 등 순차적 중복 요청 방어 |
+| 방어 계층                         | 적용 대상      | 목적                                              |
+| :-------------------------------- | :------------- | :------------------------------------------------ |
+| **비관적 락** (PESSIMISTIC_WRITE) | 크레딧 잔액    | 경합이 잦은 잔액 차감에서 Race Condition 방지     |
+| **낙관적 락** (@Version)          | 결제 상태 변경 | 결제 상태 전이(PENDING → COMPLETED)의 무결성 보장 |
+| **멱등키** (Idempotency Key)      | 결제 요청      | 네트워크 재시도 등 순차적 중복 요청 방어          |
 
 ### 검증
 
@@ -122,12 +122,12 @@ StoRead에서 유료 작품 열람을 위한 크레딧 충전/차감 시스템�
 
 ## Tech Stack
 
-| 영역              | 기술 스택                                             |
-| :---------------- | :---------------------------------------------------- |
-| **Core**          | React 19, TypeScript 5.7, Vite                        |
-| **State**         | Zustand (Client State), TanStack Query (Server State) |
-| **Visualization** | HTML5 Canvas, D3.js, react-force-graph-2d             |
-| **Editor**        | Tiptap (ProseMirror 기반)                             |
-| **Backend**       | Spring Boot, JPA, PostgreSQL, Neo4j                   |
+| 영역              | 기술 스택                                                 |
+| :---------------- | :-------------------------------------------------------- |
+| **Core**          | React 19, TypeScript 5.7, Vite                            |
+| **State**         | Zustand (Client State), TanStack Query (Server State)     |
+| **Visualization** | HTML5 Canvas, D3.js, react-force-graph-2d                 |
+| **Editor**        | Tiptap (ProseMirror 기반)                                 |
+| **Backend**       | Spring Boot, JPA, PostgreSQL, Neo4j                       |
 | **Infra**         | Docker Compose, AWS (EC2, S3, CloudFront), GitHub Actions |
-| **Tools**         | Claude Code CLI, Antigravity                          |
+| **Tools**         | Claude Code CLI, Antigravity                              |

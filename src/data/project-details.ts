@@ -17,17 +17,17 @@ export const projectDetails: Record<string, ProjectDetail> = {
           problem:
             "**사이드바 문서 목록 조회에서 쿼리 61개가 발생하고, 응답시간이 450ms까지 느려졌습니다.**\n문서 30개를 조회할 때 '문서 1번 → 태그 30번 → 카테고리 30번' 패턴으로 총 61개 쿼리가 나가고 있었습니다. JPA Lazy Loading 특성상 데이터가 적을 때는 드러나지 않다가, 문서가 쌓이면서 전형적인 N+1 패턴이 표면화된 것입니다.\n- 실측 응답시간 **450ms**, 사이드바 열 때 뚜렷한 지연 체감\n- 쿼리 로그 확인 후 원인 특정",
           approach:
-            "**DTO Projection으로 엔티티 그래프를 우회하고, Recursive CTE로 계층 트리를 단일 쿼리로 처리했습니다.**\n원인은 문서를 조회한 뒤 각 문서의 태그와 카테고리를 개별 SELECT로 가져오는 구조였습니다. `@BatchSize`로 IN 쿼리 묶음을 먼저 시도했지만 2-3회 왕복이 여전했고, Fetch Join은 OneToMany + Pageable 조합에서 HHH90003004 경고(메모리 전체 로딩)가 발생해 쓸 수 없었습니다. 결국 JPQL 생성자 표현식으로 필요 컬럼만 DTO에 직접 매핑하는 방식으로 전환해 N+1을 구조적으로 차단했습니다.\n- 폴더 트리는 Recursive CTE로 단일 쿼리 처리\n- `@BatchSize` → Fetch Join → DTO Projection 순서로 접근법 비교 후 결정",
+            "**DTO Projection으로 엔티티 그래프를 우회하고, JPA Fetch Join과 In-Memory 트리 구성을 통해 계층 구조를 효율적으로 조회했습니다.**\n원인은 문서를 조회한 뒤 각 문서의 태그와 카테고리를 개별 SELECT로 가져오는 구조였습니다. `@BatchSize`로 IN 쿼리 묶음을 먼저 시도했지만 2-3회 왕복이 여전했고, Fetch Join은 OneToMany + Pageable 조합에서 HHH90003004 경고(메모리 전체 로딩)가 발생해 쓸 수 없었습니다. 결국 JPQL 생성자 표현식으로 필요 컬럼만 DTO에 직접 매핑하는 방식으로 전환해 N+1을 구조적으로 차단했습니다.\n- 폴더 트리는 Fetch Join으로 전체 데이터를 조회한 뒤 메모리에서 Map을 활용해 O(n)으로 조립\n- `@BatchSize` → Fetch Join → In-Memory 트리 구성 순서로 접근법 비교 후 결정",
           result:
             "**쿼리 61개 → 1개, 응답 450ms → 25ms로 18배 개선됐습니다.**\n사이드바 체감 속도가 달라지는 걸 팀원들도 바로 느꼈습니다. 쿼리 수가 줄면서 DB 부하 자체가 낮아져 전체 시스템 안정성도 높아졌습니다.",
           retrospective:
-            "Fetch Join의 페이지네이션 제약을 미리 알았다면 처음부터 DTO Projection으로 설계했을 텐데, 이미 엔티티 기반으로 짜인 코드를 전부 DTO로 바꾸는 데 예상보다 시간이 많이 들었습니다. 또 Recursive CTE는 PostgreSQL과 MariaDB 문법이 조금 다른데, 초기에 DB를 바꾸면서 쿼리를 다시 짜야 했습니다. 앞으로는 ORM으로 복잡한 계층형 쿼리를 다룰 때 QueryDSL이나 네이티브 쿼리를 처음부터 고려하는 편이 낫겠다고 생각합니다.",
+            "Fetch Join의 페이지네이션 제약을 미리 알았다면 처음부터 DTO Projection으로 설계했을 텐데, 이미 엔티티 기반으로 짜인 코드를 전부 DTO로 바꾸는 데 예상보다 시간이 많이 들었습니다. 초기에는 Recursive CTE를 검토했으나, DB 벤더 간 문법 차이와 쿼리 복잡성을 고려하여 최종적으로 'Fetch Join + In-Memory 조립' 방식을 채택했습니다. 이 과정에서 기술적 트레이드오프(쿼리 단순성 vs 메모리 사용량)를 깊이 고민해 볼 수 있었습니다. 앞으로는 데이터 규모와 요구사항에 따라 QueryDSL이나 네이티브 쿼리 등 최적의 도구를 유연하게 선택하는 역량을 더 키우고자 합니다.",
           details: [
             "**문제 감지**: API 모니터링 로그에서 단일 엔드포인트에 60+ 쿼리 발생 확인",
             "**@BatchSize 시도**: IN 쿼리로 묶어도 2-3회 왕복 발생, 근본 해결 아님",
             "**Fetch Join 함정**: OneToMany + Pageable 조합에서 HHH90003004 경고 → 메모리 전체 로딩 위험",
             "**DTO Projection 전환**: JPQL 생성자 표현식으로 필요 컬럼만 직접 매핑, N+1 구조적 차단",
-            "**Recursive CTE**: 폴더 트리 전체를 재귀 쿼리 한 번으로 조회",
+            "**In-Memory 트리 구성**: Fetch Join으로 로드된 Flat 데이터를 메모리에서 O(n) 트리로 조립",
           ],
           impact: "450ms → 25ms (18배)",
         },
@@ -38,7 +38,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
           problem:
             "**트랜잭션 안에서 PG API를 호출하는 구조로, 동시 결제 10건이면 커넥션 풀이 고갈될 위험이 있었습니다.**\n결제 승인 로직이 '트랜잭션 안에서 PG API 호출 → DB 저장'을 하나의 흐름으로 묶고 있었습니다. HikariCP 기본 풀은 10개인데 토스페이먼츠 테스트 API 응답시간이 1-2초라, 결제 10건만 동시에 들어오면 모든 커넥션이 PG 응답을 기다리는 상태로 묶입니다. 일반 API(문서 조회, 에디터 저장)까지 `Connection is not available` 오류가 발생할 수 있는 구조였습니다.\n- 코드 리뷰 중 이 구조적 위험을 발견",
           approach:
-            "**네트워크 I/O와 DB 트랜잭션을 완전히 분리했습니다.**\n수정된 흐름은 이렇습니다: ① 먼저 PG API를 호출해 승인 결과를 받고(트랜잭션 없음), ② 승인 성공 확인 후 트랜잭션을 열어 크레딧을 처리합니다. ③ PG가 성공인데 DB 처리가 실패하는 엣지 케이스를 위해 PG 취소 API를 보상 트랜잭션으로 준비했습니다. 외부 API가 아무리 느려도 DB 커넥션을 물고 있지 않으니, 결제 지연이 다른 기능으로 전파되지 않습니다.",
+            "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\n수정된 흐름은 이렇습니다: ① 먼저 PG API를 호출해 승인 결과를 받고(트랜잭션 없음), ② 승인 성공 확인 후 트랜잭션을 열어 크레딧을 처리합니다. ③ PG가 성공인데 DB 처리가 실패하는 엣지 케이스를 위해 PG 취소 API를 보상 트랜잭션으로 준비했습니다. 외부 API가 아무리 느려도 DB 커넥션을 물고 있지 않으니, 결제 지연이 다른 기능으로 전파되지 않습니다.",
           result:
             "**PG 응답 지연이 DB 커넥션 풀에 영향을 주지 않는 구조로 전환됐습니다.**\n테스트 환경에서 결제 API에 지연을 주입해도 문서 조회, 에디터 저장 같은 일반 API가 정상 동작하는 것을 확인했습니다. 장애의 파급 범위가 결제 기능에만 격리되는 설계입니다.",
           retrospective:
@@ -132,13 +132,13 @@ useEffect(() => {
         {
           id: "tiptap-stability",
           title: "Tiptap 에디터 한글 입력 끊김",
-          subtitle: "커서 튐과 글자 씹힘 완전 해결",
+          subtitle: "커서 튐과 글자 씹힘 해결",
           problem:
             "**한글을 빠르게 입력하면 글자가 씹히거나 커서가 앞으로 튀는 현상이 발생했습니다.**\n영문에서는 재현이 안 돼서 한글 IME Composition 이벤트와 React 리렌더링 간 충돌을 의심했습니다. useEditor 소스를 직접 열어보니, `onUpdate` 콜백이 deps에 포함되어 있어 부모 리렌더링마다 에디터 인스턴스가 `destroy()` 후 재생성되고 있었습니다. 한글 조합 중에 이 재생성이 트리거되면 조합이 강제 종료됩니다.",
           approach:
-            "**useRef로 콜백을 감싸 에디터 인스턴스 재생성을 방지했습니다. (Event Handler Ref 패턴)**\n`useRef`로 `onUpdate` 콜백을 보관하고 `useEffect`로 최신 props를 ref에 동기화합니다. `useEditor`의 `onUpdate`에서는 ref를 통해 호출하므로, deps에서 자주 바뀌는 props를 완전히 제거할 수 있습니다. React 공식 문서의 Event Handler Ref 패턴과 동일한 방식입니다.",
+            "**useRef로 콜백을 감싸 에디터 인스턴스 재생성을 방지했습니다. (Event Handler Ref 패턴)**\n`useRef`로 `onUpdate` 콜백을 보관하고 `useEffect`로 최신 props를 ref에 동기화합니다. `useEditor`의 `onUpdate`에서는 ref를 통해 호출하므로, deps에서 자주 바뀌는 props를 제거할 수 있습니다. React 공식 문서의 Event Handler Ref 패턴과 동일한 방식입니다.",
           result:
-            "**한글 조합 중 리렌더링이 발생해도 에디터 인스턴스가 유지되어, 커서 튐과 글자 씹힘이 완전히 사라졌습니다.**\n부모 컴포넌트가 상태를 얼마나 자주 업데이트해도 에디터는 영향받지 않습니다. 마운트 시 1회만 인스턴스를 생성합니다.",
+            "**한글 조합 중 리렌더링이 발생해도 에디터 인스턴스가 유지되어, 커서 튐과 글자 씹힘이 해소됐습니다.**\n부모 컴포넌트가 상태를 얼마나 자주 업데이트해도 에디터는 영향받지 않습니다. 마운트 시 1회만 인스턴스를 생성합니다.",
           retrospective:
             "증상만 보고 원인을 추측해서 여러 방향으로 시도하다 시간을 꽤 썼습니다. 처음부터 ProseMirror와 IME Composition Event의 관계를 공식 문서에서 찾아봤으면 더 빨리 해결했을 것입니다. 또 이 버그는 macOS에서만 한글 입력기를 쓸 때 나타나서 Windows 환경에서 테스트할 때는 발견이 안 됐습니다. 다양한 OS와 입력기 조합으로 테스트 매트릭스를 넓히는 습관을 가져야겠다고 생각했습니다.",
           codeSnippet: `// TiptapEditor.tsx — Event Handler Ref 패턴으로 인스턴스 재생성 방지
@@ -155,7 +155,7 @@ const editor = useEditor({
   },
   // deps 배열에 변동이 잦은 props 없음 → 마운트 시 1회만 인스턴스 생성
 });`,
-          impact: "한글 입력 끊김 완전 해결",
+          impact: "한글 입력 끊김 해결",
         },
       ],
     },
@@ -186,15 +186,28 @@ const editor = useEditor({
     techStack: [
       {
         category: "Frontend",
-        items: ["React 19", "TypeScript", "Vite", "D3.js", "Canvas API", "Tiptap", "Zustand", "TanStack Query"],
+        items: [
+          "React 19",
+          "TypeScript",
+          "Vite",
+          "D3.js",
+          "Canvas API",
+          "Tiptap",
+          "Zustand",
+          "TanStack Query",
+        ],
       },
       {
         category: "Backend",
         items: ["Spring Boot", "JPA", "PostgreSQL", "Neo4j"],
       },
       {
-        category: "결제 & 테스트",
-        items: ["Toss Payments SDK", "JUnit 5", "Testcontainers"],
+        category: "테스트",
+        items: ["JUnit 5", "Testcontainers", "Toss Payments SDK"],
+      },
+      {
+        category: "Tools",
+        items: ["Git", "GitHub Actions"],
       },
     ],
   },
@@ -215,7 +228,7 @@ const editor = useEditor({
           problem:
             "**ML 이미지 합성(~30초)이 Tomcat I/O 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비되는 Cascade Failure가 발생했습니다.**\nFlask ML 추론을 `RestTemplate`으로 동기 호출하는 구조에서, `ThreadPoolTaskExecutor`의 maxPool(10)이 30초씩 점유됩니다. queue(25)까지 포화되면 `CallerRunsPolicy`가 발동되어 Tomcat 스레드마저 Flask를 직접 호출하게 됩니다.\n- k6 부하 테스트 실측 최대 처리량: **1.16 TPS**\n- 이미지 합성 외 일기 작성·건강 기록 등 무관한 API까지 전부 무응답",
           approach:
-            "**RabbitMQ로 WAS와 AI 처리를 완전 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`으로 시도했지만 두 가지 구조적 한계가 드러났습니다. WAS 힙에 상태를 저장하면 Scale-out 시 인스턴스 간 불일치가 발생하고, 결과 조회 후에도 Map에서 `byte[]`를 제거하지 않아 GC 후에도 +28MB가 잔류하는 메모리 누수도 확인했습니다. 상태 관리를 외부 시스템에 위임해야 한다는 결론에 도달해 RabbitMQ를 도입했습니다.\n- Spring Boot(Producer): 큐 발행 → 즉시 202 Accepted (4.9ms)\n- Python Worker(Consumer): `prefetch_count=1` + 수동 ACK로 큐 소비 → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존\n- at-least-once delivery 대응: Worker → Controller → Store 3중 멱등성 가드",
+            "**RabbitMQ로 WAS와 AI 처리를 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`으로 시도했지만 두 가지 구조적 한계가 드러났습니다. WAS 힙에 상태를 저장하면 Scale-out 시 인스턴스 간 불일치가 발생하고, 결과 조회 후에도 Map에서 `byte[]`를 제거하지 않아 GC 후에도 +28MB가 잔류하는 메모리 누수도 확인했습니다. 상태 관리를 외부 시스템에 위임해야 한다는 결론에 도달해 RabbitMQ를 도입했습니다.\n- Spring Boot(Producer): 큐 발행 → 즉시 202 Accepted (4.9ms)\n- Python Worker(Consumer): `prefetch_count=1` + 수동 ACK로 큐 소비 → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존\n- at-least-once delivery 대응: Worker → Controller → Store 3중 멱등성 가드",
           result:
             "**WAS 수락률 1.16 → 1,949 TPS (1,680배), 202 응답 레이턴시 30,000ms → 4.9ms**\nAI 처리가 아무리 오래 걸려도 WAS는 영향받지 않습니다. 서버 재시작 시에도 큐에 남은 메시지가 보존돼 작업이 유실되지 않습니다.\n- 500 VU 부하에서 p95 318ms, 에러율 **0%**\n- 총 175,463건 처리, API 수락률 100%",
           retrospective:
@@ -242,7 +255,7 @@ const editor = useEditor({
   P->>P: basic_ack()
   P->>-W: POST /webhook/character (완료 콜백)
   W->>C: 폴링으로 완료 알림`,
-            caption: "RabbitMQ 비동기 처리 흐름 — WAS와 AI 처리 완전 분리",
+            caption: "RabbitMQ 비동기 처리 흐름 — WAS와 AI 처리 분리",
           },
           impact: "1.16 → 1,949 TPS (1,680배)",
         },
@@ -251,11 +264,11 @@ const editor = useEditor({
           title: "JPA N+1과 순환 참조가 겹쳐 발생한 API 무응답",
           subtitle: "쿼리 21개 → 1개 단축, StackOverflowError 해결",
           problem:
-            "**`Diary` 엔티티를 API 응답에 직접 반환하면서 순환 참조(StackOverflowError)와 N+1(21쿼리)이 동시에 터져 API가 무응답이 됐습니다.**\n`Diary.user`가 `FetchType.EAGER`로 설정되어 있어, 일기 10건 조회 시 diary 1 + user 10 + child 10 = 총 21쿼리가 발생했습니다. 동시에 양방향 연관관계를 Jackson이 무한히 따라가며 직렬화를 시도해 서버가 비정상 종료됐습니다.\n- `Diary → User → List<Diary> → User → ...` 순환 참조로 StackOverflowError\n- 도메인 엔티티가 API 경계를 넘는 구조적 결함이 두 문제의 근본 원인",
+            "**`Diary` 엔티티를 API 응답에 직접 반환하면서 순환 참조(StackOverflowError)와 N+1(21쿼리)이 동시에 터져 API가 무응답이 됐습니다.**\n`Diary.user`가 `FetchType.EAGER`로 설정되어 있어, 일기 10건 조회 시 diary 1 + user 10 + child 10 = 총 21쿼리가 발생했습니다. 동시에 양방향 연관관계를 Jackson이 무한히 따라가며 직렬화를 시도해 서버가 비정상 종료됐습니다.\n- `Diary → User → List<Diary> → User → ...` 순환 참조로 StackOverflowError\n- 도메인 엔티티가 API 경계를 넘는 설계 문제가 두 이슈의 근본 원인",
           approach:
             "**Response DTO로 계층 책임을 분리하고, DTO Projection + `default_batch_fetch_size` 안전망을 적용했습니다.**\n`@JsonIgnore`로 순환을 억제하는 건 증상 완화일 뿐이라 기각하고, 엔티티가 API 경계를 넘지 않도록 전용 DTO를 분리했습니다. 전 연관관계를 `FetchType.LAZY`로 전환하고, JPQL 생성자 표현식으로 필요 컬럼만 DTO에 직접 매핑해 엔티티 그래프를 타지 않도록 했습니다.\n- 소유자 검증(수정·삭제)에만 `@EntityGraph`로 명시적 Fetch Join\n- `default_batch_fetch_size=100`으로 DTO Projection 미적용 경로의 안전망 확보",
           result:
-            "**쿼리 21개 → 1개(필요 컬럼만 SELECT, JOIN 없음), StackOverflowError 원천 제거**\nDTO 반환으로 응답 payload 크기도 줄어들었고, 응답 스키마 변경 시 DTO만 수정하면 되는 구조로 유지보수성이 향상됐습니다.\n- 엔티티 전 필드 노출 위험(password 등) → DTO에 명시한 필드만 노출\n- 엔티티가 Jackson에 의존하는 구조 → 완전 분리",
+            "**쿼리 21개 → 1개(필요 컬럼만 SELECT, JOIN 없음), StackOverflowError 해결**\nDTO 반환으로 응답 payload 크기도 줄어들었고, 응답 스키마 변경 시 DTO만 수정하면 되는 구조로 유지보수성이 향상됐습니다.\n- 엔티티 전 필드 노출 위험(password 등) → DTO에 명시한 필드만 노출\n- 엔티티가 Jackson에 의존하는 구조 → DTO로 분리",
           retrospective:
             "JPA 엔티티를 API 응답에 그대로 노출하는 패턴의 위험성을 실제 장애를 통해 배웠습니다. 처음부터 엔티티와 DTO를 분리해 설계했으면 이 두 문제 모두 생기지 않았을 것입니다. 사실 양방향 관계 자체를 최대한 피하고 단방향으로만 설계하는 것이 더 안전합니다. 조회가 복잡해지는 경우에는 QueryDSL을 쓰거나, 아예 읽기 전용 Repository를 분리하는 방향(CQRS 패턴의 간소화 버전)도 고려해볼 만합니다.",
           details: [
@@ -266,6 +279,28 @@ const editor = useEditor({
             "**전역 안전망**: `default_batch_fetch_size=100`으로 미적용 경로의 N+1 배치 변환",
           ],
           impact: "쿼리 21개 → 1개 / StackOverflowError 해결",
+        },
+        {
+          id: "multi-layer-cache",
+          title: "주차별 맞춤 정보 — 컨텍스트 기반 개인화 + 다층 캐시",
+          subtitle: "Caffeine + Redis + DB 3계층 캐시, 사용자별 맞춤 응답",
+          problem:
+            "**임신 주차 정보가 모든 산모에게 동일한 응답을 반환해, 개인화된 서비스를 제공하지 못하고 있었습니다.**\n기존 구현은 주차 번호만으로 Gemini를 호출해 42주 고정 콘텐츠를 생성하는 구조였습니다. 같은 20주차라도 최근 감정이 불안한 산모와 안정적인 산모가 동일한 정보를 받고 있었고, 체중·혈압 등 건강 데이터도 반영되지 않았습니다. 42주 고정 콘텐츠는 DB에 저장하면 끝이라 캐시 계층의 근거도 약했습니다.",
+          approach:
+            "**산모의 일기 감정 분석 이력과 건강 기록을 Gemini 프롬프트에 주입해 개인화하고, 사용자×주차×컨텍스트 조합의 다양성에 대응하는 3계층 캐시를 설계했습니다.**\n`UserContextService`가 최근 7일 일기 감정 빈도와 최신 건강 기록을 수집해 요약 텍스트를 생성합니다. 이 컨텍스트를 SHA-256으로 해싱해 캐시 키(`userId:contextHash`)로 사용합니다. 동일한 컨텍스트(감정·건강 상태 변화 없음)에는 캐시가 HIT되고, 일기를 쓰거나 건강 기록이 바뀌면 해시가 달라져 자동으로 새 Gemini 호출이 발생합니다.\n- **L1 Caffeine**: 200 엔트리, 2분 TTL — 동일 사용자 반복 조회 시 네트워크 홉 없이 응답\n- **L2 Redis**: 24h + Jitter TTL — 서버 간 공유, 캐시 스탬피드 방지\n- **L3 DB**: `PersonalizedWeekContent` 엔티티로 영속화 — 서버 재시작·Redis 장애 시에도 유실 없음\n- 컨텍스트 미입력 사용자는 기존 42주 공통 캐시로 Fallback",
+          result:
+            "**같은 주차라도 산모의 감정·건강 상태에 따라 다른 맞춤 응답을 제공하며, 3계층 캐시로 반복 요청 시 Gemini API 비용을 절감합니다.**\n개인화로 사용자×주차×컨텍스트 조합이 다양해져 캐시가 실질적으로 필요한 구조가 됐습니다. DB 영속화 덕에 Redis 장애나 서버 재시작에도 기존 응답을 즉시 복원할 수 있습니다.",
+          retrospective:
+            "컨텍스트 해시가 감정·건강 데이터의 정확한 값에 의존하기 때문에, 체중이 0.1kg만 변해도 새 캐시 엔트리가 생깁니다. 값을 구간(예: 60~62kg)으로 양자화하면 캐시 히트율을 높일 수 있었을 것입니다. 또한 현재는 L3 DB 조회가 contextHash 기반 단건 조회라 인덱스만으로 충분하지만, 사용자 수가 크게 늘면 오래된 엔트리를 주기적으로 정리하는 배치가 필요합니다.",
+          details: [
+            "**컨텍스트 수집**: 최근 7일 일기 감정 빈도 + 최신 체중·혈압 → 요약 텍스트 생성",
+            "**캐시 키 설계**: SHA-256(userId + week + emotions + healthData) → 상태 변화 시 자동 무효화",
+            "**L1 Caffeine**: maximumSize 200, 2분 TTL — 활성 사용자 반복 조회 최적화",
+            "**L2 Redis**: 24h + 2h Jitter TTL — 서버 간 공유, 캐시 스탬피드 방지",
+            "**L3 DB 영속화**: PersonalizedWeekContent 엔티티, 서버 재시작·Redis 장애 복원용",
+            "**Fallback 전략**: 컨텍스트 미입력 → 42주 공통 캐시, Redis 장애 → DB → Gemini 직접 호출",
+          ],
+          impact: "개인화 응답 + Gemini API 호출 최소화",
         },
         {
           id: "redis-cache",
@@ -287,27 +322,6 @@ const editor = useEditor({
           ],
           impact: "487ms → 3ms (히트율 99.99%)",
         },
-        {
-          id: "multi-layer-cache",
-          title: "주차별 정보 AI 고도화 후 캐시 3가지 장애 패턴 → 다층 캐시 아키텍처",
-          subtitle: "Hot Key · Cache Avalanche · Cache Penetration 사전 방어",
-          problem:
-            "**주차별 정보를 static HashMap에서 Gemini AI(12개 필드)로 고도화하면서 avg 487ms가 발생했고, 단순 Redis 캐싱 전에 3가지 잠재 장애 패턴을 식별했습니다.**\n임산부 대다수가 임신 2기(14~27주)에 집중되어 42개 키 중 소수에 요청이 쏠리는 **Hot Key**, 서버 시작 시 42개 키를 동일 TTL로 warmup하면 24시간 후 전부 동시 만료되는 **Cache Avalanche**, `week=99` 같은 무효 요청이 반복되면 매번 Gemini API를 호출하는 **Cache Penetration**을 확인했습니다.",
-          approach:
-            "**세 문제를 각각 다른 레이어에서 차단하는 다층 캐시 구조를 설계했습니다.**\nHot Key는 Caffeine(L1) + Redis(L2) 다층 캐시로 방어합니다. L1은 JVM 힙에서 직접 접근하므로 네트워크 홉이 없고, `maximumSize(42)`로 모든 유효 주차가 JVM에 상주합니다(W-TinyLFU 알고리즘). Cache Avalanche는 TTL에 `random(0, 2h)` Jitter를 더해 만료 시점을 분산시킵니다. Cache Penetration은 `VALID_WEEKS` Set으로 O(1) 선차단하고, 무효 키에는 null 마커를 5분간 캐싱합니다.\n- 서버 시작 시 `@Async` warmup으로 42주 사전 로딩 (200ms 간격, Gemini 과부하 방지)",
-          result:
-            "**L2 Redis HIT ~2ms (244배 단축), L1 Caffeine HIT는 네트워크 홉 없이 JVM 직접 접근**\nGemini API 호출이 서버 재시작당 최대 42회 + TTL 만료 시 1회씩으로 고정됐습니다.\n- 콘텐츠 7개 → 12개 필드로 고도화 (추천 음식, 운동, 위험 증상, 감정 지지, 권장 검사 추가)\n- 42개 키 동시 만료 구조적으로 불가, 무효 주차 반복 요청 시 Gemini 비용 0",
-          retrospective:
-            "L2 Redis 키 만료 직후 다수 요청이 동시에 MISS를 받으면 여러 Gemini 호출이 발생하는 Cache Stampede 가능성이 남아있습니다. Redis SETNX 기반 분산 락을 추가하면 MISS 시 단 한 번만 Gemini를 호출하고 나머지는 대기하도록 제어할 수 있습니다.",
-          details: [
-            "**Hot Key 방어**: Caffeine L1(2분 TTL, maximumSize=42) + Redis L2 → 인기 주차 Redis 부하 제거",
-            "**Cache Avalanche 방어**: TTL 24h + random(0, 2h) Jitter → 42개 키 동시 만료 구조적 불가",
-            "**Cache Penetration 방어**: VALID_WEEKS Set O(1) 선차단 + null 마커 5분 캐싱",
-            "**Warmup**: @EventListener(ApplicationReadyEvent) + @Async, 200ms 간격 42주 사전 로딩",
-            "**Caffeine 선택 이유**: W-TinyLFU(LRU 대비 ~5배 히트율), Spring Boot 표준 권장 구현체",
-          ],
-          impact: "487ms → L2 ~2ms / L1 네트워크 홉 없음",
-        },
       ],
       frontend: [
         {
@@ -317,9 +331,9 @@ const editor = useEditor({
           problem:
             "**사진 2장을 Canvas API로 압축하는 동안 메인 스레드가 최대 2초간 블록되어, UI 전체가 멈추고 로딩 애니메이션도 정지했습니다.**\n부모 사진 2장(각 3-5MB)을 AI 서버로 보내기 전에 리사이즈·압축하는 로직이 메인 스레드에서 동기로 실행되고 있었습니다. JavaScript는 싱글 스레드라 압축 중 이벤트 루프 전체가 블록됩니다. 로딩 애니메이션까지 멈추기 때문에 앱이 멈춘 것처럼 보이는 문제였고, 모바일에서는 더 심각했습니다.",
           approach:
-            "**Web Worker 2개로 사진을 병렬 압축하여 메인 스레드를 완전히 해방했습니다.**\nOffscreenCanvas를 먼저 검토했지만 당시 모바일 브라우저 지원이 불충분해 기각했습니다. Worker A(아빠 사진)와 Worker B(엄마 사진)를 동시에 돌려 병렬 압축하고, `postMessage`로 완료된 Blob을 메인 스레드로 전달합니다. `Promise.all`로 두 Worker 완료를 기다렸다가 AI 서버로 전송합니다.",
+            "**Web Worker 2개로 사진을 병렬 압축하여 메인 스레드 블로킹을 제거했습니다.**\nOffscreenCanvas를 먼저 검토했지만 당시 모바일 브라우저 지원이 불충분해 기각했습니다. Worker A(아빠 사진)와 Worker B(엄마 사진)를 동시에 돌려 병렬 압축하고, `postMessage`로 완료된 Blob을 메인 스레드로 전달합니다. `Promise.all`로 두 Worker 완료를 기다렸다가 AI 서버로 전송합니다.",
           result:
-            "**UI Freezing이 완전히 사라지고, 로딩 애니메이션이 정상 동작합니다.**\n사진 처리 중에도 다른 UI 조작이 가능하고, 두 사진을 병렬 압축하기 때문에 순차 처리 대비 시간도 단축됐습니다. 모바일에서도 매끄럽게 동작합니다.",
+            "**UI Freezing이 해소되고, 로딩 애니메이션이 정상 동작합니다.**\n사진 처리 중에도 다른 UI 조작이 가능하고, 두 사진을 병렬 압축하기 때문에 순차 처리 대비 시간도 단축됐습니다. 모바일에서도 매끄럽게 동작합니다.",
           retrospective:
             "Worker 2개를 항상 생성하는 방식이라 사진이 1장만 업로드될 경우 Worker 하나가 낭비됩니다. 업로드 파일 수에 따라 Worker를 동적으로 생성하거나, Worker Pool을 만들어 재사용하는 게 더 효율적입니다. 또 Worker와 메인 스레드 간 이미지 데이터를 복사하는 과정에서 메모리 사용량이 일시적으로 두 배가 됩니다. `Transferable Objects`를 사용해 복사 대신 소유권을 이전하면 이 오버헤드를 없앨 수 있는데, 당시에는 이 API를 몰라서 적용하지 못했습니다.",
           details: [
@@ -340,7 +354,7 @@ const editor = useEditor({
           approach:
             "**Zustand로 전역 상태를 단일화하고, 비즈니스 로직을 커스텀 훅으로 캡슐화했습니다.**\nRedux는 보일러플레이트가 2인 프로젝트에 과했고, Context API는 값 변경 시 구독 컴포넌트 전체가 리렌더링되는 문제가 있어 Zustand를 선택했습니다. 스토어를 함수 하나로 정의하고 slice 단위로 구독하면 보일러플레이트 없이 필요한 상태만 반응합니다. 서버 상태는 SWR 방식으로 분리하고, `useCharacter`, `useDiary` 같은 커스텀 훅으로 비즈니스 로직을 View 밖으로 분리했습니다.",
           result:
-            "**5단계 Prop Drilling이 사라지고, 상태 불일치 버그가 해소됐습니다.**\n어떤 컴포넌트에서든 `useCharacterStore()`로 캐릭터 상태에 바로 접근하며, 한 스토어가 단일 진실의 원천 역할을 합니다. 새 기능을 추가할 때 기존 컴포넌트를 거의 건드리지 않아도 됩니다.",
+            "**5단계 Prop Drilling이 사라지고, 상태 불일치 버그가 해소됐습니다.**\n어떤 컴포넌트에서든 `useCharacterStore()`로 캐릭터 상태에 바로 접근하며, 한 스토어에서 상태를 일관되게 관리합니다. 새 기능을 추가할 때 기존 컴포넌트를 거의 건드리지 않아도 됩니다.",
           retrospective:
             "처음에 도메인 구분 없이 하나의 큰 스토어를 만들었더니, 프로젝트가 커지면서 스토어가 비대해졌습니다. `useCharacterStore`, `useDiaryStore`, `useUserStore`처럼 도메인별로 나눴으면 관심사가 더 명확해졌을 것입니다. 또 Zustand 스토어는 테스트 시 초기화가 번거로울 수 있는데, 각 테스트마다 스토어를 리셋하는 헬퍼 함수를 처음부터 만들어 두었으면 좋았겠습니다.",
           details: [
@@ -367,29 +381,49 @@ const editor = useEditor({
         description: "Redis 날짜 기반 캐싱, 히트율 99.99%, Gemini 일 1회",
       },
       {
-        metric: "487ms → ~2ms",
-        label: "주차별 정보 API",
-        description: "Caffeine L1 + Redis L2 다층 캐시, 3가지 장애 패턴 방어",
-      },
-      {
         metric: "21쿼리 → 1쿼리",
         label: "일기 목록 조회",
         description: "DTO Projection + 계층 책임 분리, StackOverflowError 해결",
+      },
+      {
+        metric: "3계층 캐시",
+        label: "주차별 맞춤 정보",
+        description: "감정·건강 컨텍스트 개인화, Caffeine + Redis + DB",
       },
     ],
 
     techStack: [
       {
-        category: "Backend",
-        items: ["Spring Boot", "JPA", "MariaDB", "RabbitMQ", "Redis", "Caffeine"],
-      },
-      {
-        category: "AI / Infra",
-        items: ["Flask", "MediaPipe", "Gemini 2.5 Flash", "Docker Compose", "AWS EC2", "S3", "CloudFront"],
-      },
-      {
         category: "Frontend",
         items: ["React", "TypeScript", "Zustand", "Web Worker API"],
+      },
+      {
+        category: "Backend",
+        items: [
+          "Spring Boot",
+          "JPA",
+          "MariaDB",
+          "RabbitMQ",
+          "Redis",
+          "Caffeine",
+        ],
+      },
+      {
+        category: "AI",
+        items: ["Flask", "MediaPipe", "Gemini 2.5 Flash"],
+      },
+      {
+        category: "Infra",
+        items: [
+          "Docker Compose",
+          "AWS EC2",
+          "S3",
+          "CloudFront",
+        ],
+      },
+      {
+        category: "Tools",
+        items: ["Git", "GitHub Actions"],
       },
     ],
   },
