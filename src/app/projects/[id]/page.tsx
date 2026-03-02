@@ -19,6 +19,8 @@ import {
   AlertCircle,
   Lightbulb,
   CheckCircle2,
+  Printer,
+  ChevronDown,
 } from "lucide-react";
 import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
@@ -70,14 +72,16 @@ function SectionCard({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: idx * 0.08 }}
-      className="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden print:border print:shadow-none print:break-inside-avoid"
+      className="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden print:border print:border-stone-200 print:shadow-none print:break-inside-avoid print:mb-8"
     >
       {/* 헤더 */}
       <div className="px-5 sm:px-7 py-4 sm:py-5 border-b border-stone-100 dark:border-stone-800">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
           <div className="min-w-0">
             {section.subtitle && (
-              <p className={`text-[10px] sm:text-xs font-bold ${colors.text} tracking-wider mb-1`}>
+              <p
+                className={`text-[10px] sm:text-xs font-bold ${colors.text} tracking-wider mb-1`}
+              >
                 {section.subtitle}
               </p>
             )}
@@ -86,7 +90,9 @@ function SectionCard({
             </h3>
           </div>
           {section.impact && (
-            <span className={`shrink-0 self-start px-3 py-1.5 rounded-lg ${colors.bg} text-white text-xs sm:text-sm font-bold print:text-stone-900 print:bg-stone-100 print:border`}>
+            <span
+              className={`shrink-0 self-start px-3 py-1.5 rounded-lg ${colors.bg} text-white text-xs sm:text-sm font-bold print:text-stone-900 print:bg-stone-100 print:border`}
+            >
               {section.impact}
             </span>
           )}
@@ -100,7 +106,8 @@ function SectionCard({
             const value = section[step.key];
             if (!value) return null;
             const StepIcon = step.icon;
-            const isLast = stepIdx === steps.length - 1 || !section[steps[stepIdx + 1]?.key];
+            const isLast =
+              stepIdx === steps.length - 1 || !section[steps[stepIdx + 1]?.key];
             return (
               <div key={step.key} className="relative pl-7 sm:pl-8">
                 {/* 타임라인 세로선 */}
@@ -108,11 +115,15 @@ function SectionCard({
                   <div className="absolute left-[9px] sm:left-[11px] top-7 bottom-[-24px] sm:bottom-[-32px] w-px bg-stone-200 dark:bg-stone-700 print:bg-stone-300" />
                 )}
                 {/* 타임라인 도트 */}
-                <div className={`absolute left-0 top-[3px] w-[19px] h-[19px] sm:w-[23px] sm:h-[23px] rounded-full border-2 border-white dark:border-stone-900 ${step.dot} flex items-center justify-center print:border-stone-200`}>
+                <div
+                  className={`absolute left-0 top-[3px] w-[19px] h-[19px] sm:w-[23px] sm:h-[23px] rounded-full border-2 border-white dark:border-stone-900 ${step.dot} flex items-center justify-center print:border-stone-200 print:!bg-stone-400`}
+                >
                   <StepIcon size={10} className="text-white sm:w-3 sm:h-3" />
                 </div>
                 {/* 라벨 + 본문 */}
-                <p className={`text-[11px] sm:text-xs font-bold ${step.color} uppercase tracking-wider mb-1.5 sm:mb-2`}>
+                <p
+                  className={`text-[11px] sm:text-xs font-bold ${step.color} uppercase tracking-wider mb-1.5 sm:mb-2`}
+                >
                   {step.label}
                 </p>
                 <div className="text-stone-700 dark:text-stone-300 leading-[1.85] text-[13.5px] sm:text-[15px] break-keep print:text-stone-800 print:text-[12px] print:leading-[1.7]">
@@ -128,7 +139,10 @@ function SectionCard({
           <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-stone-100 dark:border-stone-800 space-y-2.5">
             {section.details.map((d, i) => (
               <div key={i} className="flex items-start gap-2.5">
-                <ChevronRight size={13} className={`${colors.text} shrink-0 mt-0.5`} />
+                <ChevronRight
+                  size={13}
+                  className={`${colors.text} shrink-0 mt-0.5`}
+                />
                 <div className="text-[13px] sm:text-sm text-stone-600 dark:text-stone-400 leading-relaxed break-keep print:text-stone-700 print:text-[11px]">
                   <FormattedText text={d} />
                 </div>
@@ -136,7 +150,6 @@ function SectionCard({
             ))}
           </div>
         )}
-
       </div>
 
       {/* 코드 스니펫 — 카드 하단에 풀 너비로 */}
@@ -176,7 +189,9 @@ export default function ProjectDetailPage({ params }: PageProps) {
   const hasFrontend = (detail.sections.frontend?.length ?? 0) > 0;
   const defaultTab = hasBackend ? "backend" : "frontend";
 
-  const [activeTab, setActiveTab] = useState<"backend" | "frontend">(defaultTab);
+  const [activeTab, setActiveTab] = useState<"backend" | "frontend">(
+    defaultTab,
+  );
 
   const Icon = getProjectIcon(project.id);
   const colors = getProjectColors(project.color);
@@ -185,11 +200,26 @@ export default function ProjectDetailPage({ params }: PageProps) {
   const nextProject = projects[(currentIndex + 1) % projects.length];
 
   const activeSections =
-    activeTab === "backend" ? detail.sections.backend ?? [] : detail.sections.frontend ?? [];
+    activeTab === "backend"
+      ? (detail.sections.backend ?? [])
+      : (detail.sections.frontend ?? []);
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
-      <Nav />
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 print:bg-white">
+      <div className="no-print">
+        <Nav />
+      </div>
+
+      {/* Floating Print Button (웹 전용) */}
+      <div className="fixed bottom-8 right-8 z-50 no-print">
+        <button
+          onClick={() => window.print()}
+          className={`flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r ${colors.gradient} text-white font-bold shadow-xl hover:scale-105 active:scale-95 transition-all`}
+        >
+          <Printer size={18} />
+          PDF로 인쇄
+        </button>
+      </div>
 
       {/* Hero */}
       <header className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 overflow-hidden">
@@ -202,9 +232,12 @@ export default function ProjectDetailPage({ params }: PageProps) {
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-10 relative z-10">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors mb-8 sm:mb-10 group text-sm font-medium"
+            className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors mb-8 sm:mb-10 group text-sm font-medium no-print"
           >
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft
+              size={16}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
             프로젝트 목록
           </button>
 
@@ -214,10 +247,14 @@ export default function ProjectDetailPage({ params }: PageProps) {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-3 mb-3 sm:mb-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${colors.gradient}`}>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${colors.gradient}`}
+              >
                 Project
               </span>
-              <span className="text-stone-400 text-xs sm:text-sm">{project.period}</span>
+              <span className="text-stone-400 text-xs sm:text-sm">
+                {project.period}
+              </span>
             </div>
             <h1
               className="text-3xl sm:text-5xl md:text-6xl font-black text-stone-900 dark:text-stone-100 tracking-tight mb-3 sm:mb-4"
@@ -248,8 +285,12 @@ export default function ProjectDetailPage({ params }: PageProps) {
                   <Briefcase size={13} className="text-stone-500" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">Role</p>
-                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200 truncate">{project.role}</p>
+                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">
+                    Role
+                  </p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200 truncate">
+                    {project.role}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-2.5">
@@ -257,8 +298,12 @@ export default function ProjectDetailPage({ params }: PageProps) {
                   <Calendar size={13} className="text-stone-500" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">Period</p>
-                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200">{project.period}</p>
+                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">
+                    Period
+                  </p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200">
+                    {project.period}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-2.5">
@@ -266,8 +311,12 @@ export default function ProjectDetailPage({ params }: PageProps) {
                   <Users size={13} className="text-stone-500" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">Team</p>
-                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200">{project.team}</p>
+                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold uppercase tracking-wider">
+                    Team
+                  </p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200">
+                    {project.team}
+                  </p>
                 </div>
               </div>
               {project.github && (
@@ -311,12 +360,12 @@ export default function ProjectDetailPage({ params }: PageProps) {
           </div>
         </motion.section>
 
-        {/* 카테고리 탭 */}
+        {/* 카테고리 탭 (인쇄 시 숨김) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8"
+          className="mb-8 no-print"
         >
           <div className="flex gap-1 p-1 bg-stone-100 dark:bg-stone-800/50 rounded-xl w-fit">
             {hasBackend && (
@@ -330,11 +379,13 @@ export default function ProjectDetailPage({ params }: PageProps) {
               >
                 <Server size={15} />
                 Backend
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-black ${
-                  activeTab === "backend"
-                    ? `${colors.light} ${colors.text}`
-                    : "bg-stone-200 dark:bg-stone-700 text-stone-500"
-                }`}>
+                <span
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-black ${
+                    activeTab === "backend"
+                      ? `${colors.light} ${colors.text}`
+                      : "bg-stone-200 dark:bg-stone-700 text-stone-500"
+                  }`}
+                >
                   {detail.sections.backend?.length ?? 0}
                 </span>
               </button>
@@ -350,11 +401,13 @@ export default function ProjectDetailPage({ params }: PageProps) {
               >
                 <Monitor size={15} />
                 Frontend
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-black ${
-                  activeTab === "frontend"
-                    ? `${colors.light} ${colors.text}`
-                    : "bg-stone-200 dark:bg-stone-700 text-stone-500"
-                }`}>
+                <span
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-black ${
+                    activeTab === "frontend"
+                      ? `${colors.light} ${colors.text}`
+                      : "bg-stone-200 dark:bg-stone-700 text-stone-500"
+                  }`}
+                >
                   {detail.sections.frontend?.length ?? 0}
                 </span>
               </button>
@@ -362,21 +415,68 @@ export default function ProjectDetailPage({ params }: PageProps) {
           </div>
         </motion.div>
 
-        {/* 섹션 목록 */}
-        <AnimatePresence mode="wait">
-          <motion.section
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-6 mb-16"
-          >
-            {activeSections.map((section, idx) => (
-              <SectionCard key={section.id} section={section} idx={idx} colors={colors} />
-            ))}
-          </motion.section>
-        </AnimatePresence>
+        {/* 섹션 목록 (웹 전용 탭 인터페이스) */}
+        <div className="no-print mb-16">
+          <AnimatePresence mode="wait">
+            <motion.section
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {activeSections.map((section, idx) => (
+                <SectionCard
+                  key={section.id}
+                  section={section}
+                  idx={idx}
+                  colors={colors}
+                />
+              ))}
+            </motion.section>
+          </AnimatePresence>
+        </div>
+
+        {/* 인쇄용 전체 섹션 (웹에서는 숨김, 인쇄 시 순차 노출) */}
+        <div className="hidden print:block space-y-12 mb-20">
+          {hasBackend && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 py-4 border-b-2 border-stone-900 mb-6">
+                <Server size={24} className="text-stone-900" />
+                <h2 className="text-2xl font-black text-stone-900 uppercase tracking-tight">
+                  Backend Engineering
+                </h2>
+              </div>
+              {detail.sections.backend?.map((section, idx) => (
+                <SectionCard
+                  key={section.id}
+                  section={section}
+                  idx={idx}
+                  colors={colors}
+                />
+              ))}
+            </div>
+          )}
+          {hasFrontend && (
+            <div className={`space-y-6 ${hasBackend ? "pt-12" : ""}`}>
+              <div className="flex items-center gap-3 py-4 border-b-2 border-stone-900 mb-6">
+                <Monitor size={24} className="text-stone-900" />
+                <h2 className="text-2xl font-black text-stone-900 uppercase tracking-tight">
+                  Frontend Engineering
+                </h2>
+              </div>
+              {detail.sections.frontend?.map((section, idx) => (
+                <SectionCard
+                  key={section.id}
+                  section={section}
+                  idx={idx}
+                  colors={colors}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Key Results */}
         <motion.section
@@ -386,39 +486,52 @@ export default function ProjectDetailPage({ params }: PageProps) {
           transition={{ duration: 0.5 }}
           className="mb-16"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <Trophy size={18} className={colors.text} />
-            <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">Key Results</h2>
+          <div className="flex items-center gap-3 mb-6 print:mt-10">
+            <Trophy
+              size={18}
+              className={colors.text + " print:text-stone-900"}
+            />
+            <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
+              Key Results
+            </h2>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-3 print:grid-cols-2">
             {detail.achievements.map((a, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-4 p-5 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700"
+                className="flex items-start gap-4 p-5 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 print:border print:border-stone-200 print:bg-stone-50"
               >
                 {a.metric && (
-                  <span className={`text-xl font-black ${colors.text} shrink-0 leading-tight`}>
+                  <span
+                    className={`text-xl font-black ${colors.text} shrink-0 leading-tight print:text-stone-950`}
+                  >
                     {a.metric}
                   </span>
                 )}
                 <div className="min-w-0">
-                  <p className="font-bold text-stone-900 dark:text-stone-100 mb-0.5">{a.label}</p>
-                  <p className="text-sm text-stone-500 dark:text-stone-400">{a.description}</p>
+                  <p className="font-bold text-stone-900 dark:text-stone-100 mb-0.5">
+                    {a.label}
+                  </p>
+                  <p className="text-sm text-stone-500 dark:text-stone-400 print:text-stone-700 print:text-[11px]">
+                    {a.description}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </motion.section>
 
-        {/* Next Project */}
+        {/* Next Project (인쇄 시 숨김) */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="pt-12 border-t border-stone-200 dark:border-stone-800"
+          className="pt-12 border-t border-stone-200 dark:border-stone-800 no-print"
         >
-          <p className="text-xs text-stone-400 font-semibold mb-4">Next Project</p>
+          <p className="text-xs text-stone-400 font-semibold mb-4">
+            Next Project
+          </p>
           <Link
             href={nextProject.link}
             className="group flex items-center justify-between p-7 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 hover:shadow-lg transition-all duration-300"
@@ -430,10 +543,15 @@ export default function ProjectDetailPage({ params }: PageProps) {
               >
                 {nextProject.title}
               </h3>
-              <p className="text-stone-500 dark:text-stone-400 text-sm">{nextProject.subtitle}</p>
+              <p className="text-stone-500 dark:text-stone-400 text-sm">
+                {nextProject.subtitle}
+              </p>
             </div>
             <div className="w-12 h-12 rounded-full border-2 border-stone-200 dark:border-stone-700 group-hover:border-stone-900 dark:group-hover:border-amber-500 group-hover:bg-stone-900 dark:group-hover:bg-amber-500 flex items-center justify-center transition-all duration-300">
-              <ArrowRight size={20} className="text-stone-400 group-hover:text-white transition-colors" />
+              <ArrowRight
+                size={20}
+                className="text-stone-400 group-hover:text-white transition-colors"
+              />
             </div>
           </Link>
         </motion.section>

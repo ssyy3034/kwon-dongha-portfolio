@@ -402,6 +402,47 @@ if (json != null) {
           ],
           impact: "487ms → 3ms / Gemini 일 1회",
         },
+        {
+          id: "mixed-content",
+          title: "Mixed Content 에러 해결 (CloudFront API 프록시)",
+          subtitle: "인프라 구조 변경을 통한 보안 및 정책 해결",
+          problem:
+            "**프론트엔드(HTTPS)가 백엔드(HTTP)를 직접 호출하면서 브라우저의 Mixed Content 정책에 의해 모든 API 요청이 전면 차단됐습니다.**\n각 서버에 개별 SSL을 적용하려 했으나, Flask와 Spring Boot 모두 관리해야 하는 포인트가 늘어나는 문제가 있었습니다. 또한 Flask 포트를 외부에 노출하는 것이 보안상 취약점으로 판단되었습니다.",
+          approach:
+            "**CloudFront를 API 프록시로 활용하고 백엔드 진입점을 Spring Boot로 단일화했습니다.**\nCloudFront에서 `/api/*` 경로를 Spring Boot로 라우팅하여 HTTPS를 종단(Termination)하고, 내부적으로는 HTTP로 통신하게 했습니다. 프론트엔드에서 Flask를 직접 호출하던 코드를 제거하고 Spring Boot가 `RestTemplate`으로 Flask에 요청을 전달하는 프록시 구조로 개편했습니다.\n- CloudFront SSL Termination 적용\n- 백엔드 단일 진입점(Single Entry Point) 구축",
+          result:
+            "**Mixed Content 에러가 완전히 해결되었으며, Flask 포트를 외부에 노출하지 않아 공격 표면(Attack Surface)을 줄였습니다.**\n프론트엔드 측의 API 엔드포인트 관리 포인트가 하나로 줄어들어 유지보수성도 향상되었습니다.",
+          details: [
+            "**보안 강화**: Flask 포트(5001) 차단, 내부 네트워크 통신으로 한정",
+            "**유지보수 효율**: 프론트엔드 API 도메인 단일화",
+          ],
+          diagram: {
+            type: "mermaid",
+            content: `graph TD
+  FE[Frontend: HTTPS] -- /api/* --> CF[CloudFront: SSL Termination]
+  CF -- HTTP --> SB[Spring Boot: EC2]
+  SB -- Internal HTTP --> FL[Flask: Docker]
+  style CF fill:#ff9900,stroke:#232f3e,color:#fff`,
+            caption: "CloudFront 기반 백엔드 단일 진입점 아키텍처",
+          },
+          impact: "보안 강화 및 API 정책 문제 해결",
+        },
+        {
+          id: "memory-leak",
+          title: "비동기 처리 중 메모리 누수 탐지 및 해결",
+          subtitle: "Heap Memory 분석을 통한 GC Root 식별",
+          problem:
+            "**k6 부하 테스트 중 힙 메모리가 반환되지 않고 지속적으로 증가하는 현상이 발생했습니다.**\n이미지 합성 결과를 메모리에 임시 저장하는 구조였는데, 소량의 테스트만으로도 베이스라인 대비 힙 사용량이 28MB 이상 잔류하는 것을 확인했습니다. GC를 강제로 수행해도 메모리가 해제되지 않아 서버 장애로 이어질 수 있는 상황이었습니다.",
+          approach:
+            "**VisualVM으로 Heap Dump를 분석하여 Strong Reference Chain을 식별하고 TTL 기반 정리 로직을 도입했습니다.**\n분석 결과, 클라이언트가 결과를 조회한 뒤에도 `byte[]` 데이터가 `ConcurrentHashMap`에 강한 참조로 남아있어 GC 수거 대상에서 제외되고 있었습니다. 이를 해결하기 위해 `@Scheduled`를 활용한 10분 TTL 정리 스케줄러를 구현했습니다.",
+          result:
+            "**부하 테스트 후에도 힙 메모리 사용량이 베이스라인 수준으로 정상 반환되는 것을 확인했습니다.**\n메모리 누수 원천 차단으로 장기 운영 안정성을 확보했습니다.",
+          details: [
+            "**분석 도구**: VisualVM, Spring Boot Actuator",
+            "**해결 전략**: @Scheduled 기반 캐시 클리업 스케줄러 구현",
+          ],
+          impact: "서버 안정성 확보 및 누수 0%",
+        },
       ],
       frontend: [
         {
@@ -488,12 +529,7 @@ if (json != null) {
       },
       {
         category: "Infra",
-        items: [
-          "Docker Compose",
-          "AWS EC2",
-          "S3",
-          "CloudFront",
-        ],
+        items: ["Docker Compose", "AWS EC2", "S3", "CloudFront"],
       },
       {
         category: "Tools",

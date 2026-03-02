@@ -86,15 +86,14 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
           </span>
         </div>
       )}
-      <SyntaxHighlighter
         language={lang}
         style={oneDark}
+        className="syntax-highlighter no-scrollbar"
         customStyle={{
           margin: 0,
           padding: "1rem 1.25rem",
           fontSize: "0.72rem",
           lineHeight: "1.7",
-          background: "#16162a",
           borderRadius: 0,
         }}
         showLineNumbers={false}
