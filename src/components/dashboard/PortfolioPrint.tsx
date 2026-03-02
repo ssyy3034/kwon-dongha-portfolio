@@ -4,334 +4,348 @@ import { useProfile } from "@/context/ProfileContext";
 import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
 import FormattedText from "@/components/common/FormattedText";
-import { Code, Lightbulb, Users } from "lucide-react";
+import {
+  Code,
+  Lightbulb,
+  Users,
+  Briefcase,
+  Calendar,
+  AlertCircle,
+  CheckCircle2,
+  Server,
+  Monitor,
+  Trophy,
+} from "lucide-react";
+import { getProjectColors, getProjectIcon } from "@/config/project-theme";
+import Mermaid from "@/components/common/Mermaid";
+import CodeBlock from "@/components/common/CodeBlock";
+
+const steps = [
+  {
+    key: "problem" as const,
+    label: "Problem",
+    icon: AlertCircle,
+    color: "text-red-500",
+    dot: "bg-red-500",
+  },
+  {
+    key: "approach" as const,
+    label: "Approach",
+    icon: Lightbulb,
+    color: "text-amber-500",
+    dot: "bg-amber-500",
+  },
+  {
+    key: "result" as const,
+    label: "Result",
+    icon: CheckCircle2,
+    color: "text-emerald-500",
+    dot: "bg-emerald-500",
+  },
+] as const;
+
+function SectionCard({ section, colors }: { section: any; colors: any }) {
+  return (
+    <article className="mb-10 break-inside-avoid">
+      {/* 라인 기반 헤더 - Narrative Style */}
+      <div className="flex items-baseline justify-between gap-4 border-b-2 border-stone-100 pb-2 mb-4">
+        <h3 className="text-[14px] font-black text-stone-900 tracking-tight flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${colors.bg}`} />
+          {section.title}
+        </h3>
+        {section.impact && (
+          <span
+            className={`text-[11px] font-black ${colors.text} uppercase tracking-widest`}
+          >
+            {section.impact}
+          </span>
+        )}
+      </div>
+
+      <div className="pl-4 relative">
+        {/* 수직 타임라인 연결선 */}
+        <div className="absolute left-[7px] top-2 bottom-4 w-0.5 bg-stone-100" />
+
+        <div className="space-y-6">
+          {steps.map((step) => {
+            const value = section[step.key];
+            if (!value) return null;
+            return (
+              <div key={step.key} className="relative pl-6">
+                {/* 단계 표시 도트 */}
+                <div
+                  className={`absolute left-[-1.5px] top-1.5 w-2 h-2 rounded-full border-2 border-white ${step.dot}`}
+                />
+
+                <div className="mb-1">
+                  <span
+                    className={`text-[10px] font-black ${step.color} uppercase tracking-widest`}
+                  >
+                    {step.label}
+                  </span>
+                  {step.key === "title" && section.subtitle && (
+                    <span className="text-stone-400 text-[10px] ml-2">
+                      — {section.subtitle}
+                    </span>
+                  )}
+                </div>
+                <div className="text-stone-700 leading-relaxed text-[10pt] font-medium">
+                  <FormattedText noDark text={value} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 세부항목 - 차별화된 스타일 */}
+        {section.details && section.details.length > 0 && (
+          <div className="mt-4 ml-6 space-y-2 border-l-2 border-stone-50 pl-4">
+            {section.details.map((d: string, i: number) => (
+              <div
+                key={i}
+                className="text-[10pt] text-stone-500 leading-relaxed italic"
+              >
+                <FormattedText noDark text={d} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 기술적 결과물 - 중앙 배치 및 캡션 강화 */}
+        {(section.codeSnippet || section.diagram) && (
+          <div className="mt-6 ml-6 space-y-4">
+            {section.codeSnippet && (
+              <div className="rounded-xl overflow-hidden border border-stone-100 shadow-sm">
+                <CodeBlock code={section.codeSnippet} />
+              </div>
+            )}
+            {section.diagram?.type === "mermaid" && (
+              <div className="p-6 bg-stone-50/30 rounded-xl border border-stone-100">
+                {section.diagram.caption && (
+                  <p className="text-[10px] text-stone-400 font-black mb-3 uppercase tracking-[0.2em] text-center">
+                    {section.diagram.caption}
+                  </p>
+                )}
+                <div className="max-h-[250px] flex justify-center">
+                  <Mermaid chart={section.diagram.content} />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
 
 export default function PortfolioPrint() {
   const { profile } = useProfile();
 
   return (
-    <div className="bg-white text-stone-900">
-      {/* ===== PAGE 1: RESUME SUMMARY ===== */}
+    <div className="bg-white text-stone-900 font-sans">
+      {/* ===== PAGE 1: RESUME SUMMARY - NARRATIVE CENTERED ===== */}
+      <section className="pt-12 pb-12 border-b-2 border-stone-900 mb-12 text-center">
+        <header className="mb-12">
+          <h1
+            className="text-8xl font-black tracking-tighter mb-4"
+            style={{ fontFamily: "var(--font-editorial)" }}
+          >
+            {profile.name}
+          </h1>
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-3xl font-black text-amber-600 uppercase tracking-[0.2em]">
+              {profile.role}
+            </p>
+            <div className="flex gap-8 text-stone-400 font-bold text-[12px] uppercase tracking-[0.2em] border-t border-stone-100 pt-4">
+              <span>{profile.social.email}</span>
+              <span className="text-stone-200">|</span>
+              <span>{profile.social.github.replace("https://", "")}</span>
+            </div>
+          </div>
+        </header>
 
-      {/* Header */}
-      <header className="mb-8">
-        <h1 className="text-4xl font-black tracking-tight mb-1">
-          {profile.name}
-        </h1>
-        <p className="text-lg font-medium text-amber-600 mb-4">
-          {profile.role}
-        </p>
-
-        <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-stone-600">
-          <span>{profile.social.email}</span>
-          <span>{profile.social.github.replace("https://", "")}</span>
-        </div>
-      </header>
-
-      {/* About */}
-      <section className="mb-8">
-        <h2 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-3">
-          About
-        </h2>
-        <div className="flex flex-col gap-4">
+        {/* Bio Highlights - Horizontal Narrative */}
+        <div className="grid grid-cols-3 gap-6 mb-12">
           {profile.bio.cards?.map((card, idx) => (
             <div
               key={idx}
-              className="flex items-start gap-4 p-4 border border-stone-200 rounded-2xl bg-white shadow-sm break-inside-avoid"
+              className="p-6 bg-stone-50 rounded-2xl border border-stone-100 text-left relative overflow-hidden group"
             >
-              {/* Icon Box */}
               <div
-                className="flex items-center justify-center shrink-0 w-12 h-12 rounded-xl"
-                style={{
-                  backgroundColor: `${card.color}15`, // Ultra light background
-                  color: card.color,
-                }}
+                className="absolute top-0 left-0 w-1 h-full"
+                style={{ backgroundColor: card.color }}
+              />
+              <h3
+                className="text-[11px] font-black uppercase tracking-widest mb-3"
+                style={{ color: card.color }}
               >
-                {card.icon === "code" && <Code className="w-6 h-6" />}
-                {card.icon === "bulb" && <Lightbulb className="w-6 h-6" />}
-                {card.icon === "users" && <Users className="w-6 h-6" />}
-              </div>
+                {card.title}
+              </h3>
+              <p className="text-[12px] text-stone-700 leading-relaxed font-semibold">
+                <FormattedText
+                  noDark
+                  text={typeof card.content === "string" ? card.content : ""}
+                />
+              </p>
+            </div>
+          ))}
+        </div>
 
-              {/* Content */}
-              <div className="flex-1">
-                <h3
-                  className="text-base font-bold mb-1.5"
-                  style={{ color: card.color }}
-                >
-                  {card.title}
-                </h3>
-                <p className="text-sm text-stone-700 leading-relaxed text-justify">
-                  {/* Highlighter Logic */}
-                  {typeof card.content === "string" ? (
-                    card.content.split("**").map((text, i) =>
-                      i % 2 === 1 ? (
-                        <span
-                          key={i}
-                          className="font-bold px-0.5"
-                          style={{ backgroundColor: "#fff3cd" }} // Yellow highlighter
-                        >
-                          {text}
-                        </span>
-                      ) : (
-                        text
-                      ),
-                    )
-                  ) : (
-                    <span>{JSON.stringify(card.content)}</span>
-                  )}
-                </p>
+        {/* Integrated Tech Stack Grid */}
+        <div className="grid grid-cols-2 gap-10 text-left">
+          {profile.skills.map((cat) => (
+            <div
+              key={cat.category}
+              className="p-6 border border-stone-50 rounded-2xl"
+            >
+              <h3 className="text-[12px] font-black text-stone-900 border-b-2 border-stone-900 pb-2 mb-4 uppercase tracking-widest">
+                {cat.category}
+              </h3>
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                {cat.items.map((skill) => (
+                  <span
+                    key={skill.name}
+                    className="text-[13px] font-bold text-stone-600"
+                  >
+                    {skill.name}
+                  </span>
+                ))}
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Primary Skills Quick View */}
-      <section className="mb-8">
-        <h2 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-3">
-          Core Expertise
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {profile.skills
-            .flatMap((cat) => cat.items)
-            .filter((s) => s.slug !== "nextdotjs" && s.slug !== "lighthouse")
-            .slice(0, 10)
-            .map((skill) => (
-              <span
-                key={skill.name}
-                className="px-2 py-1 bg-stone-100 text-stone-700 text-xs font-bold rounded"
-              >
-                {skill.name}
-              </span>
-            ))}
-        </div>
-      </section>
-
-      {/* Project Summaries (Quick Look) */}
-      <section className="mb-12">
-        <h2 className="text-sm font-black text-stone-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-4">
-          Project Summaries
-          <div className="h-px bg-stone-200 flex-1"></div>
-        </h2>
-
-        <div className="grid grid-cols-1 gap-8">
-          {projects.map((project) => (
-            <article
-              key={project.id}
-              className="border-l-4 border-stone-100 pl-6 py-2"
-            >
-              <div className="flex justify-between items-baseline mb-3">
-                <h3 className="text-xl font-black text-stone-900">
-                  {project.title}
-                  <span className="text-sm font-medium text-stone-500 ml-3">
-                    {project.subtitle}
-                  </span>
-                </h3>
-                <span className="text-sm font-bold text-stone-400">
-                  {project.period}
-                </span>
-              </div>
-              <p className="text-sm text-stone-600 leading-relaxed mb-4">
-                <FormattedText noDark text={project.description} />
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {project.tech.map((t) => (
-                  <span
-                    key={t}
-                    className="px-2 py-0.5 bg-stone-50 text-stone-500 text-[10px] font-bold rounded border border-stone-200"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* ===== PAGE 2: DETAILED SKILLS ===== */}
-      <div className="break-before-page pt-8">
-        <div className="mb-10 border-b-4 border-stone-900 pb-4">
-          <h2 className="text-4xl font-black text-stone-900 tracking-tighter">
-            Technical Expertise
-          </h2>
-          <p className="text-stone-500 font-medium mt-1">
-            Core competencies and practical applications
-          </p>
-        </div>
-
-        <div className="space-y-12">
-          {profile.skills.map((category) => (
-            <section key={category.category}>
-              <h3 className="text-lg font-black text-amber-600 uppercase tracking-widest mb-6 flex items-center gap-3">
-                <span className="h-px bg-amber-200 flex-1"></span>
-                {category.category}
-                <span className="h-px bg-amber-200 flex-1"></span>
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                {category.items.map((skill) => (
-                  <div
-                    key={skill.name}
-                    className="relative pl-6 border-l-2 border-stone-100 group"
-                  >
-                    <div className="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-stone-300 group-hover:bg-amber-500 transition-colors" />
-                    <h4 className="text-base font-bold text-stone-900 mb-2">
-                      {skill.name}
-                    </h4>
-                    <p className="text-sm text-stone-600 leading-relaxed">
-                      {skill.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </div>
-
-      {/* ===== PROJECT DETAIL PAGES (Deep Dive) ===== */}
+      {/* ===== PROJECT DETAIL PAGES ===== */}
       {projects.map((project) => {
         const detail = getProjectDetail(project.id);
         if (!detail) return null;
+        const colors = getProjectColors(project.color);
 
         return (
-          <div key={`${project.id}-detail`} className="break-before-page pt-12">
-            {/* Project Cover Header */}
-            <div
-              className={`mb-12 p-10 rounded-3xl bg-gradient-to-br ${project.color === "amber" ? "from-amber-50 to-orange-50" : "from-red-50 to-rose-50"} border border-stone-100`}
-            >
-              <div className="flex justify-between items-start mb-6">
+          <div key={project.id} className="break-before-page pt-10">
+            {/* Project Branding Header - Narrative Style */}
+            <header className="mb-12">
+              <div className="flex items-end justify-between mb-8">
                 <div>
-                  <h2 className="text-4xl font-black text-stone-900 tracking-tight mb-2">
+                  <h1
+                    className="text-7xl font-black text-stone-900 tracking-tighter leading-none"
+                    style={{ fontFamily: "var(--font-editorial)" }}
+                  >
                     {project.title}
-                  </h2>
+                  </h1>
                   <p
-                    className={`text-lg font-bold ${project.color === "amber" ? "text-amber-600" : "text-red-600"}`}
+                    className={`text-[12px] font-black ${colors.text} uppercase tracking-[0.3em] mt-4`}
                   >
                     {project.subtitle}
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="block text-sm font-black text-stone-400 uppercase tracking-widest">
-                    {project.period}
+                  <span className="text-[12px] font-black text-stone-300 uppercase tracking-widest block mb-1">
+                    Timeline
                   </span>
-                  <span className="block text-sm font-bold text-stone-600 mt-1">
-                    {project.role}
+                  <span className="text-lg font-black text-stone-900 tabular-nums">
+                    {project.period}
                   </span>
                 </div>
               </div>
-              <div className="p-6 bg-white/60 backdrop-blur rounded-2xl border border-white/50 text-base text-stone-700 leading-relaxed font-medium">
-                <FormattedText noDark text={detail.overview} />
-              </div>
-            </div>
 
-            {/* Achievements Section */}
-            <section className="mb-12 break-inside-avoid">
-              <h3 className="text-xs font-black text-stone-400 uppercase tracking-[0.3em] mb-6">
-                Key Achievements
-              </h3>
-              <div className="grid grid-cols-2 gap-6">
-                {detail.achievements.map((ach, idx) => (
+              {/* Tagline & Overview - High Impact Single Column */}
+              {detail && (
+                <div className="mb-10 p-8 bg-stone-50 rounded-3xl border border-stone-100 relative overflow-hidden">
+                  <div
+                    className={`absolute top-0 left-0 w-2 h-full ${colors.bg}`}
+                  />
+                  <p className="text-stone-900 font-extrabold leading-relaxed text-[18px] mb-4 max-w-3xl">
+                    <FormattedText noDark text={detail.tagline} />
+                  </p>
+                  <p className="text-stone-500 leading-relaxed text-[11pt] font-medium max-w-4xl">
+                    <FormattedText noDark text={detail.overview} />
+                  </p>
+                </div>
+              )}
+
+              {/* Horizontal Achievement Bar - GRID IMPACT */}
+              <div className="grid grid-cols-4 gap-4 mb-10">
+                {detail.achievements.map((a, idx) => (
                   <div
                     key={idx}
-                    className="p-6 bg-stone-50 border border-stone-100 rounded-2xl"
+                    className="p-4 bg-white border-2 border-stone-50 rounded-2xl shadow-sm text-center"
                   >
                     <div
-                      className={`text-2xl font-black ${project.color === "amber" ? "text-amber-600" : "text-red-600"} mb-2`}
+                      className={`text-2xl font-black ${colors.text} mb-1 tabular-nums tracking-tighter`}
                     >
-                      {ach.metric}
+                      {a.metric}
                     </div>
-                    <div className="text-sm font-black text-stone-900 mb-1">
-                      {ach.label}
-                    </div>
-                    <div className="text-xs text-stone-500 leading-relaxed">
-                      {ach.description}
+                    <div className="text-[10px] font-black text-stone-900 uppercase tracking-tighter leading-tight">
+                      {a.label}
                     </div>
                   </div>
                 ))}
               </div>
-            </section>
 
-            {/* Technical Case Studies */}
-            <h3 className="text-xs font-black text-stone-400 uppercase tracking-[0.3em] mb-8">
-              Technical Deep Dive
-            </h3>
-            <div className="space-y-16">
-              {[
-                ...(detail.sections.backend ?? []),
-                ...(detail.sections.frontend ?? []),
-              ].map((section, idx) => (
-                <article key={idx} className="break-inside-avoid space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-white ${project.color === "amber" ? "bg-amber-600" : "bg-red-600"}`}
-                    >
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-black text-stone-900">
-                        {section.title}
-                      </h4>
-                      <p className="text-sm font-bold text-stone-400">
-                        {section.subtitle}
-                      </p>
-                    </div>
-                  </div>
+              {/* Role & Team Mini-Badge */}
+              <div className="flex gap-6 font-black uppercase text-[11px] tracking-widest text-stone-400 pl-2">
+                <div className="flex items-center gap-2">
+                  <Briefcase size={14} />
+                  <span className="text-stone-900">{project.role}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users size={14} />
+                  <span className="text-stone-900">{project.team}</span>
+                </div>
+              </div>
+            </header>
 
-                  <div className="grid grid-cols-1 gap-8">
-                    {/* Problem - Solution - Result 3단 구성 */}
-                    <div className="flex flex-col gap-6">
-                      <div className="p-6 bg-rose-50/50 border border-rose-100 rounded-2xl">
-                        <p className="text-[10px] font-black text-rose-600 uppercase mb-2 tracking-widest">
-                          The Problem
-                        </p>
-                        <div className="text-sm text-stone-700 leading-relaxed">
-                          <FormattedText noDark text={section.problem} />
-                        </div>
+            {/* Engineering Deep Dive - Linear Narrative */}
+            <div className="space-y-16 pb-12">
+              {/* Backend Section */}
+              {detail.sections.backend &&
+                detail.sections.backend.length > 0 && (
+                  <section className="relative">
+                    <div className="flex items-center gap-4 mb-10">
+                      <div className="w-10 h-10 rounded-full bg-stone-900 text-white flex items-center justify-center">
+                        <Server size={20} />
                       </div>
-
-                      <div className="p-6 bg-emerald-50/50 border border-emerald-100 rounded-2xl">
-                        <p className="text-[10px] font-black text-emerald-600 uppercase mb-2 tracking-widest">
-                          Engineering Approach
-                        </p>
-                        <div className="text-sm text-stone-800 leading-relaxed font-bold mb-4">
-                          <FormattedText noDark text={section.approach} />
-                        </div>
-                        {section.details && (
-                          <ul className="space-y-2">
-                            {section.details.map((bullet, i) => (
-                              <li
-                                key={i}
-                                className="flex gap-3 text-xs text-stone-600 leading-normal"
-                              >
-                                <span className="text-emerald-400 font-black">
-                                  •
-                                </span>
-                                <FormattedText noDark text={bullet} />
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-
-                      {section.retrospective && (
-                        <div className="p-6 bg-amber-50/50 border border-amber-100 rounded-2xl italic">
-                          <p className="text-[10px] font-black text-amber-600 uppercase mb-2 tracking-widest not-italic">
-                            Engineers Perspective & Retrospective
-                          </p>
-                          <div className="text-xs text-stone-600 leading-relaxed">
-                            <FormattedText
-                              noDark
-                              text={section.retrospective}
-                            />
-                          </div>
-                        </div>
-                      )}
+                      <h2 className="text-xl font-black text-stone-900 uppercase tracking-[0.1em]">
+                        Engineering: Backend
+                      </h2>
                     </div>
-                  </div>
-                </article>
-              ))}
+                    <div className="space-y-12">
+                      {detail.sections.backend.map((section, idx) => (
+                        <SectionCard
+                          key={idx}
+                          section={section}
+                          colors={colors}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+              {/* Frontend Section */}
+              {detail.sections.frontend &&
+                detail.sections.frontend.length > 0 && (
+                  <section className="relative pt-8 border-t-2 border-stone-50">
+                    <div className="flex items-center gap-4 mb-10">
+                      <div className="w-10 h-10 rounded-full bg-stone-900 text-white flex items-center justify-center">
+                        <Monitor size={20} />
+                      </div>
+                      <h2 className="text-xl font-black text-stone-900 uppercase tracking-[0.1em]">
+                        Solution: Frontend
+                      </h2>
+                    </div>
+                    <div className="space-y-12">
+                      {detail.sections.frontend.map((section, idx) => (
+                        <SectionCard
+                          key={idx}
+                          section={section}
+                          colors={colors}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
             </div>
           </div>
         );
