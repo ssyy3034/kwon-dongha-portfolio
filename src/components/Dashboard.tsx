@@ -18,20 +18,18 @@ export default function Dashboard({
   const { profile } = useProfile();
   const contentRef = useRef<HTMLElement>(null);
 
-  const scrollToContent = () => {
-    contentRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <div className="min-h-screen bg-[#FEFDFB] dark:bg-stone-950 text-stone-900 dark:text-stone-50 font-sans antialiased selection:bg-amber-500 selection:text-white transition-colors duration-300">
-      {/* PDF 출력 전용 포트폴리오 */}
-      <div className="print-portfolio">
+      {/* PDF 출력 전용 포트폴리오 섹션 (인쇄 시에만 보임) */}
+      <div className="hidden print:block bg-white text-stone-900 p-0 m-0">
         <PortfolioPrint />
       </div>
 
-      <Nav />
+      <div className="no-print">
+        <Nav />
+      </div>
 
-      {/* HERO */}
+      {/* HERO (웹 전용) */}
       <section className="min-h-[100svh] flex flex-col no-print relative">
         <div className="flex-1 animate-fade-in-up opacity-0 fill-mode-forwards">
           <Hero streak={streakData.streak} heatmapData={streakData.heatmap} />

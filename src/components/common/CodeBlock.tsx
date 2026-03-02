@@ -43,11 +43,7 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
   const lang = language || detectLanguage(code);
 
   const displayCode = header
-    ? code
-        .split("\n")
-        .slice(1)
-        .join("\n")
-        .replace(/^\n/, "")
+    ? code.split("\n").slice(1).join("\n").replace(/^\n/, "")
     : code;
 
   const highlighted = getHighlightedLines(displayCode);
@@ -86,6 +82,7 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
           </span>
         </div>
       )}
+      <SyntaxHighlighter
         language={lang}
         style={oneDark}
         className="syntax-highlighter no-scrollbar"

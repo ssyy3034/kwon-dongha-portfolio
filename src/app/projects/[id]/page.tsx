@@ -210,17 +210,6 @@ export default function ProjectDetailPage({ params }: PageProps) {
         <Nav />
       </div>
 
-      {/* Floating Print Button (웹 전용) */}
-      <div className="fixed bottom-8 right-8 z-50 no-print">
-        <button
-          onClick={() => window.print()}
-          className={`flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r ${colors.gradient} text-white font-bold shadow-xl hover:scale-105 active:scale-95 transition-all`}
-        >
-          <Printer size={18} />
-          PDF로 인쇄
-        </button>
-      </div>
-
       {/* Hero */}
       <header className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
