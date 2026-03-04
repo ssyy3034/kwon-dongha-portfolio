@@ -59,7 +59,7 @@
   display: none;
 }
 
-/* Print styles for PDF Portfolio - Narrative Flow Layout */
+/* Print styles for PDF Portfolio - Grid-First & Print Optimized */
 @media print {
   body {
     -webkit-print-color-adjust: exact !important;
@@ -68,65 +68,80 @@
     font-size: 10pt !important;
     color: #1c1917 !important;
     line-height: 1.5 !important;
+    -webkit-font-smoothing: antialiased;
   }
 
   @page {
     size: A4;
-    margin: 20mm 20mm 20mm 20mm;
+    margin: 15mm 15mm 15mm 15mm;
   }
 
-  /* Narrative Typography & Hierarchy */
+  /* Structural Typography - Grid-First Scale */
   h1 {
-    font-size: 48pt !important;
-    margin-bottom: 8mm !important;
-    letter-spacing: -0.06em !important;
-    font-weight: 950 !important;
-    line-height: 0.9 !important;
+    font-size: 64pt !important;
+    margin-bottom: 10mm !important;
+    letter-spacing: -0.07em !important;
+    font-weight: 1000 !important;
+    line-height: 0.8 !important;
   }
   h2 {
-    font-size: 18pt !important;
-    margin-bottom: 6mm !important;
-    font-weight: 900 !important;
-    letter-spacing: -0.02em !important;
+    font-size: 24pt !important;
+    margin-bottom: 8mm !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.04em !important;
+    line-height: 1 !important;
   }
   h3 {
-    font-size: 14pt !important;
-    margin-bottom: 4mm !important;
-    font-weight: 850 !important;
+    font-size: 16pt !important;
+    margin-bottom: 6mm !important;
+    font-weight: 900 !important;
   }
 
   p,
   div,
   li {
-    line-height: 1.55 !important;
+    line-height: 1.6 !important;
     font-size: 10pt !important;
   }
 
-  /* Structural Spacing (Narrative Flow) */
+  /* Grid & Spacing Management */
+  .grid {
+    display: grid !important;
+  }
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  .gap-8 {
+    gap: 8mm !important;
+  }
+  .gap-12 {
+    gap: 12mm !important;
+  }
+
+  .mb-20 {
+    margin-bottom: 20mm !important;
+  }
   .mb-16 {
     margin-bottom: 15mm !important;
   }
   .mb-12 {
     margin-bottom: 12mm !important;
   }
-  .mb-10 {
-    margin-bottom: 10mm !important;
-  }
-  .mb-8 {
-    margin-bottom: 8mm !important;
-  }
 
+  .space-y-20 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 20mm !important;
+  }
   .space-y-16 > :not([hidden]) ~ :not([hidden]) {
     margin-top: 15mm !important;
   }
-  .space-y-12 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 12mm !important;
-  }
-  .space-y-8 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 8mm !important;
-  }
 
-  /* Page Control */
+  /* Page Break & Continuity (CRITICAL) */
   .break-before-page {
     break-before: page !important;
     padding-top: 10mm !important;
@@ -134,14 +149,29 @@
   .break-inside-avoid {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
+    display: block !important;
   }
 
-  /* Visual Elements - Brand Preservation */
+  /* Mermaid & Visual Assets Optimization */
+  .mermaid {
+    background: transparent !important;
+    filter: saturate(1.5) contrast(1.1) !important;
+    max-height: 10cm !important;
+    width: 100% !important;
+    margin: 8mm auto !important;
+  }
+
+  .mermaid svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Brand Colors & Visuals */
   .bg-stone-50 {
-    background-color: #f7f7f7 !important;
+    background-color: #f8f8f8 !important;
   }
   .bg-stone-900 {
-    background-color: #1c1917 !important;
+    background-color: #121212 !important;
     color: white !important;
   }
   .bg-amber-600 {
@@ -152,44 +182,24 @@
     color: #d97706 !important;
   }
 
-  /* Timeline Dots & Lines (CSS Only for consistency) */
-  .dot-primary {
-    background-color: #d97706 !important;
-  }
-  .dot-stone {
-    background-color: #44403c !important;
-  }
-
-  /* Assets Optimization */
-  img,
-  svg,
-  .mermaid {
-    max-height: 9cm !important;
-    width: auto !important;
-    margin: 6mm auto !important;
-    break-inside: avoid !important;
-  }
-
   pre {
-    background-color: #1c1917 !important;
-    color: #f7f7f7 !important;
-    padding: 12pt !important;
-    border-radius: 8pt !important;
+    background-color: #121212 !important;
+    color: #f9f9f9 !important;
+    padding: 15pt !important;
+    border-radius: 12pt !important;
     font-size: 9pt !important;
-    line-height: 1.5 !important;
-    border: 1px solid #292524 !important;
+    line-height: 1.6 !important;
+    border: 1px solid #222 !important;
   }
 
   /* Clean up */
-  .shadow-sm {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
-    border: 1px solid #f0f0f0 !important;
+  .shadow-sm,
+  .shadow-lg {
+    box-shadow: none !important;
+    border: 1.5px solid #f0f0f0 !important;
   }
   .border-stone-100 {
     border-color: #f0f0f0 !important;
-  }
-  .border-stone-200 {
-    border-color: #e7e5e4 !important;
   }
 
   .no-print {
