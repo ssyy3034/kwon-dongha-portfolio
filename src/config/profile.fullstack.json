@@ -101,10 +101,10 @@
           "description": "타입 시스템으로 런타임 오류를 줄이고 협업 시 코드 의도를 명확히 전달하는 데 활용합니다."
         },
         {
-          "name": "D3.js + Canvas API",
-          "slug": "d3dotjs",
+          "name": "react-force-graph-2d",
+          "slug": "react-force-graph",
           "color": "F9A03C",
-          "description": "Force Simulation 기반 지식 그래프를 Canvas로 구현하여 650노드 환경에서 응답속도 6.5배 개선."
+          "description": "Canvas 기반 Force Graph 라이브러리로 650노드 환경에서 INP 420ms → 64ms 개선."
         },
         {
           "name": "Vite",

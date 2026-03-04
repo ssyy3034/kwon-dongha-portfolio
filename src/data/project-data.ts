@@ -45,12 +45,12 @@ export const PROJECTS: Project[] = [
       "TypeScript",
       "Zustand",
       "TanStack Query",
-      "D3.js",
+      "react-force-graph-2d",
       "Canvas API",
       "Tiptap",
     ],
     highlights: [
-      "SVG 기반 그래프를 Canvas로 마이그레이션하여 렌더링 성능 16.3배 개선",
+      "DOM 기반 SVG 렌더링을 Canvas 이벤트 위임 모델로 마이그레이션하여 대규모 데이터에서도 60FPS 방어",
       "TanStack Query와 Zustand를 연동하여 낙관적 업데이트 구현",
       "AI 에이전트 기반 개발 워크플로우 자동화 도입",
     ],
@@ -58,9 +58,12 @@ export const PROJECTS: Project[] = [
     category: "frontend",
     problemSolving: [
       {
-        challenge: "DOM 기반 SVG 렌더링의 성능 한계 (노드 30개 시 10FPS)",
-        approach: "Canvas API 전환 및 텍스처 캐싱, 단일 레이어 렌더링 적용",
-        result: "노드 600개 이상에서도 60FPS 유지, INP 16.3배 개선",
+        challenge:
+          "노드/엣지별 개별 SVG DOM 이벤트 핸들러 부착으로 인한 렌더링 부하 증가 (노드 600개 이상 시 프레임 드랍)",
+        approach:
+          "단일 Canvas 레이어 렌더링으로 전환 및 좌표 기반 자체 Hit Test(레이캐스팅)로 마우스 이벤트 위임 처리",
+        result:
+          "수천 개의 DOM 노드 유지 비용을 제거하여 600명 이상의 인물 관계망에서도 60FPS 안정적 유지",
       },
       {
         challenge: "서버 응답 대기에 따른 UI 반응성 저하",
@@ -75,8 +78,9 @@ export const PROJECTS: Project[] = [
           "서버 상태와 클라이언트 상태를 분리하고, 캐싱 전략 및 낙관적 업데이트를 적용하여 즉각적인 피드백 구현",
       },
       {
-        tech: "D3.js & Canvas API",
-        reason: "대규모 노드 데이터의 실시간 시각화 및 물리 엔진 시뮬레이션",
+        tech: "Canvas API & Raycasting",
+        reason:
+          "대규모 노드/엣지 환경에서 DOM 유지 비용을 최소화하고 렌더링 엔진 부하 완화",
       },
     ],
   },
