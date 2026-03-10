@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import FormattedText from "@/components/common/FormattedText";
@@ -348,6 +349,39 @@ export default function ProjectDetailPage({ params }: PageProps) {
             </div>
           </div>
         </motion.section>
+
+        {/* Architecture Section */}
+        {detail.architectureImage && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="mb-8 sm:mb-10"
+          >
+            <div className="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl border border-stone-200 dark:border-stone-700 p-4 sm:p-6 md:p-8 shadow-sm overflow-hidden">
+              <div className="flex items-center gap-3 mb-5 sm:mb-6">
+                <div
+                  className={`p-2 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center`}
+                >
+                  <Server size={18} className={colors.text} />
+                </div>
+                <h2 className="text-xl font-black text-stone-900 dark:text-stone-100 uppercase tracking-tight">
+                  System Architecture
+                </h2>
+              </div>
+              <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
+                <Image
+                  src={detail.architectureImage}
+                  alt={`${project.title} Architecture Diagram`}
+                  fill
+                  className="object-contain p-2 sm:p-4"
+                  sizes="(max-width: 1100px) 100vw, 1100px"
+                  priority
+                />
+              </div>
+            </div>
+          </motion.section>
+        )}
 
         {/* 카테고리 탭 (인쇄 시 숨김) */}
         <motion.div

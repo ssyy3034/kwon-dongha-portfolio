@@ -5,8 +5,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
     id: "stolink",
     tagline:
       "웹소설 작가를 위한 세컨드 브레인 서비스입니다. 에디터에서 집필하면 AI가 글을 분석하고, 월드 페이지에서 인물·관계·사건을 시각화합니다. 독자는 StoRead에서 관계도와 함께 작품을 열람할 수 있습니다.",
+    architectureImage: "/images/stolink-arch.png",
     overview:
-      "크래프톤 정글 최종 프로젝트, 5인 팀. 프론트엔드 일부(에디터·관계도·사이드바·대시보드)와 백엔드 일부(OAuth2 인증·문서 CRUD·결제 시스템)를 담당했습니다. 가장 도전적이었던 부분은 인물이 수백 명으로 늘어도 버티는 관계도 렌더링과, 테스트 결제 환경에서의 동시성 제어 및 잔액 정합성이었습니다.",
+      "크래프톤 정글 최종 프로젝트, 5인 팀. 프론트엔드 일부(에디터·관계도·사이드바·대시보드)와 백엔드 일부(OAuth2 인증·문서 CRUD·결제 시스템)를 담당했습니다. 가장 도전적이었던 부분은 인물이 수백 명으로 늘어도 버티는 관계도 렌더링 성능 최적화와, 오버엔지니어링을 지양하며 즉각적인 성능 개선을 이뤄낸 점이었습니다.",
 
     sections: {
       backend: [
@@ -17,7 +18,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
           problem:
             "**사이드바 문서 목록 조회에서 쿼리가 대량 발생하고, 응답시간이 450ms까지 느려졌습니다.**\n문서 30개를 조회할 때 각 문서의 부모(parent) 관계를 Lazy Loading으로 개별 SELECT하는 구조여서, 문서 수에 비례해 쿼리가 늘어나는 N+1 문제가 발생했습니다. JPA Lazy Loading 특성상 데이터가 적을 때는 드러나지 않다가, 문서가 늘어나면서 병목이 드러났습니다.\n- 실측 응답시간 **450ms**, 사이드바 열 때 뚜렷한 지연 체감\n- 쿼리 로그 확인 후 원인 특정",
           approach:
-            "**Fetch Join으로 전체 문서를 1쿼리로 가져온 뒤, Java에서 Map 기반 O(n) 트리를 조립하는 방식으로 해결했습니다.**\n원인은 문서를 조회한 뒤 각 문서의 부모 관계를 Lazy Loading으로 개별 SELECT하는 구조였습니다. `@BatchSize`로 IN 쿼리를 묶는 방법을 검토했지만, 사이드바 트리는 전체 문서가 항상 필요해 부분 로딩의 이점이 없었습니다. 사이드바(트리)는 페이징이 불필요하므로 Fetch Join으로 전체 로드가 가능했고, `DocumentTreeResponse.from()`으로 필요 필드만 DTO에 매핑해 엔티티 그래프 탐색을 차단했습니다.\n반면 스크리브닝 모드(무한 스크롤)는 Pageable이 필요해 Fetch Join 시 HHH90003004 경고가 발생했고, Spring Data 네이밍 쿼리로 분리해 해결했습니다.\n- 사이드바: Fetch Join + In-Memory 트리 / 스크리브닝: 네이밍 쿼리 + Pageable",
+            "**초기 서비스 단계임을 고려해 복잡한 인메모리 캐시 등 오버엔지니어링을 지양하고, Fetch Join과 In-Memory 트리 조립으로 직관적인 해결책을 선택했습니다.**\n원인은 문서를 조회한 뒤 각 문서의 부모 관계를 Lazy Loading으로 개별 SELECT하는 구조였습니다. `@BatchSize`로 IN 쿼리를 묶는 방법을 검토했지만, 사이드바 트리는 전체 문서가 항상 필요해 부분 로딩의 이점이 없었습니다. 사이드바(트리)는 페이징이 불필요하므로 Fetch Join으로 전체 로드가 가능했고, `DocumentTreeResponse.from()`으로 필요 필드만 DTO에 매핑해 엔티티 그래프 탐색을 차단했습니다.\n반면 스크리브닝 모드(무한 스크롤)는 Pageable이 필요해 Fetch Join 시 메모리 경고가 발생했고, 네이밍 쿼리로 분리해 해결했습니다.\n- 사이드바: Fetch Join + In-Memory 트리 / 스크리브닝: 네이밍 쿼리 + Pageable",
           result:
             "**쿼리 61개 → 1개, 응답 450ms → 25ms로 18배 개선됐습니다.**\nChrome DevTools Network 탭에서 응답 시간을 측정해 개선 폭을 확인했습니다.",
           retrospective:
@@ -161,7 +162,7 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
           approach:
             "**1,000줄 문서를 3-Layer로 분리하고, 작업 규모에 따라 필요한 문서만 로딩하는 구조로 변경했습니다.**\n- **Core** (~150줄, 항상 로딩): 핵심 규칙·아키텍처 원칙만\n- **Appendix** (작업별 선택): tech-stack, design-system, api-reference 등\n- **Spec** (L 작업만): API_SPEC, DATA_MODEL 전체 명세\n\nSupervisor 에이전트가 요청을 S/M/L로 분류해 문서 참조량과 프로세스를 결정하고, 역할별 전문 에이전트가 순차적으로 작업합니다.\n- **Architect** → 구조·로직 구현 / **Stylist** → 디자인 시스템 적용\n- **Auditor** → 품질 검증 / **Librarian** → 코드 변경 시 문서 자동 동기화",
           result:
-            "**전체 로딩(1,000줄) → Core(150줄) 선택 로딩으로 전환하여, 동일 API 할당량 내 AI 가용 시간을 1시간 미만에서 2시간 이상으로 연장했습니다.** outdated 문서 참조로 인한 잘못된 코드 생성이 감소했고, 단순 작업(S) 프로세스는 7단계에서 2단계로 단축됐습니다. 교대 개발 시 맥락이 끊기는 문제를 해결하기 위해 퇴근 전 남은 토큰으로 Librarian 에이전트를 실행해 문서를 최신화하는 방식을 제안하여 도입했고, 이후 팀원이 퇴근한 동료의 작업을 이어받을 때 커밋 메시지와 최신화된 문서만으로 즉시 작업을 시작할 수 있게 됐습니다.",
+            "**3-Layer 모델 전환으로 토큰 소모를 극적으로 줄여 AI 가용 시간을 2배 이상 연장했습니다.** 무엇보다 outdated 문서 참조로 인한 할루시네이션(잘못된 코드 생성)을 없앴고, 단순 작업(S) 프로세스를 7단계에서 2단계로 단축했습니다. 또한 교대 개발 시 맥락 단절을 막기 위해 Librarian 에이전트 기반의 자동 문서 동기화 파이프라인을 구축, 팀 전체의 생산성(Productivity)을 크게 높였습니다.",
           retrospective:
             "Stylist가 로직까지 건드리는 월권이 초기에 잦았는데, 프롬프트에 명시적 금지 조건을 추가한 뒤 안정됐습니다. T-Shirt Sizing의 S/M/L 기준이 주관적이라 팀원 간 분류가 달랐던 점은 가이드라인 문서화로 보완할 수 있었을 것입니다.",
           details: [
@@ -227,7 +228,8 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
             "**동적 임포트(Lazy Load)**: Export(730KB) 및 Graph 기능은 해당 라우트 진입 시 지연 로딩",
             "**브라우저 캐시 최적화**: 잦은 배포 시에도 캐시를 유지하기 위해 Editor Core와 Extensions 분리 (기존 374KB 무효화 → 33KB 무효화로 개선)",
           ],
-          impact: "초기 용량 gzip 기준 60% 절감 / 배포 시 캐시 무효화 범위 축소",
+          impact:
+            "초기 용량 gzip 기준 60% 절감 / 배포 시 캐시 무효화 범위 축소",
         },
       ],
     },
@@ -289,15 +291,17 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
     id: "aidiary",
     tagline:
       "산모가 일기를 쓰면 AI가 감정을 분석해 피드백을 제공하는 서비스입니다. 부모 사진으로 아기 캐릭터를 생성하는 기능도 함께 제공합니다.",
+    architectureImage: "/images/aidiary-arch.png",
     overview:
-      "캡스톤 디자인 프로젝트(2인 팀)로 시작해 크래프톤 정글 수료 후 개인적으로 성능 개선을 이어갔습니다. 백엔드 전체(인증·일기 CRUD·AI 처리·캐싱)와 프론트엔드 일부를 담당했습니다. Python 전용 AI 라이브러리가 필요해 Spring Boot + Flask 이중 서버로 구성했고, AI 처리 병목 해결이 이 프로젝트의 가장 큰 기술적 도전이었습니다.",
+      "캡스톤 디자인 프로젝트(2인 팀)로 시작해 크래프톤 정글 수료 후 개인적으로 아키텍처 개선을 이어갔습니다. 백엔드 전체(인증·일기 CRUD·인프라)와 프론트엔드를 담당했습니다. 우선순위를 고려하여 트래픽이 검증되지 않은 초기 단계의 복잡도는 낮추되, 핵심 비즈니스 로직(AI 추론 등)은 언제든 별도 컨테이너로 뗄 수 있도록 논리적으로 분리(Loosely Coupled)한 '하이브리드 아키텍처' 설계가 가장 큰 특징입니다.",
 
     sections: {
       backend: [
         {
           id: "rabbitmq-async",
           title: "AI 이미지 합성 동기 블로킹 → RabbitMQ 비동기 전환",
-          subtitle: "WAS 수용 처리량 1.16 → 1,949 TPS (큐 발행 기준), 202 응답 30s → 4.9ms",
+          subtitle:
+            "WAS 수용 처리량 1.16 → 1,949 TPS (큐 발행 기준), 202 응답 30s → 4.9ms",
           problem:
             "**ML 이미지 합성(~30초)이 Tomcat I/O 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비되는 Cascade Failure가 발생했습니다.**\nFlask ML 추론을 `RestTemplate`으로 동기 호출하는 구조에서, `ThreadPoolTaskExecutor`의 maxPool(10)이 30초씩 점유됩니다. queue(25)까지 포화되면 `CallerRunsPolicy`가 발동되어 Tomcat 스레드마저 Flask를 직접 호출하게 됩니다.\n- k6 부하 테스트 실측 최대 처리량: **1.16 TPS**\n- 이미지 합성 외 일기 작성·건강 기록 등 무관한 API까지 전부 무응답",
           approach:
@@ -307,9 +311,9 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
           retrospective:
             "Webhook 방식을 채택하다 보니 클라이언트가 주기적으로 상태를 폴링해야 합니다. UX 관점에서는 '생성 요청 → 기다림 → 완료 알림'이 깔끔하지 않고, 폴링 요청도 불필요하게 생깁니다. SSE(Server-Sent Events)나 WebSocket으로 서버에서 직접 완료 이벤트를 푸시하는 방식이 더 나았을 것 같습니다. 또 Python Worker 프로세스에 대한 헬스 체크나 모니터링이 없어서, Worker가 죽어도 바로 알 수 없는 약점이 있습니다. Prometheus + Grafana 같은 모니터링 스택을 붙이면 이 부분을 보완할 수 있습니다.",
           details: [
-            "**@Async 시도 → 한계**: ConcurrentHashMap 메모리 누수(GC 후 +28MB 잔류) + Scale-out 시 상태 불일치 → MQ 도입 근거",
-            "**DLQ**: 처리 실패 메시지 별도 보관, Worker 장애 시 메시지 유실 방지 → 장애 복구 후 수동 재처리",
-            "**3중 멱등성 가드**: Worker 중복 소비 차단 → Controller 중복 webhook 차단 → Store 최후 방어선 (at-least-once 대응)",
+            "**논리적 분리 (Loosely Coupled)**: AI 서비스 호출 시 구체 클래스가 아닌 인터페이스에 의존하고 Entity 대신 DTO만 던지도록 설계. 트랜잭션 경계를 끊어내어 훗날 완전한 MSA 전환 시나리오 대비",
+            "**장애 격리와 고가용성**: 무거운 연산을 격리하여 Python Flask 다운 시에도 회원 자격 및 일기 저장 (Core 생태계) 100% 정상 작동 확보",
+            "**DLQ 및 3중 멱등성 가드**: Worker 장애 시 메시지 유실 방지 및 at-least-once 배달 대응 (Worker → Webhook → DB)",
           ],
           diagram: {
             type: "mermaid",
@@ -413,7 +417,8 @@ if (json != null) {
       {
         metric: "1.16 → 1,949 TPS",
         label: "WAS 수용 처리량",
-        description: "RabbitMQ 비동기 전환 (큐 발행 기준), 500 VU / p95 318ms / 에러율 0%",
+        description:
+          "RabbitMQ 비동기 전환 (큐 발행 기준), 500 VU / p95 318ms / 에러율 0%",
       },
       {
         metric: "487ms → 3ms",
