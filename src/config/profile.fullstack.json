@@ -82,7 +82,8 @@
     "description": "서비스의 전 계층을 이해하고 경계에서 생기는 문제를 빠르게 찾아 해결하는 것을 목표로 합니다. 매일 배운 내용을 코드와 글로 정리하며 스스로를 점검합니다."
   },
   "interests": [
-    { "name": "AI 활용 개발", "slug": "openai", "color": "10A37F" }
+    { "name": "AI 활용 개발", "slug": "openai", "color": "10A37F" },
+    { "name": "DDD", "slug": "ddd", "color": "2563EB" }
   ],
   "skills": [
     {
@@ -92,25 +93,25 @@
           "name": "React & Next.js",
           "slug": "react",
           "color": "61DAFB",
-          "description": "컴포넌트 생명주기를 이해하고 렌더링 성능 최적화를 다룹니다. Next.js의 SSG/SSR 특성을 이해하고 배포 파이프라인(Vercel) 구축에 능숙합니다."
+          "description": "SVG 기반 관계도를 Canvas로 전환해 600+ 노드에서도 60FPS를 유지하고, Web Worker로 UI 블로킹을 해소했습니다."
         },
         {
           "name": "TypeScript",
           "slug": "typescript",
           "color": "3178C6",
-          "description": "타입 시스템으로 런타임 오류를 줄이고 협업 시 코드 의도를 명확히 전달하는 데 활용합니다."
+          "description": "타입 시스템을 활용해 런타임 오류를 줄이고, 협업 시 코드 의도를 명확히 전달합니다."
         },
         {
           "name": "react-force-graph-2d",
           "slug": "react-force-graph",
           "color": "F9A03C",
-          "description": "Canvas 기반 Force Graph 라이브러리로 650노드 환경에서 INP 420ms → 64ms 개선."
+          "description": "Canvas 기반 Force Graph로 650노드 관계도의 INP를 420ms에서 64ms로 개선했습니다."
         },
         {
           "name": "Vite",
           "slug": "vite",
           "color": "646CFF",
-          "description": "manualChunks와 Lazy Loading으로 번들을 최적화해 초기 로딩 시간을 58% 줄인 경험이 있습니다."
+          "description": "manualChunks와 Lazy Loading으로 초기 번들 사이즈를 58% 줄였습니다."
         }
       ]
     },
@@ -121,25 +122,25 @@
           "name": "Java & Spring Boot",
           "slug": "springboot",
           "color": "6DB33F",
-          "description": "REST API 설계, JWT 인증, JPA 기반 도메인 모델링 경험이 있습니다."
+          "description": "두 프로젝트에서 REST API와 인증 시스템을 설계했고, 토스페이먼츠 연동 시 트랜잭션 범위를 분리해 커넥션 풀 고갈을 방지했습니다."
         },
         {
           "name": "JPA / Hibernate",
           "slug": "hibernate",
           "color": "59666C",
-          "description": "N+1 문제를 Fetch Join·DTO Projection으로 해결하고, 엔티티 설계 시 쿼리 성능을 함께 고려합니다."
+          "description": "문서 조회 시 N+1 병목을 발견하고, Fetch Join과 In-Memory 트리 조립으로 응답을 450ms에서 25ms로 줄였습니다."
         },
         {
           "name": "RabbitMQ",
           "slug": "rabbitmq",
           "color": "FF6600",
-          "description": "비동기 처리 아키텍처 설계: 동기 블로킹 문제를 해소하고 WAS의 신규 요청 수용 능력을 극대화했습니다."
+          "description": "30초짜리 AI 연산이 서버를 묶는 문제를 비동기 큐로 분리해 처리량을 1,949 TPS까지 끌어올렸습니다."
         },
         {
           "name": "Redis",
           "slug": "redis",
           "color": "DC382D",
-          "description": "L1/L2 다층 캐시 설계 및 날짜 기반 TTL 캐싱으로 응답시간 487ms → 3ms 개선."
+          "description": "반복되는 AI API 호출을 날짜 키 TTL로 캐싱하고, Caffeine과 조합해 응답을 487ms에서 3ms로 줄였습니다."
         }
       ]
     },
@@ -150,13 +151,13 @@
           "name": "Git / GitHub",
           "slug": "github",
           "color": "181717",
-          "description": "브랜치 전략 수립, PR 기반 코드 리뷰, 이슈 단위 작업 관리."
+          "description": "브랜치 전략 수립과 PR 기반 코드 리뷰, 이슈 단위 작업 관리를 실천합니다."
         },
         {
           "name": "AI Agents",
           "slug": "openai",
           "color": "10A37F",
-          "description": "Claude Code CLI의 Skill·커스텀 커맨드·MCP 플러그인을 활용해 개발 워크플로우를 자동화하고 있습니다."
+          "description": "1,000줄 CLAUDE.md를 3-Layer로 분리하고 Supervisor 에이전트를 설계해 AI 워크플로우를 최적화했습니다."
         }
       ]
     }

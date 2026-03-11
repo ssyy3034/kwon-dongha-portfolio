@@ -13,14 +13,14 @@ export const projectDetails: Record<string, ProjectDetail> = {
       backend: [
         {
           id: "n1-query",
-          title: "계층형 문서 조회 N+1 쿼리",
+          title: "계층형 문서 조회 N+1 → Fetch Join + In-Memory 트리",
           subtitle: "API 응답 450ms → 25ms (18배 개선)",
           problem:
-            "**사이드바 문서 목록 조회에서 쿼리가 대량 발생하고, 응답시간이 450ms까지 느려졌습니다.**\n문서 30개를 조회할 때 각 문서의 부모(parent) 관계를 Lazy Loading으로 개별 SELECT하는 구조여서, 문서 수에 비례해 쿼리가 늘어나는 N+1 문제가 발생했습니다. JPA Lazy Loading 특성상 데이터가 적을 때는 드러나지 않다가, 문서가 늘어나면서 병목이 드러났습니다.\n- 실측 응답시간 **450ms**, 사이드바 열 때 뚜렷한 지연 체감\n- 쿼리 로그 확인 후 원인 특정",
+            "**사이드바 문서 목록 조회에서 쿼리가 대량 발생하고, 응답시간이 450ms까지 느려졌습니다.**\n문서 30개를 조회할 때 각 문서의 부모(parent) 관계를 Lazy Loading으로 개별 SELECT하는 구조여서, 문서 수에 비례해 쿼리가 늘어나는 N+1 문제가 발생했습니다.\n- 실측 응답시간 **450ms**, 사이드바 열 때 뚜렷한 지연 체감\n- 쿼리 로그 확인 후 원인 특정",
           approach:
-            "**초기 서비스 단계임을 고려해 복잡한 인메모리 캐시 등 오버엔지니어링을 지양하고, Fetch Join과 In-Memory 트리 조립으로 직관적인 해결책을 선택했습니다.**\n원인은 문서를 조회한 뒤 각 문서의 부모 관계를 Lazy Loading으로 개별 SELECT하는 구조였습니다. `@BatchSize`로 IN 쿼리를 묶는 방법을 검토했지만, 사이드바 트리는 전체 문서가 항상 필요해 부분 로딩의 이점이 없었습니다. 사이드바(트리)는 페이징이 불필요하므로 Fetch Join으로 전체 로드가 가능했고, `DocumentTreeResponse.from()`으로 필요 필드만 DTO에 매핑해 엔티티 그래프 탐색을 차단했습니다.\n반면 스크리브닝 모드(무한 스크롤)는 Pageable이 필요해 Fetch Join 시 메모리 경고가 발생했고, 네이밍 쿼리로 분리해 해결했습니다.\n- 사이드바: Fetch Join + In-Memory 트리 / 스크리브닝: 네이밍 쿼리 + Pageable",
+            "**Fetch Join으로 1쿼리 로드 후, HashMap O(n) 트리 조립으로 해결했습니다.**\n`@BatchSize`도 검토했지만, 사이드바 트리는 전체 문서가 항상 필요해 부분 로딩의 이점이 없었습니다. Fetch Join으로 전체 로드 후 `DocumentTreeResponse.from()`으로 필요 필드만 DTO에 매핑해 엔티티 그래프 탐색을 차단했습니다.\n스크리브닝 모드(무한 스크롤)는 Pageable이 필요해 Fetch Join 시 메모리 경고가 발생, 네이밍 쿼리로 분리해 해결했습니다.",
           result:
-            "**쿼리 61개 → 1개, 응답 450ms → 25ms로 18배 개선됐습니다.**\nChrome DevTools Network 탭에서 응답 시간을 측정해 개선 폭을 확인했습니다.",
+            "**쿼리 61개 → 1개, 응답 450ms → 25ms로 18배 개선.**\nChrome DevTools Network 탭에서 응답 시간을 측정해 확인.",
           retrospective:
             "'트리 전체 조회'와 '페이징 필요한 스크리브닝 모드'를 같은 쿼리로 처리하려다 HHH90003004를 만났는데, 용도별로 쿼리를 분리하니 각각 최적의 전략을 적용할 수 있었습니다. 이 경험에서 '한 쿼리로 모든 케이스를 커버하려는 욕심'보다 용도별 분리가 성능과 유지보수에도 좋다는 것을 배웠습니다.",
           details: [
@@ -54,14 +54,14 @@ private List<DocumentTreeResponse> buildTreeInMemory(List<Document> documents) {
         },
         {
           id: "connection-pool",
-          title: "결제 PG 외부 API 호출로 인한 DB 커넥션 풀 고갈",
-          subtitle: "결제 시스템 장애 격리",
+          title: "결제 PG 외부 API 호출에 의한 DB 커넥션 풀 고갈 방지",
+          subtitle: "트랜잭션-외부 I/O 분리로 장애 격리",
           problem:
-            "**트랜잭션 안에서 PG API를 호출하는 구조로, 동시 결제 10건이면 커넥션 풀이 고갈될 위험이 있었습니다.**\n결제 승인 로직이 '트랜잭션 안에서 PG API 호출 → DB 저장'을 하나의 흐름으로 묶고 있었습니다. HikariCP 기본 풀은 10개인데 토스페이먼츠 테스트 API 응답시간이 1-2초라, 결제 10건만 동시에 들어오면 모든 커넥션이 PG 응답을 기다리는 상태로 묶입니다. 일반 API(문서 조회, 에디터 저장)까지 `Connection is not available` 오류가 발생할 수 있는 구조였습니다.\n- 코드 리뷰 중 이 구조적 위험을 발견",
+            "**트랜잭션 안에서 PG API를 호출하는 구조로, 동시 결제 10건이면 커넥션 풀이 고갈될 위험이 있었습니다.**\n결제 승인 로직이 하나의 트랜잭션 안에서 토스페이먼츠 API를 동기 호출하고 있었습니다. HikariCP 기본 풀은 10개인데 PG 응답이 1~2초 소요되므로, 동시 결제 10건이면 일반 API(문서 조회, 에디터 저장)까지 커넥션 부족 오류가 발생할 수 있는 구조였습니다.",
           approach:
-            "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\n수정된 흐름은 이렇습니다: ① TX1에서 결제 정보를 검증하고 상태를 IN_PROGRESS로 전환한 뒤 커밋합니다(커넥션 즉시 반환). ② 트랜잭션 밖에서 PG API를 호출합니다(커넥션 미점유). ③ TX2에서 승인 결과를 반영하고 크레딧을 지급합니다. PG 승인 후 TX2가 실패하는 엣지 케이스는 보상 트랜잭션(PaymentCompensation)으로 대비했습니다. 외부 API가 아무리 느려도 DB 커넥션을 물고 있지 않으니, 결제 지연이 다른 기능으로 전파되지 않습니다.",
+            "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\nTX1에서 검증+상태 전환 후 커밋(커넥션 반환) → 트랜잭션 밖에서 PG API 호출(커넥션 미점유) → TX2에서 승인 결과 반영. PG 승인 후 TX2 실패 시 보상 트랜잭션(PaymentCompensation)으로 정합성 대비.",
           result:
-            "**PG 응답 지연이 DB 커넥션 풀에 영향을 주지 않는 구조로 전환됐습니다.**\n테스트 환경에서 결제 API에 지연을 주입해도 문서 조회, 에디터 저장 같은 일반 API가 정상 동작하는 것을 확인했습니다. 장애의 파급 범위가 결제 기능에만 격리되는 설계입니다.",
+            "**PG 응답 지연이 DB 커넥션 풀에 영향을 주지 않는 구조로 전환.**\n결제 API에 지연을 주입해도 일반 API가 정상 동작하는 것을 확인. 장애가 결제 기능에만 격리됩니다.",
           retrospective:
             "'트랜잭션 안에서 외부 API 호출 금지'는 백엔드 설계의 기본 원칙인데, 초기 구현에서 놓쳤다가 코드 리뷰 과정에서 발견해 수정했습니다. 현재 구조에서도 PG사가 완전히 다운됐을 때를 대비한 회로 차단기(Circuit Breaker)가 없습니다. Resilience4j를 적용해 PG 연속 실패 시 빠른 실패(Fail Fast)와 사용자에게 명확한 안내 메시지를 주는 것이 다음 단계입니다.",
           details: [
@@ -300,14 +300,13 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
         {
           id: "rabbitmq-async",
           title: "AI 이미지 합성 동기 블로킹 → RabbitMQ 비동기 전환",
-          subtitle:
-            "WAS 수용 처리량 1.16 → 1,949 TPS (큐 발행 기준), 202 응답 30s → 4.9ms",
+          subtitle: "WAS 처리량 1.16 → 1,949 TPS, 응답 30s → 4.9ms",
           problem:
-            "**ML 이미지 합성(~30초)이 Tomcat I/O 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비되는 Cascade Failure가 발생했습니다.**\nFlask ML 추론을 `RestTemplate`으로 동기 호출하는 구조에서, `ThreadPoolTaskExecutor`의 maxPool(10)이 30초씩 점유됩니다. queue(25)까지 포화되면 `CallerRunsPolicy`가 발동되어 Tomcat 스레드마저 Flask를 직접 호출하게 됩니다.\n- k6 부하 테스트 실측 최대 처리량: **1.16 TPS**\n- 이미지 합성 외 일기 작성·건강 기록 등 무관한 API까지 전부 무응답",
+            "**ML 이미지 합성(~30초)이 Tomcat 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비되는 Cascade Failure가 발생했습니다.**\nFlask ML 추론을 동기 호출하는 구조에서, 스레드 풀이 30초씩 점유돼 일기 작성·건강 기록 등 무관한 API까지 전부 무응답.\n- k6 실측 최대 처리량: **1.16 TPS**",
           approach:
-            "**RabbitMQ로 WAS와 AI 처리를 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`으로 시도했지만 두 가지 구조적 한계가 드러났습니다. WAS 힙에 상태를 저장하면 Scale-out 시 인스턴스 간 불일치가 발생하고, 결과 조회 후에도 Map에서 `byte[]`를 제거하지 않아 GC 후에도 +28MB가 잔류하는 메모리 누수도 확인했습니다. 상태 관리를 외부 시스템에 위임해야 한다는 결론에 도달해 RabbitMQ를 도입했습니다.\n- Spring Boot(Producer): 큐 발행 → 즉시 202 Accepted (4.9ms)\n- Python Worker(Consumer): `prefetch_count=1` + 수동 ACK로 큐 소비 → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존\n- at-least-once delivery 대응: Worker → Controller → Store 3중 멱등성 가드",
+            "**RabbitMQ로 WAS와 AI 처리를 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`을 시도했지만 Scale-out 불일치와 메모리 누수(GC 후 +28MB 잔류) 문제가 드러나 RabbitMQ로 전환.\n- Spring Boot: 큐 발행 → 202 Accepted (4.9ms)\n- Python Worker: `prefetch_count=1` + 수동 ACK → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존",
           result:
-            "**WAS 수용 처리량(큐 발행 → 202 Accepted 반환 기준) 1.16 → 1,949 TPS, 응답 레이턴시 30,000ms → 4.9ms**\nBefore는 ML 처리 완료까지의 end-to-end TPS, After는 큐 발행 후 즉시 응답하는 WAS 처리량입니다. AI 처리가 아무리 오래 걸려도 WAS는 영향받지 않습니다. 서버 재시작 시에도 큐에 남은 메시지가 보존돼 작업이 유실되지 않습니다.\n- 500 VU 부하에서 p95 318ms, 에러율 **0%**\n- 총 175,463건 처리, API 처리량 100%",
+            "**WAS 처리량 1.16 → 1,949 TPS, 응답 레이턴시 30,000ms → 4.9ms.**\n500 VU 부하에서 p95 318ms, 에러율 0%. 총 175,463건 처리. AI 처리 지연과 무관하게 WAS 가용성 유지.",
           retrospective:
             "Webhook 방식을 채택하다 보니 클라이언트가 주기적으로 상태를 폴링해야 합니다. UX 관점에서는 '생성 요청 → 기다림 → 완료 알림'이 깔끔하지 않고, 폴링 요청도 불필요하게 생깁니다. SSE(Server-Sent Events)나 WebSocket으로 서버에서 직접 완료 이벤트를 푸시하는 방식이 더 나았을 것 같습니다. 또 Python Worker 프로세스에 대한 헬스 체크나 모니터링이 없어서, Worker가 죽어도 바로 알 수 없는 약점이 있습니다. Prometheus + Grafana 같은 모니터링 스택을 붙이면 이 부분을 보완할 수 있습니다.",
           details: [

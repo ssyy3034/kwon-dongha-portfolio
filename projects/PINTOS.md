@@ -1,126 +1,43 @@
-# Pintos Kernel - 시스템 프로그래밍 챌린지
+# Pintos Kernel - 하드웨어의 심장에서 숨 쉬는 운영체제
 
 > KAIST Jungle OS Lab | **4인 팀** | C + x86 Assembly
 
-하드웨어 위에서 직접 동작하는 교육용 운영체제의 핵심 모듈을 구현했습니다.
+아무것도 없는 하드웨어 위에서 한 줄 한 줄 코드를 쌓아 올리며 운영체제의 핵심 원리를 일깨운 도전입니다. 추상적인 개념으로만 존재하던 스케줄링, 가상 메모리, 파일 시스템을 직접 구현하며 시스템 프로그래밍의 깊은 곳을 탐험했습니다.
 
 ---
 
-## 1. Priority Donation: 8-depth 중첩 락 체인 해결
+## 🏗️ 높은 곳의 기다림: 8단계 중첩 락과 우선순위 기부
 
-### 문제 상황
+운영체제에서 우선순위가 높은 스레드가 낮은 스레드 때문에 멈춰 서는 '우선순위 역전(Priority Inversion)'은 시스템 전체의 성능을 갉아먹는 고질적인 문제였습니다. 특히 여러 개의 락이 실타래처럼 꼬인 'Nested Lock' 상황에서는 해결이 더욱 막막했습니다.
 
-높은 우선순위(H) 스레드가 낮은 우선순위(L) 스레드가 점유한 락을 기다릴 때, 중간 우선순위(M) 스레드가 L을 선점해버리면 H가 무한정 대기하는 **우선순위 역전(Priority Inversion)** 이 발생했습니다.
-
-### 해결 과정
-
-Priority Donation 메커니즘을 설계하고 구현했습니다.
-
-```c
-// lock_acquire 시 기부 로직
-void lock_acquire(struct lock *lock) {
-  struct thread *holder = lock->holder;
-  struct thread *cur = thread_current();
-
-  // 1. 락 보유자에게 내 우선순위 기부
-  if (holder != NULL && holder->priority < cur->priority) {
-    holder->priority = cur->priority;
-
-    // 2. 중첩 기부: 보유자가 다른 락을 기다리면 체인 전파
-    propagate_donation(holder, 8); // depth limit
-  }
-}
-```
-
-1. **Donation**: 락 대기 시 보유자에게 자신의 높은 우선순위를 일시적으로 기부
-2. **Chain Handling**: 중첩된 락 대기 상황(Nested Donation)까지 재귀적으로 전파 (depth limit: 8)
-3. **Revert**: 락 해제 시 기부받은 우선순위를 반납하고 본래 우선순위로 복귀
-
-### 성과
-
-| 테스트                          | 결과                         |
-| :------------------------------ | :--------------------------- |
-| `donate-one/multiple/multiple2` | **Pass**                     |
-| `donate-nest/chain`             | **Pass** (8-depth 정상 동작) |
-| `donate-lower`                  | **Pass** (정확한 원복)       |
+저는 **Priority Donation(우선순위 기부)** 메커니즘을 설계했습니다. 락을 기다리는 높은 순위의 스레드가 락 보유자에게 자신의 권한을 잠시 빌려주어, 빠르게 작업을 끝내고 락을 넘겨받게 하는 방식입니다. 단순히 일대일 기부를 넘어, 최대 8단계까지 이어지는 복잡한 기부 체인을 재귀적으로 전파하도록 구현하여 어떤 복잡한 상황에서도 시스템이 멈추지 않고 흐르도록 만들었습니다.
 
 ---
 
-## 2. Widowed Frame 디버깅: 무한 Page Fault 해결
+## 🔍 고아 프레임을 찾아서: 무한 Page Fault의 사투
 
-### 문제 상황
+가상 메모리를 구현하던 중, 특정 메모리에 접근할 때마다 시스템이 무한 루프에 빠지며 종료되는 기현상을 마주했습니다. Page Fault를 처리했다고 보고했지만, 하드웨어는 즉시 다시 Fault를 발생시키고 있었습니다.
 
-mmap된 메모리에 접근하자 Page Fault가 무한 반복되며 프로세스가 `exit(-1)`로 강제 종료되었습니다.
+범인은 소프트웨어 상태와 하드웨어 매핑의 불일치인 **"고아 프레임(Widowed Frame)"** 이었습니다. 소프트웨어는 프레임을 할당했다고 생각했지만, 실제 CPU의 페이지 테이블(PML4)에는 매핑이 누락되어 있었던 것입니다.
 
-- **현상**: Page Fault → 처리 완료 보고 → 다시 Page Fault → 무한 루프
-- **원인**: 소프트웨어(`page->frame != NULL`)와 하드웨어(PML4) 간 상태 불일치
-
-### 해결 과정
-
-"고아 프레임(Widowed Frame)" - 프레임은 할당되었지만 PML4 매핑이 없는 상태를 감지하고 복구하는 로직을 추가했습니다.
-
-```c
-// Before: 프레임만 확인
-if (page->frame != NULL)
-    return true;  // 문제: PML4 매핑 누락 시 무한 Page Fault
-
-// After: 하드웨어 매핑까지 검증
-if (page->frame != NULL) {
-    struct thread *t = thread_current();
-    if (pml4_get_page(t->pml4, page->va) == NULL) {
-        // 고아 프레임 감지 → 매핑 복구
-        if (!pml4_set_page(t->pml4, page->va,
-                          page->frame->kva, page->writable))
-            return false;
-    }
-    return true;
-}
-```
-
-### 성과
-
-- 무한 Page Fault 현상 **완전 해결**
-- `mmap-*` 관련 테스트 **전체 통과**
+저는 디버깅 과정에서 하드웨어 매핑 상태까지 이중으로 검증하는 로직을 추가했습니다. 보이지 않는 하드웨어 계층과 소프트웨어 계층 사이의 신뢰를 회복시키며, 마침내 무한 루프의 늪에서 벗어날 수 있었습니다.
 
 ---
 
-## 3. Demand Paging: 가상 공간 확장 및 지연 로딩
+## 💾 필요한 만큼만 가져오기: Demand Paging의 마법
 
-### 문제 상황
+한정된 물리 메모리 환경에서 모든 프로그램을 한꺼번에 올리는 것은 불가능에 가깝습니다. 저는 프로세스가 실제로 메모리를 요구할 때만 디스크에서 데이터를 읽어오는 **Demand Paging**을 구현했습니다.
 
-프로세스 실행 시 모든 세그먼트를 메모리에 올리면 물리 메모리가 금방 부족해집니다.
+- **SPT(Supplemental Page Table)**: 페이지의 고향(디스크 위치)을 기억하는 지도를 만들었습니다.
+- **Lazy Loading**: 실행 시점에는 가상 주소만 확보하고, 실제 접근이 일어나는 순간 '앗 차거!' 하며 데이터를 채워 넣습니다.
+- **Stack Growth**: 프로그램이 더 넓은 스택을 요구할 때마다 실시간으로 공간을 확장해주었습니다.
 
-### 해결 과정
-
-Page Fault가 발생했을 때만 해당 페이지를 로드하는 Demand Paging을 구현했습니다.
-
-1. **Supplemental Page Table (SPT)**: 각 페이지의 메타데이터(디스크 위치, 쓰기 가능 여부) 관리
-2. **Page Fault Handler**: 디스크에서 데이터를 읽어 물리 프레임에 매핑 후 재시작
-3. **Stack Growth**: `rsp` 레지스터 값을 감시하여 스택 영역 접근 시 자동 페이지 할당
-
-### 성과
-
-- 한정된 물리 메모리 극복 및 가상 공간 활용 가능
-- `page-*`, `swap-*` 테스트 **전체 통과**
+이 과정을 통해 물리적인 한계를 뛰어넘어 가상 공간을 자유롭게 활용하는 운영체제의 경이로움을 경험했습니다.
 
 ---
 
-## 전체 성과
+## 🛠️ 시스템의 기반이 된 기술들
 
-| 모듈                    | 테스트                    | 결과         |
-| :---------------------- | :------------------------ | :----------- |
-| **Threads (P1)**        | Alarm 6개 + Priority 11개 | **Pass**     |
-| **User Programs (P2)**  | 시스템 콜 76개            | **All Pass** |
-| **Virtual Memory (P3)** | Page/Swap/Mmap 40개       | **All Pass** |
-| **TOTAL**               |                           | **All Pass** |
-
----
-
-## Tech Stack
-
-| 영역            | 기술                                                     |
-| :-------------- | :------------------------------------------------------- |
-| **Language**    | C (C99), x86 Assembly                                    |
-| **Environment** | Linux (Ubuntu), QEMU Emulator                            |
-| **Tools**       | GDB (Kernel Debugging), Makefile                         |
-| **Concepts**    | Virtual Memory, Paging, Multi-threading, Synchronization |
+- **Core**: 현대 컴퓨팅의 뿌리인 **C 언어**와 하드웨어를 직접 제어하는 **x86 Assembly**를 사용했습니다.
+- **Environment**: **Linux** 환경에서 **QEMU 에뮬레이터**를 통해 커널을 구동하고, **GDB**라는 현미경으로 커널 내부의 미세한 움직임을 관찰했습니다.
+- **Concepts**: 가상 메모리, 멀티스레딩, 동기화 등 컴퓨터 과학의 정수를 몸소 체득하며 탄탄한 기초 체력을 다졌습니다.
