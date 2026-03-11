@@ -111,7 +111,9 @@ export default function Hero({
                     />
                   </div>
                   <div className="relative z-10 min-w-0">
-                    <h3 className={`font-black text-base sm:text-lg mb-1.5 sm:mb-2 ${info.color}`}>
+                    <h3
+                      className={`font-black text-base sm:text-lg mb-1.5 sm:mb-2 ${info.color}`}
+                    >
                       {info.label}
                     </h3>
                     <p className="text-stone-900 dark:text-stone-100 font-bold mb-1.5 sm:mb-2 text-sm sm:text-[15px]">
@@ -267,7 +269,9 @@ export default function Hero({
                 }}
                 onMouseOver={(event: any, value: any) => {
                   if (!value) return;
-                  const rect = (event.target as HTMLElement).getBoundingClientRect();
+                  const rect = (
+                    event.target as HTMLElement
+                  ).getBoundingClientRect();
                   setTooltip({
                     show: true,
                     data: value,
