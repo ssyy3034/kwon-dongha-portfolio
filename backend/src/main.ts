@@ -29,10 +29,9 @@ async function bootstrap() {
 
   if (configService.get('NODE_ENV') !== 'production') {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle('Portfolio API')
-      .setDescription('Portfolio backend API')
-      .setVersion('0.1.0')
-      .addBearerAuth()
+      .setTitle('Portfolio AI Navigator API')
+      .setDescription('Portfolio chatbot backend API')
+      .setVersion('1.0.0')
       .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api/docs', app, document);

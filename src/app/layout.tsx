@@ -3,6 +3,7 @@ import { DM_Sans, Space_Grotesk, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-display",
@@ -53,7 +54,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ProfileProvider>{children}</ProfileProvider>
+          <ProfileProvider>
+            {children}
+            <ChatWidget />
+          </ProfileProvider>
         </ThemeProvider>
       </body>
     </html>
