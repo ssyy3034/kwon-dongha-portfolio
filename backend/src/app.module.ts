@@ -6,6 +6,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ChatModule } from './chat/chat.module';
 import { AiModule } from './ai/ai.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ResumeModule } from './resume/resume.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     ChatModule,
     AiModule,
     AnalyticsModule,
+    ResumeModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

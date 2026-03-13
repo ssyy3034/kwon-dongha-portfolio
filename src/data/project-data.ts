@@ -61,7 +61,7 @@ export const PROJECTS: Project[] = [
         challenge:
           "노드/엣지별 개별 SVG DOM 이벤트 핸들러 부착으로 인한 렌더링 부하 증가 (노드 600개 이상 시 프레임 드랍)",
         approach:
-          "단일 Canvas 레이어 렌더링으로 전환 및 좌표 기반 자체 Hit Test(레이캐스팅)로 마우스 이벤트 위임 처리",
+          "단일 Canvas 레이어 렌더링으로 전환하고, react-force-graph-2d의 nodePointerAreaPaint로 클릭 영역을 커스텀 정의하여 라이브러리의 이벤트 위임 구조 위에서 인터랙션 처리",
         result:
           "수천 개의 DOM 노드 유지 비용을 제거하여 600명 이상의 인물 관계망에서도 60FPS 안정적 유지",
       },

@@ -14,7 +14,7 @@ D3.js SVG 기반 소설 인물 관계도에서 노드 50개만 넘어도 클릭 
 
 ### 원인 분석
 
-DevTools Performance 탭으로 분석한 결과, SVG 각 요소마다 발생하는 **Style Recalculation**이 병목임을 확인했습니다. SVG는 각 노드가 개별 DOM 요소로 존재하기 때문에, 노드 수가 증가할수록 브라우저의 스타일 재계산 비용이 기하급수적으로 증가하는 구조적 한계가 있었습니다.
+DevTools Performance 탭으로 분석한 결과, 매 프레임마다 수백 개 SVG DOM 요소의 스타일 재계산(Style Recalculation) → 레이아웃 재배치(Reflow) → 다시 그리기(Paint)가 연쇄적으로 발생하며 메인 스레드를 블로킹하는 것이 병목임을 확인했습니다.
 
 ### 해결 과정
 

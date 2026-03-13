@@ -199,7 +199,7 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
           title: "인물 관계도 시각화 성능 최적화 (SVG → Canvas)",
           subtitle: "DOM 이벤트 오버헤드 제거로 600+ 노드 환경에서 60fps 방어",
           problem:
-            "**개별 노드와 엣지에 클릭 이벤트를 달기 위해 SVG DOM 요소를 사용하다 보니, 데이터 수에 비례해 렌더링 부하가 커지는 문제가 있었습니다.**\n초기에는 직관적인 이벤트 처리를 위해 각 요소를 `<svg><g>` 형태로 그렸습니다. 하지만 600명이 넘는 인물과 복잡한 관계선이 모이자 수천 개의 DOM 트리가 생성되었고, 이로 인해 마우스를 가볍게 움직이기만 해도 브라우저의 Layout/Paint 과정에 병목이 발생해 프레임이 떨어졌습니다.",
+            "**개별 노드와 엣지에 클릭 이벤트를 달기 위해 SVG DOM 요소를 사용하다 보니, 데이터 수에 비례해 렌더링 부하가 커지는 문제가 있었습니다.**\n초기에는 직관적인 이벤트 처리를 위해 각 요소를 `<svg><g>` 형태로 그렸습니다. 하지만 600명이 넘는 인물과 복잡한 관계선이 모이자 수천 개의 DOM 트리가 생성되었고, 이로 인해 마우스를 가볍게 움직이기만 해도 브라우저의 Style Recalculation → Layout → Paint가 연쇄적으로 발생하며 메인 스레드에 병목이 생겨 프레임이 떨어졌습니다.",
           approach:
             "**DOM 조작을 최소화할 수 있는 단일 `<canvas>` 픽셀 렌더링으로 전환하고, 이벤트 처리를 중앙화했습니다.**\nReact DOM 기반 렌더링을 걷어내고 `react-force-graph-2d`를 통해 Canvas Context 위에 노드를 그렸습니다. 커스텀 `nodeCanvasObject`로 노드 외형을 직접 렌더링하고, `nodePointerAreaPaint`로 클릭 영역을 확장하여 라이브러리의 이벤트 위임(Event Delegation) 구조 위에서 클릭/호버 인터랙션을 처리했습니다.",
           result:
@@ -210,7 +210,7 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
             "**DOM → Canvas**: 개별 이벤트를 위해 생성한 수천 개의 SVG 태그를 단일 Canvas 요소로 교체해 Paint 오버헤드 완화",
             "**이벤트 위임**: 개별 리스너 부착 대신, react-force-graph-2d의 nodePointerAreaPaint로 클릭 영역을 커스텀 정의하고 라이브러리 이벤트 콜백으로 상호작용 처리",
           ],
-          impact: "빈번한 Layout/Paint 방지 / 대규모 스케일에서 60fps 유지",
+          impact: "빈번한 Style Recalculation/Layout/Paint 방지 / 대규모 스케일에서 60fps 유지",
         },
         {
           id: "bundle-optimization",
