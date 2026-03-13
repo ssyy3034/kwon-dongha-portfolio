@@ -243,7 +243,7 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
       {
         metric: "100스레드 / 100%",
         label: "결제 잔액 정합성",
-        description: "비관적 락 + 멱등키, Testcontainers 검증",
+        description: "동시 결제 100건 잔액 정합성 100%, Testcontainers 검증",
       },
       {
         metric: "420ms → 64ms",

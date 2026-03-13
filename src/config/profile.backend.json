@@ -80,8 +80,7 @@
     "description": "시스템의 동작 원리를 이해하고, 장애 상황에서도 안정적으로 동작하는 서비스를 만드는 것을 목표로 합니다. 매일 배운 내용을 코드와 글로 정리하며 스스로를 점검합니다."
   },
   "interests": [
-    { "name": "AI 활용 개발", "slug": "openai", "color": "10A37F" },
-    { "name": "DDD", "slug": "ddd", "color": "2563EB" }
+    { "name": "AI 활용 개발", "slug": "openai", "color": "10A37F" }
   ],
   "skills": [
     {
@@ -115,7 +114,7 @@
           "name": "PostgreSQL / MariaDB",
           "slug": "postgresql",
           "color": "4169E1",
-          "description": "결제 정합성을 위해 비관적 락을 적용하고, 100스레드 동시 테스트로 잔액 무결성을 검증했습니다."
+          "description": "StoLink에서 문서·결제 도메인, Aidiary에서 산모 일기·건강 기록의 관계형 데이터를 설계하고 관리했습니다."
         },
         {
           "name": "Neo4j",

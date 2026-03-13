@@ -16,7 +16,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
         uri: config.get<string>('MONGODB_URI'),
       }),
     }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 200 }]),
     ChatModule,
     AiModule,
     AnalyticsModule,

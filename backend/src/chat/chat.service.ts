@@ -17,9 +17,6 @@ const SUGGESTIONS = [
   'RabbitMQ로 처리량을 1,949 TPS까지 올린 이유가 뭔가요?',
 ];
 
-const REDIRECT_REPLY =
-  '권동하 지원자의 이력과 관련된 질문만 답변할 수 있습니다. 프로젝트, 기술 스택, 경험 등에 대해 물어봐 주세요!';
-
 const MAX_HISTORY = 5;
 
 @Injectable()
@@ -29,17 +26,6 @@ export class ChatService {
   constructor(private readonly aiService: AiService) {}
 
   async processMessage(dto: ChatMessageDto): Promise<ChatResponseDto & { tokenUsage: number; isGuardrailPassed: boolean }> {
-    const isRelevant = await this.aiService.checkGuardrail(dto.message);
-
-    if (!isRelevant) {
-      return {
-        reply: REDIRECT_REPLY,
-        relatedLinks: [],
-        tokenUsage: 0,
-        isGuardrailPassed: false,
-      };
-    }
-
     const history = this.getHistory(dto.sessionId);
     history.push({ role: 'user', content: dto.message });
 

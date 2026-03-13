@@ -80,8 +80,7 @@
     "description": "시스템의 동작 원리를 이해하고, 장애 상황에서도 안정적으로 동작하는 서비스를 만드는 것을 목표로 합니다. 매일 배운 내용을 코드와 글로 정리하며 스스로를 점검합니다."
   },
   "interests": [
-    { "name": "AI 활용 개발", "slug": "openai", "color": "10A37F" },
-    { "name": "DDD", "slug": "ddd", "color": "2563EB" }
+    { "name": "AI 활용 개발", "slug": "openai", "color": "10A37F" }
   ],
   "skills": [
     {
