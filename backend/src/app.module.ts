@@ -15,6 +15,7 @@ import { ResumeModule } from './resume/resume.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         uri: config.get<string>('MONGODB_URI'),
+        autoIndex: true,
       }),
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 200 }]),
