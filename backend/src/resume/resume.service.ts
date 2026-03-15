@@ -96,15 +96,28 @@ export class ResumeService {
   }
 
   async searchForChatbot(query: string): Promise<Pick<ResumeEntry, 'type' | 'title' | 'summary' | 'tags' | 'metrics'>[]> {
-    return this.model
-      .find(
-        { $text: { $search: query } },
-        { score: { $meta: 'textScore' } },
-      )
-      .select('type title summary tags metrics')
-      .sort({ score: { $meta: 'textScore' } })
-      .limit(5)
-      .lean()
-      .exec();
+    try {
+      return await this.model
+        .find(
+          { $text: { $search: query } },
+          { score: { $meta: 'textScore' } },
+        )
+        .select('type title summary tags metrics')
+        .sort({ score: { $meta: 'textScore' } })
+        .limit(5)
+        .lean()
+        .exec();
+    } catch (error) {
+      // Fallback: regex search when text index is unavailable
+      this.logger.warn(`Text search failed, using regex fallback: ${error.message}`);
+      const keywords = query.split(/\s+/).filter((k) => k.length > 1);
+      const regex = new RegExp(keywords.join('|'), 'i');
+      return this.model
+        .find({ $or: [{ title: regex }, { summary: regex }, { content: regex }] })
+        .select('type title summary tags metrics')
+        .limit(5)
+        .lean()
+        .exec();
+    }
   }
 }

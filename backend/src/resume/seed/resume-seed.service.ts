@@ -13,9 +13,12 @@ export class ResumeSeedService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    // 인덱스 명시적 생성 (프로덕션 환경에서 autoIndex가 늦을 수 있음)
-    await this.model.ensureIndexes();
-    this.logger.log('Indexes ensured');
+    try {
+      await this.model.ensureIndexes();
+      this.logger.log('Indexes ensured');
+    } catch (error) {
+      this.logger.warn(`Index creation failed (non-fatal): ${error.message}`);
+    }
 
     const count = await this.model.countDocuments();
     if (count > 0) {
