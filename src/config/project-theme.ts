@@ -5,6 +5,7 @@ export const projectIcons = {
   pintos: Cpu,
   aidiary: Database,
   garden: Layout,
+  "knowledge-garden": Layout,
 } as const;
 
 export const accentColors = {

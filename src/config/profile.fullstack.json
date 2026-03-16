@@ -93,25 +93,25 @@
           "name": "React & Next.js",
           "slug": "react",
           "color": "61DAFB",
-          "description": "SVG 기반 관계도를 Canvas로 전환해 600+ 노드에서도 60FPS를 유지하고, Web Worker로 UI 블로킹을 해소했습니다."
+          "description": "컴포넌트 설계와 상태 관리, Canvas 기반 시각화에 활용했습니다"
         },
         {
           "name": "TypeScript",
           "slug": "typescript",
           "color": "3178C6",
-          "description": "타입 시스템을 활용해 런타임 오류를 줄이고, 협업 시 코드 의도를 명확히 전달합니다."
+          "description": "프론트엔드 전반에서 타입을 정의해 런타임 오류를 줄였습니다"
         },
         {
           "name": "react-force-graph-2d",
           "slug": "react-force-graph",
           "color": "F9A03C",
-          "description": "Canvas 기반 Force Graph로 650노드 관계도의 INP를 420ms에서 64ms로 개선했습니다."
+          "description": "Canvas Force Graph로 수백 노드 관계도를 시각화했습니다"
         },
         {
           "name": "Vite",
           "slug": "vite",
           "color": "646CFF",
-          "description": "manualChunks와 Lazy Loading으로 초기 번들 사이즈를 58% 줄였습니다."
+          "description": "manualChunks와 Lazy Loading으로 초기 번들 사이즈를 줄였습니다"
         }
       ]
     },
@@ -122,25 +122,31 @@
           "name": "Java & Spring Boot",
           "slug": "springboot",
           "color": "6DB33F",
-          "description": "두 프로젝트에서 REST API와 인증 시스템을 설계했고, 토스페이먼츠 연동 시 트랜잭션 범위를 분리해 커넥션 풀 고갈을 방지했습니다."
+          "description": "두 프로젝트에서 REST API와 인증을 설계하고, 토스페이먼츠 결제를 연동했습니다"
+        },
+        {
+          "name": "NestJS",
+          "slug": "nestjs",
+          "color": "E0234E",
+          "description": "포트폴리오 챗봇 백엔드를 모듈·DI·인터셉터 기반으로 설계했습니다"
         },
         {
           "name": "JPA / Hibernate",
           "slug": "hibernate",
           "color": "59666C",
-          "description": "문서 조회 시 N+1 병목을 발견하고, Fetch Join과 In-Memory 트리 조립으로 응답을 450ms에서 25ms로 줄였습니다."
+          "description": "계층형 문서 조회의 N+1을 해결하고, Fetch Join으로 쿼리를 튜닝했습니다"
         },
         {
           "name": "RabbitMQ",
           "slug": "rabbitmq",
           "color": "FF6600",
-          "description": "30초짜리 AI 연산이 서버를 묶는 문제를 비동기 큐로 분리해 처리량을 1,949 TPS까지 끌어올렸습니다."
+          "description": "AI 연산 같은 무거운 작업을 비동기 큐로 분리해 서버 부하를 줄였습니다"
         },
         {
           "name": "Redis",
           "slug": "redis",
           "color": "DC382D",
-          "description": "반복되는 AI API 호출을 날짜 키 TTL로 캐싱하고, Caffeine과 조합해 응답을 487ms에서 3ms로 줄였습니다."
+          "description": "TTL 기반 응답 캐싱과 Caffeine 로컬 캐시를 조합해 응답 속도를 개선했습니다"
         }
       ]
     },
@@ -151,13 +157,13 @@
           "name": "Git / GitHub",
           "slug": "github",
           "color": "181717",
-          "description": "브랜치 전략 수립과 PR 기반 코드 리뷰, 이슈 단위 작업 관리를 실천합니다."
+          "description": "브랜치 전략을 수립하고 PR 기반 코드 리뷰로 협업했습니다"
         },
         {
           "name": "AI Agents",
           "slug": "openai",
           "color": "10A37F",
-          "description": "1,000줄 CLAUDE.md를 3-Layer로 분리하고 Supervisor 에이전트를 설계해 AI 워크플로우를 최적화했습니다."
+          "description": "프롬프트를 설계하고 AI 에이전트 워크플로우를 구성했습니다"
         }
       ]
     }

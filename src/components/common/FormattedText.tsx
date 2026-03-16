@@ -8,7 +8,6 @@ import React from "react";
  * - \n -> line breaks (first line becomes headline, rest are body)
  * - Lines starting with "- " -> bullet points
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function FormattedText({
   text,
   noDark = false,

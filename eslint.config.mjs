@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     "study/**",
     ".obsidian/**",
     "test-github.js",
+    "backend/dist/**",
   ]),
   {
     rules: {

@@ -20,13 +20,11 @@ import {
   AlertCircle,
   Lightbulb,
   CheckCircle2,
-  Printer,
-  ChevronDown,
 } from "lucide-react";
 import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
 import { ProblemSolution } from "@/types/project";
-import { getProjectColors, getProjectIcon } from "@/config/project-theme";
+import { getProjectColors } from "@/config/project-theme";
 import Nav from "@/components/dashboard/Nav";
 import Mermaid from "@/components/common/Mermaid";
 import CodeBlock from "@/components/common/CodeBlock";
@@ -181,20 +179,19 @@ export default function ProjectDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
   const project = projects.find((p) => p.id === id);
-  if (!project) return notFound();
+  const detail = project ? getProjectDetail(id) : undefined;
 
-  const detail = getProjectDetail(id);
-  if (!detail) return notFound();
-
-  const hasBackend = (detail.sections.backend?.length ?? 0) > 0;
-  const hasFrontend = (detail.sections.frontend?.length ?? 0) > 0;
+  const hasBackend = (detail?.sections.backend?.length ?? 0) > 0;
+  const hasFrontend = (detail?.sections.frontend?.length ?? 0) > 0;
   const defaultTab = hasBackend ? "backend" : "frontend";
 
   const [activeTab, setActiveTab] = useState<"backend" | "frontend">(
     defaultTab,
   );
 
-  const Icon = getProjectIcon(project.id);
+  if (!project) return notFound();
+  if (!detail) return notFound();
+
   const colors = getProjectColors(project.color);
 
   const currentIndex = projects.findIndex((p) => p.id === id);

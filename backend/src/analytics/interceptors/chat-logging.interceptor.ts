@@ -36,6 +36,7 @@ export class ChatLoggingInterceptor implements NestInterceptor {
           .catch(() => {});
 
         // Strip internal metadata before sending to client
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { tokenUsage, isGuardrailPassed, ...clientResponse } = response;
         return clientResponse;
       }),

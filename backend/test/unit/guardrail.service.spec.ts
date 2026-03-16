@@ -21,7 +21,7 @@ describe('AiService - Guardrail', () => {
   let service: AiService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const testingModule: TestingModule = await Test.createTestingModule({
       providers: [
         AiService,
         {
@@ -31,7 +31,7 @@ describe('AiService - Guardrail', () => {
       ],
     }).compile();
 
-    service = module.get<AiService>(AiService);
+    service = testingModule.get<AiService>(AiService);
     mockCreate.mockReset();
   });
 

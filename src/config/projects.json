@@ -32,5 +32,22 @@
     "link": "/projects/aidiary",
     "github": "https://github.com/ssyy3034/aidiary-main",
     "color": "red"
+  },
+  {
+    "id": "knowledge-garden",
+    "title": "Knowledge Garden",
+    "subtitle": "NestJS 백엔드 · Next.js 프론트엔드 · LLM 챗봇",
+    "role": "개인 프로젝트",
+    "period": "2026.02 - 현재",
+    "team": "1인",
+    "description": "NestJS로 챗봇 백엔드를, Next.js로 포트폴리오 프론트엔드를 개발했습니다. MongoDB 텍스트 검색으로 이력서 데이터를 LLM에 주입하고, 가드레일과 분석 로깅을 구성했습니다.",
+    "metrics": [
+      { "value": "NestJS", "label": "모듈·DI·인터셉터·가드 활용" },
+      { "value": "Next.js", "label": "App Router 기반 SSR 포트폴리오" }
+    ],
+    "tech": ["NestJS", "MongoDB", "OpenAI API", "Next.js", "TypeScript", "Docker"],
+    "link": "/projects/knowledge-garden",
+    "github": "https://github.com/ssyy3034/kwon-dongha-portfolio",
+    "color": "emerald"
   }
 ]

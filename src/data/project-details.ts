@@ -461,6 +461,85 @@ if (json != null) {
       },
     ],
   },
+
+  "knowledge-garden": {
+    id: "knowledge-garden",
+    tagline:
+      "포트폴리오 겸 챗봇 백엔드를 NestJS로, 프론트엔드를 Next.js로 구현한 개인 프로젝트입니다.",
+    overview:
+      "NestJS의 모듈·DI·인터셉터·가드 등 프레임워크 기능을 활용해 챗봇 백엔드를 구성하고, Next.js App Router로 프론트엔드를 개발했습니다. 챗봇은 MongoDB 텍스트 검색으로 이력서 데이터를 찾아 LLM 컨텍스트에 주입하는 구조이며, 가드레일로 무관 질문을 필터링하고 인터셉터로 응답 분석 로그를 수집합니다.",
+
+    sections: {
+      backend: [
+        {
+          id: "chatbot-api",
+          title: "LLM 챗봇 API 설계",
+          subtitle: "MongoDB 텍스트 검색 + 가드레일 + 세션 관리",
+          problem:
+            "**포트폴리오 방문자가 프로젝트에 대해 자유롭게 질문할 수 있는 챗봇이 필요했습니다.**\n단순히 LLM에 전체 이력서를 넣으면 토큰 낭비가 심하고, 무관한 질문(날씨, 코딩 문제 등)에도 응답하게 됩니다.",
+          approach:
+            "**질문과 관련된 이력서 데이터만 검색해서 LLM 컨텍스트에 주입하는 구조로 설계했습니다.**\n- MongoDB 텍스트 인덱스에 필드별 가중치(title 10x, summary 5x, content 1x)를 설정하고, 상위 5개 문서를 시스템 프롬프트에 마크다운으로 주입\n- LLM 가드레일 분류기(max_tokens: 5, temp: 0)로 포트폴리오 무관 질문을 사전 필터링\n- 인메모리 슬라이딩 윈도우로 최근 10턴 대화 맥락 유지\n- 입력 검증(500자 제한), 글로벌 쓰로틀링(200req/min)",
+          result:
+            "**질문에 맞는 프로젝트·경험 데이터만 컨텍스트로 들어가 토큰 효율을 높이고, 무관한 질문은 가드레일에서 걸러냅니다.** 대화 맥락이 유지되어 후속 질문도 자연스럽게 이어집니다.",
+          details: [
+            "**모듈 구성**: Chat(오케스트레이션) · AI(LLM 호출·가드레일) · Analytics(로깅) · Resume(데이터 검색) 4개 모듈을 NestJS DI로 연결",
+            "**분석 로깅**: 인터셉터에서 토큰 사용량·응답 시간을 비동기로 MongoDB에 저장하고, 클라이언트 응답에서는 내부 메타데이터를 제거",
+            "**TTL 자동 정리**: MongoDB TTL 인덱스로 90일 지난 로그 자동 만료",
+          ],
+          impact: "텍스트 검색 기반 컨텍스트 주입 + 가드레일 필터링",
+        },
+      ],
+      frontend: [
+        {
+          id: "portfolio-frontend",
+          title: "Next.js App Router 기반 포트폴리오",
+          subtitle: "대시보드 · 프로젝트 상세 · 챗봇 위젯 · PDF 내보내기",
+          problem:
+            "**프로젝트 경험을 체계적으로 보여주면서, 방문자가 챗봇으로 바로 질문할 수 있는 인터랙티브한 포트폴리오가 필요했습니다.**",
+          approach:
+            "**Next.js App Router로 페이지를 구성하고, 공통 데이터는 JSON 설정 파일로 관리합니다.**\n- 프로필 데이터를 Context API로 공유하여 대시보드·PDF·챗봇에서 일관되게 사용\n- 프로젝트 상세 페이지는 동적 라우트(`/projects/[id]`)로 Backend/Frontend 탭 분리\n- 챗봇 위젯은 Framer Motion으로 열림/닫힘 애니메이션 처리, sessionStorage로 세션 유지\n- react-markdown으로 챗봇 응답 마크다운 렌더링, 추천 질문 제공",
+          result:
+            "**하나의 JSON 설정으로 대시보드·상세 페이지·PDF가 동기화되고, 챗봇을 통해 방문자가 프로젝트에 대해 바로 질문할 수 있습니다.**",
+          details: [
+            "**PDF 내보내기**: 프로필 데이터를 기반으로 인쇄용 레이아웃을 별도 구성",
+            "**다크 모드**: Tailwind CSS 다크 모드 전체 지원",
+            "**반응형**: 모바일 하단 네비게이션, 데스크톱 상단 네비게이션 분리",
+          ],
+          impact: "JSON 기반 데이터 동기화 + 인터랙티브 챗봇",
+        },
+      ],
+    },
+
+    achievements: [
+      {
+        label: "NestJS 모듈 아키텍처",
+        description: "Chat · AI · Analytics · Resume 4개 도메인 모듈 분리, DI 기반 의존성 관리",
+      },
+      {
+        label: "LLM 챗봇",
+        description: "가중치 텍스트 검색 컨텍스트 주입, 가드레일 필터링, 슬라이딩 윈도우 대화 관리",
+      },
+      {
+        label: "Next.js 프론트엔드",
+        description: "App Router, 동적 라우트, Framer Motion 챗봇 위젯, PDF 내보내기",
+      },
+    ],
+
+    techStack: [
+      {
+        category: "Backend",
+        items: ["NestJS", "MongoDB", "Mongoose", "OpenAI API"],
+      },
+      {
+        category: "Frontend",
+        items: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
+      },
+      {
+        category: "Infra",
+        items: ["Docker", "Vercel"],
+      },
+    ],
+  },
 };
 
 export function getProjectDetail(id: string): ProjectDetail | undefined {

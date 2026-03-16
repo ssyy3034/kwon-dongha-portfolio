@@ -5,44 +5,15 @@ import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
 import FormattedText from "@/components/common/FormattedText";
 import {
-  Code,
-  Lightbulb,
   Users,
   Briefcase,
-  Calendar,
-  AlertCircle,
-  CheckCircle2,
   Server,
   Monitor,
-  Trophy,
 } from "lucide-react";
-import { getProjectColors, getProjectIcon } from "@/config/project-theme";
+import { getProjectColors } from "@/config/project-theme";
 import Mermaid from "@/components/common/Mermaid";
 import CodeBlock from "@/components/common/CodeBlock";
 
-const steps = [
-  {
-    key: "problem" as const,
-    label: "Problem",
-    icon: AlertCircle,
-    color: "text-red-500",
-    dot: "bg-red-500",
-  },
-  {
-    key: "approach" as const,
-    label: "Approach",
-    icon: Lightbulb,
-    color: "text-amber-500",
-    dot: "bg-amber-500",
-  },
-  {
-    key: "result" as const,
-    label: "Result",
-    icon: CheckCircle2,
-    color: "text-emerald-500",
-    dot: "bg-emerald-500",
-  },
-] as const;
 
 function SectionCard({ section, colors }: { section: any; colors: any }) {
   return (

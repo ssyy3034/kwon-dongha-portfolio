@@ -24,7 +24,7 @@ describe('Chat (e2e)', () => {
       ]),
     };
 
-    const module: TestingModule = await Test.createTestingModule({
+    const testingModule: TestingModule = await Test.createTestingModule({
       controllers: [ChatController],
       providers: [
         { provide: ChatService, useValue: mockChatService },
@@ -33,12 +33,12 @@ describe('Chat (e2e)', () => {
       ],
     }).compile();
 
-    app = module.createNestApplication();
+    app = testingModule.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     await app.init();
 
-    chatService = module.get<ChatService>(ChatService);
-    analyticsService = module.get<AnalyticsService>(AnalyticsService);
+    chatService = testingModule.get<ChatService>(ChatService);
+    analyticsService = testingModule.get<AnalyticsService>(AnalyticsService);
   });
 
   afterAll(async () => {

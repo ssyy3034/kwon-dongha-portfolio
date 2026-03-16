@@ -6,14 +6,13 @@ import {
   Github,
   Home,
   PenLine,
-  FileDown,
   Moon,
   Sun,
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useSyncExternalStore } from "react";
 import { useProfile } from "@/context/ProfileContext";
 import { useTheme } from "next-themes";
 
@@ -23,11 +22,11 @@ export default function Nav() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -38,10 +37,6 @@ export default function Nav() {
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
-
-  const handlePrintPDF = useCallback(() => {
-    window.print();
-  }, []);
 
   const handleHashClick = useCallback(
     (e: React.MouseEvent, href: string) => {
@@ -188,14 +183,6 @@ export default function Nav() {
               )}
             </button>
 
-            {/* PDF Button */}
-            <button
-              onClick={handlePrintPDF}
-              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-stone-900 dark:bg-amber-600 text-white hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-            >
-              <FileDown size={18} />
-              <span className="text-sm font-bold">PDF 저장</span>
-            </button>
           </div>
         </div>
       </nav>
@@ -270,14 +257,6 @@ export default function Nav() {
             )}
           </button>
 
-          {/* Mobile PDF Button */}
-          <button
-            onClick={handlePrintPDF}
-            className="flex items-center justify-center w-12 h-12 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-colors"
-            aria-label="PDF로 저장"
-          >
-            <FileDown size={22} />
-          </button>
         </div>
       </nav>
     </>
