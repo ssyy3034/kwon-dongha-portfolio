@@ -5,6 +5,7 @@ import {
   Folder,
   Github,
   Home,
+  PenLine,
   FileDown,
   Moon,
   Sun,
@@ -76,6 +77,12 @@ export default function Nav() {
       name: "GitHub",
       href: profile.social.github,
       icon: Github,
+      external: true,
+    },
+    {
+      name: "Blog",
+      href: profile.social.blog,
+      icon: PenLine,
       external: true,
     },
   ];

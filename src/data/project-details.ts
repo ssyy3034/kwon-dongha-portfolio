@@ -7,7 +7,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
       "웹소설 작가를 위한 세컨드 브레인 서비스입니다. 에디터에서 집필하면 AI가 글을 분석하고, 월드 페이지에서 인물·관계·사건을 시각화합니다. 독자는 StoRead에서 관계도와 함께 작품을 열람할 수 있습니다.",
     architectureImage: "/images/stolink-arch.png",
     overview:
-      "크래프톤 정글 최종 프로젝트, 5인 팀. 프론트엔드 일부(에디터·관계도·사이드바·대시보드)와 백엔드 일부(OAuth2 인증·문서 CRUD·결제 시스템)를 담당했습니다. 가장 도전적이었던 부분은 인물이 수백 명으로 늘어도 버티는 관계도 렌더링 성능 최적화와, 오버엔지니어링을 지양하며 즉각적인 성능 개선을 이뤄낸 점이었습니다.",
+      "크래프톤 정글 최종 프로젝트 (5인 팀). OAuth2 인증, 토스페이먼츠 결제 연동, 문서 CRUD 등 백엔드와 Canvas 관계도, Tiptap 에디터, 폴더 트리 사이드바 등 프론트엔드를 담당했습니다. SVG → Canvas 전환으로 관계도 INP를 420ms에서 64ms로 개선하고, 결제 동시성 제어는 Testcontainers로 100스레드 환경에서 정합성을 검증했습니다.",
 
     sections: {
       backend: [
@@ -130,7 +130,7 @@ return completePaymentProcess(orderId, paymentKey, tossResponse.method());`,
           result:
             "**100개 스레드 동시 차감에서 10회 반복 모두 잔액 정합성 100%를 확인했습니다.**\n동일 멱등키로 들어오는 중복 요청은 DB 트랜잭션 시작 전에 즉시 차단됩니다. 이 테스트 코드가 CI에 포함되어 결제 코드 변경 시 회귀를 자동으로 감지합니다.",
           retrospective:
-            "처음에는 비관적 락과 낙관적 락(@Version)을 함께 사용했는데, 비관적 락이 행 단위 배타적 접근을 이미 보장하므로 @Version은 충돌을 감지할 일이 없는 죽은 코드였습니다. 리뷰를 통해 이를 인지하고 @Version을 제거했으며, JPA Dirty Checking으로 명시적 save() 호출도 제거했습니다. 서비스가 멀티 인스턴스로 Scale-out 되면 단일 DB 비관적 락으로는 한계가 생기는 문제도 있습니다. 이때는 Redis 기반 분산 락으로 전환하거나 결제를 별도 서비스로 분리하는 방향을 검토해야 합니다.",
+            "처음에는 비관적 락과 낙관적 락(@Version)을 함께 사용했는데, 비관적 락이 행 단위 배타적 접근을 이미 보장하므로 @Version은 충돌을 감지할 일이 없는 죽은 코드였습니다. 리뷰를 통해 이를 인지하고 @Version을 제거했으며, JPA Dirty Checking으로 명시적 save() 호출도 제거했습니다. SELECT FOR UPDATE는 DB 레벨 락이므로 앱 인스턴스가 늘어나도 동일 DB를 사용하는 한 정상 동작합니다. 다만 동시 결제 트래픽이 극단적으로 늘면 행 잠금 대기로 인한 응답 지연이 생길 수 있고, 이때는 큐 기반 순차 처리나 결제 서비스 분리를 검토해야 합니다.",
           details: [
             "**Dirty Checking**: 비관적 락 안에서 엔티티 변경 → 커밋 시 자동 UPDATE, 명시적 save() 불필요",
             "**Testcontainers**: 실제 PostgreSQL + 100 스레드 동시 요청으로 정합성 검증",
@@ -162,7 +162,7 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
           approach:
             "**1,000줄 문서를 3-Layer로 분리하고, 작업 규모에 따라 필요한 문서만 로딩하는 구조로 변경했습니다.**\n- **Core** (~150줄, 항상 로딩): 핵심 규칙·아키텍처 원칙만\n- **Appendix** (작업별 선택): tech-stack, design-system, api-reference 등\n- **Spec** (L 작업만): API_SPEC, DATA_MODEL 전체 명세\n\nSupervisor 에이전트가 요청을 S/M/L로 분류해 문서 참조량과 프로세스를 결정하고, 역할별 전문 에이전트가 순차적으로 작업합니다.\n- **Architect** → 구조·로직 구현 / **Stylist** → 디자인 시스템 적용\n- **Auditor** → 품질 검증 / **Librarian** → 코드 변경 시 문서 자동 동기화",
           result:
-            "**3-Layer 모델 전환으로 토큰 소모를 극적으로 줄여 AI 가용 시간을 2배 이상 연장했습니다.** 무엇보다 outdated 문서 참조로 인한 할루시네이션(잘못된 코드 생성)을 없앴고, 단순 작업(S) 프로세스를 7단계에서 2단계로 단축했습니다. 또한 교대 개발 시 맥락 단절을 막기 위해 Librarian 에이전트 기반의 자동 문서 동기화 파이프라인을 구축, 팀 전체의 생산성(Productivity)을 크게 높였습니다.",
+            "**3-Layer 모델 전환으로 토큰 소모를 극적으로 줄여 AI 가용 시간을 2배 이상 연장했습니다.** 무엇보다 outdated 문서 참조로 인한 할루시네이션(잘못된 코드 생성)을 없앴고, 단순 작업(S) 프로세스를 7단계에서 2단계로 단축했습니다. 또한 교대 개발 시 맥락 단절을 막기 위해 Librarian 에이전트 기반의 자동 문서 동기화 파이프라인을 구축, 팀 전체의 생산성을 크게 높였습니다.",
           retrospective:
             "Stylist가 로직까지 건드리는 월권이 초기에 잦았는데, 프롬프트에 명시적 금지 조건을 추가한 뒤 안정됐습니다. T-Shirt Sizing의 S/M/L 기준이 주관적이라 팀원 간 분류가 달랐던 점은 가이드라인 문서화로 보완할 수 있었을 것입니다.",
           details: [
@@ -293,7 +293,7 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
       "산모가 일기를 쓰면 AI가 감정을 분석해 피드백을 제공하는 서비스입니다. 부모 사진으로 아기 캐릭터를 생성하는 기능도 함께 제공합니다.",
     architectureImage: "/images/aidiary-arch.png",
     overview:
-      "캡스톤 디자인 프로젝트(2인 팀)로 시작해 크래프톤 정글 수료 후 개인적으로 아키텍처 개선을 이어갔습니다. 백엔드 전체(인증·일기 CRUD·인프라)와 프론트엔드를 담당했습니다. 우선순위를 고려하여 트래픽이 검증되지 않은 초기 단계의 복잡도는 낮추되, 핵심 비즈니스 로직(AI 추론 등)은 언제든 별도 컨테이너로 뗄 수 있도록 논리적으로 분리(Loosely Coupled)한 '하이브리드 아키텍처' 설계가 가장 큰 특징입니다.",
+      "캡스톤 디자인 (2인 팀)으로 시작해 수료 후 개인적으로 아키텍처 개선을 이어갔습니다. 인증, 일기 CRUD, AI 연동 등 Spring Boot + Flask 이중 서버 백엔드 전체와 Docker Compose 기반 인프라를 담당했습니다. k6 부하 테스트에서 AI 추론(~30초)의 동기 호출이 서비스 전체를 마비시키는 문제를 발견하고 RabbitMQ 비동기 처리로 전환하여 TPS를 1.16에서 1,949까지 개선했으며, Redis 캐싱과 Caffeine 다층 캐시로 반복 API 호출 비용을 줄였습니다.",
 
     sections: {
       backend: [
@@ -302,17 +302,17 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
           title: "AI 이미지 합성 동기 블로킹 → RabbitMQ 비동기 전환",
           subtitle: "WAS 처리량 1.16 → 1,949 TPS, 응답 30s → 4.9ms",
           problem:
-            "**ML 이미지 합성(~30초)이 Tomcat 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비되는 Cascade Failure가 발생했습니다.**\nFlask ML 추론을 동기 호출하는 구조에서, 스레드 풀이 30초씩 점유돼 일기 작성·건강 기록 등 무관한 API까지 전부 무응답.\n- k6 실측 최대 처리량: **1.16 TPS**",
+            "**ML 이미지 합성(~30초)이 Tomcat 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비됐습니다.**\nFlask ML 추론을 동기 호출하는 구조에서, 스레드 풀이 30초씩 점유돼 일기 작성·건강 기록 등 무관한 API까지 전부 무응답.\n- k6 실측 최대 처리량: **1.16 TPS**",
           approach:
-            "**RabbitMQ로 WAS와 AI 처리를 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`을 시도했지만 Scale-out 불일치와 메모리 누수(GC 후 +28MB 잔류) 문제가 드러나 RabbitMQ로 전환.\n- Spring Boot: 큐 발행 → 202 Accepted (4.9ms)\n- Python Worker: `prefetch_count=1` + 수동 ACK → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존",
+            "**RabbitMQ로 WAS와 AI 처리를 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`을 시도했지만 Scale-out 시 서버 간 상태 불일치와 메모리 누수(GC 후 +28MB 잔류) 문제가 드러나 RabbitMQ로 전환.\n- Spring Boot: 큐 발행 → 202 Accepted (4.9ms)\n- Python Worker: `prefetch_count=1` + 수동 ACK → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존",
           result:
             "**WAS 처리량 1.16 → 1,949 TPS, 응답 레이턴시 30,000ms → 4.9ms.**\n500 VU 부하에서 p95 318ms, 에러율 0%. 총 175,463건 처리. AI 처리 지연과 무관하게 WAS 가용성 유지.",
           retrospective:
             "Webhook 방식을 채택하다 보니 클라이언트가 주기적으로 상태를 폴링해야 합니다. UX 관점에서는 '생성 요청 → 기다림 → 완료 알림'이 깔끔하지 않고, 폴링 요청도 불필요하게 생깁니다. SSE(Server-Sent Events)나 WebSocket으로 서버에서 직접 완료 이벤트를 푸시하는 방식이 더 나았을 것 같습니다. 또 Python Worker 프로세스에 대한 헬스 체크나 모니터링이 없어서, Worker가 죽어도 바로 알 수 없는 약점이 있습니다. Prometheus + Grafana 같은 모니터링 스택을 붙이면 이 부분을 보완할 수 있습니다.",
           details: [
-            "**논리적 분리 (Loosely Coupled)**: AI 서비스 호출 시 구체 클래스가 아닌 인터페이스에 의존하고 Entity 대신 DTO만 던지도록 설계. 트랜잭션 경계를 끊어내어 훗날 완전한 MSA 전환 시나리오 대비",
-            "**장애 격리와 고가용성**: 무거운 연산을 격리하여 Python Flask 다운 시에도 회원 자격 및 일기 저장 (Core 생태계) 100% 정상 작동 확보",
-            "**DLQ 및 3중 멱등성 가드**: Worker 장애 시 메시지 유실 방지 및 at-least-once 배달 대응 (Worker → Webhook → DB)",
+            "**의존 방향 정리**: AI 서비스 호출을 인터페이스 기반으로 추상화하고, Entity 대신 DTO만 전달하도록 설계. 트랜잭션 경계를 분리하여 AI 처리 모듈을 별도 서버로 떼어낼 때 변경 범위를 최소화",
+            "**장애 격리**: AI 연산을 별도 Worker로 분리하여, Flask 서버가 다운되더라도 로그인·일기 작성 등 주요 기능은 정상 동작",
+            "**DLQ 및 3중 멱등성 가드**: Worker 장애 시 메시지 유실 방지(DLQ), 메시지 재전달로 인한 중복 처리 방지를 Worker → Webhook → DB 각 단계에서 적용",
           ],
           diagram: {
             type: "mermaid",
@@ -335,25 +335,6 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
         },
 
         {
-          id: "redis-cache",
-          title: "오늘의 질문 — 매 요청 Gemini API 호출 → Redis 날짜 기반 캐싱",
-          subtitle: "응답 487ms → 3ms, Gemini 호출 일 1회 고정",
-          problem:
-            "**'오늘의 질문'이 요청마다 Gemini API를 호출해 매번 다른 질문을 생성하는 기능 결함이 있었고, 응답도 avg 487ms로 느렸습니다.**\n기획 의도는 하루에 하나의 질문을 모든 산모가 공유하는 것이었는데, 구현을 확인해보니 요청마다 Flask → Gemini API를 동기 호출하고 있었습니다.\n- 같은 날인데 요청마다 다른 질문 생성 → '오늘의 질문' 기능 의미 자체가 무너짐\n- API 비용이 요청 수에 비례해 선형 증가 (사용자 100명 = Gemini 100번 호출)",
-          approach:
-            "**날짜 자체를 Redis 키로, 자정까지 남은 시간을 TTL로 설정해 하루 1회만 Gemini API를 호출하도록 했습니다.**\n`daily_question:{yyyyMMdd}` 형태로 키를 설계하면 날짜가 바뀌는 순간 자동으로 만료되어, 별도 스케줄러 없이 다음 날 첫 요청이 새 질문을 생성합니다.\n- HIT 시 Redis에서 ~1ms 즉시 반환, AI API 호출 없음\n- MISS(하루 첫 요청)에만 Flask → Gemini 호출 (~500ms, 하루 1번만)\n- 캐시 무효화 전략이 필요 없음 — 날짜 변경 자체가 무효화",
-          result:
-            "**응답 487ms → 3ms, Gemini API 호출이 요청 수 비례(N회) → 일 1회로 고정됐습니다.**\n모든 산모가 같은 날 동일한 질문을 받아 기능 일관성이 확보됐고, 기능 결함(요청마다 다른 질문)도 캐싱으로 동시에 해결됐습니다.",
-          retrospective:
-            "자정에 키가 만료되면서 첫 번째 요청이 Gemini API를 호출하게 됩니다. 이 시점에 동시 요청이 있으면 Cache Thundering Herd 문제가 발생할 수 있습니다. 자정 직전에 다음 날 질문을 미리 캐싱하는 스케줄러를 붙였으면 더 안전했을 것입니다. 또 Redis가 다운될 때를 대비한 fallback 전략이 없어서, Gemini API를 직접 호출하는 graceful degradation을 추가하면 장애 전파를 방지할 수 있습니다.",
-          details: [
-            "**기능 결함 발견**: 같은 날인데 요청마다 다른 질문 생성 → 캐싱이 기능 결함과 성능을 동시에 해결",
-            "**키 설계**: `daily_question:{yyyyMMdd}`, TTL = 자정까지 남은 초 — 날짜 변경 자체가 무효화, 스케줄러 불필요",
-            "**Gemini 호출 절감**: 요청 수 비례(N회) → 일 1회 고정, API 비용 선형 증가 구조 제거",
-          ],
-          impact: "487ms → 3ms / Gemini 일 1회",
-        },
-        {
           id: "multi-layer-cache",
           title: "주차별 맞춤 정보 — 산모 상태 기반 개인화 응답 + 다층 캐시",
           subtitle:
@@ -368,12 +349,12 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
             "컨텍스트 해시가 감정·건강 데이터의 정확한 값에 의존하기 때문에, 체중이 0.1kg만 변해도 새 캐시 엔트리가 생깁니다. 값을 구간(예: 60~62kg)으로 양자화하면 캐시 히트율을 높일 수 있었을 것입니다. 또한 현재는 L3 DB 조회가 contextHash 기반 단건 조회라 인덱스만으로 충분하지만, 사용자 수가 크게 늘면 오래된 엔트리를 주기적으로 정리하는 배치가 필요합니다.",
           details: [
             "**캐시 키 설계**: SHA-256(userId + week + emotions + healthData) → 감정·건강 변화 시 해시 자동 변경으로 무효화",
-            "**Fallback 전략**: 컨텍스트 미입력 → 42주 공통 캐시 / Redis 장애 → DB → Gemini 직접 호출 (graceful degradation)",
+            "**Fallback 전략**: 컨텍스트 미입력 → 42주 공통 캐시 / Redis 장애 → DB → Gemini 직접 호출",
           ],
           codeSnippet: `// PregnancyWeekCacheService.java — L1 → L2 → L3 → Gemini 순차 조회
 String cacheKey = ctx.userId() + ":" + ctx.contextHash();  // ← 감정·건강 변화 시 해시 변경
 
-// L1: Caffeine (JVM 내 캐시, 네트워크 홉 없음)
+// L1: Caffeine (JVM 내 캐시, 네트워크 홉 없이)
 PregnancyWeekDTO dto = localCache.getIfPresent(cacheKey);  // ← L1
 if (dto != null) return dto;
 
@@ -388,6 +369,25 @@ if (json != null) {
 // L3: DB → L1+L2 승격 / MISS → Gemini 호출 → 전 계층 저장
 // (이하 동일 패턴: 역직렬화 → populateCache → return)`,
           impact: "개인화 응답 + Gemini API 호출 최소화",
+        },
+        {
+          id: "redis-cache",
+          title: "오늘의 질문 — 매 요청 Gemini API 호출 → Redis 날짜 기반 캐싱",
+          subtitle: "응답 487ms → 3ms, Gemini 호출 일 1회 고정",
+          problem:
+            "**'오늘의 질문'이 요청마다 Gemini API를 호출해 매번 다른 질문을 생성하는 기능 결함이 있었고, 응답도 avg 487ms로 느렸습니다.**\n기획 의도는 하루에 하나의 질문을 모든 산모가 공유하는 것이었는데, 구현을 확인해보니 요청마다 Flask → Gemini API를 동기 호출하고 있었습니다.\n- 같은 날인데 요청마다 다른 질문 생성 → '오늘의 질문' 기능 의미 자체가 무너짐\n- API 비용이 요청 수에 비례해 선형 증가 (사용자 100명 = Gemini 100번 호출)",
+          approach:
+            "**다층 캐시에서 이미 사용 중인 Redis를 활용해, 날짜 자체를 키로, 자정까지 남은 시간을 TTL로 설정하여 하루 1회만 Gemini API를 호출하도록 했습니다.**\n`daily_question:{yyyyMMdd}` 형태로 키를 설계하면 날짜가 바뀌는 순간 자동으로 만료되어, 별도 스케줄러 없이 다음 날 첫 요청이 새 질문을 생성합니다. 하루 뒤 버려질 일회성 데이터이므로 DB 영속화 대신 TTL 자동 만료가 적합했습니다.\n- HIT 시 Redis에서 ~1ms 즉시 반환, AI API 호출 없음\n- MISS(하루 첫 요청)에만 Flask → Gemini 호출 (~500ms, 하루 1번만)\n- 캐시 무효화 전략이 필요 없음 — 날짜 변경 자체가 무효화",
+          result:
+            "**응답 487ms → 3ms, Gemini API 호출이 요청 수 비례(N회) → 일 1회로 고정됐습니다.**\n모든 산모가 같은 날 동일한 질문을 받아 기능 일관성이 확보됐고, 기능 결함(요청마다 다른 질문)도 캐싱으로 동시에 해결됐습니다.",
+          retrospective:
+            "자정에 키가 만료되면서 첫 번째 요청이 Gemini API를 호출하게 됩니다. 이 시점에 동시 요청이 있으면 Cache Stampede 문제가 발생할 수 있습니다. 자정 직전에 다음 날 질문을 미리 캐싱하는 스케줄러를 붙였으면 더 안전했을 것입니다. 또 Redis가 다운될 때를 대비한 fallback이 없어서, Gemini API를 직접 호출하도록 대비하면 장애 전파를 방지할 수 있습니다.",
+          details: [
+            "**기능 결함 발견**: 같은 날인데 요청마다 다른 질문 생성 → 캐싱이 기능 결함과 성능을 동시에 해결",
+            "**키 설계**: `daily_question:{yyyyMMdd}`, TTL = 자정까지 남은 초 — 날짜 변경 자체가 무효화, 스케줄러 불필요",
+            "**Gemini 호출 절감**: 요청 수 비례(N회) → 일 1회 고정, API 비용 선형 증가 구조 제거",
+          ],
+          impact: "487ms → 3ms / Gemini 일 1회",
         },
       ],
       frontend: [

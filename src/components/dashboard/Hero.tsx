@@ -5,6 +5,7 @@ import {
   Folder,
   Github,
   Mail,
+  PenLine,
   Code,
   Lightbulb,
   Users,
@@ -204,6 +205,15 @@ export default function Hero({
                     aria-label="GitHub"
                   >
                     <Github size={16} />
+                  </a>
+                  <a
+                    href={profile.social.blog}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-500 hover:text-white hover:scale-110 transition-all duration-300 shadow-sm"
+                    aria-label="Blog"
+                  >
+                    <PenLine size={16} />
                   </a>
                   <a
                     href={`mailto:${profile.social.email}`}
