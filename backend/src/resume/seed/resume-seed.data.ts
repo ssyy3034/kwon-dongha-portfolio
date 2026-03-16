@@ -261,13 +261,13 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
   },
   {
     type: 'troubleshooting',
-    title: 'Canvas 대규모 렌더링 최적화 — SVG → Canvas 전환',
+    title: 'SVG → Canvas 전환으로 관계도 렌더링 병목 해소',
     summary:
-      'SVG 기반 관계도 렌더링 시 대규모 노드에서 Style Recalculation → Reflow → Paint 연쇄 병목 → Canvas API 전환, INP 420ms → 64ms, 650+ 노드 60FPS.',
+      'SVG 기반 관계도에서 노드가 늘어날수록 DOM 수가 비례 증가하여 레이아웃 비용이 커지는 문제 발견 → Canvas API로 전환하여 INP 420ms → 64ms, 650+ 노드에서 60FPS 유지.',
     content:
-      '## 문제\nSVG 기반 관계도 렌더링 시 대규모 노드에서 발생하는 Style Recalculation → Reflow → Paint 연쇄 병목 현상.\n\n' +
-      '## 해결\n브라우저 렌더링 파이프라인 부담이 적은 Canvas API로 전면 전환.\n\n' +
-      '## 성과\nINP 420ms → 64ms 단축, 650+ 노드 환경에서 60FPS 부드러운 인터랙션 유지.',
+      '## 문제\nSVG 기반 관계도는 노드·엣지 각각이 DOM 요소로 존재하여, 노드가 늘어날수록 Style Recalculation → Layout → Paint 비용이 비례 증가. 650+ 노드 환경에서 인터랙션이 눈에 띄게 느려졌습니다.\n\n' +
+      '## 해결\nCanvas API로 전환하여 렌더링을 단일 비트맵 레이어로 처리. DOM 요소 수에 비례하는 레이아웃 비용을 제거했습니다.\n\n' +
+      '## 성과\nINP 420ms → 64ms, 650+ 노드 환경에서 60FPS 유지.',
     tags: ['stolink', 'react', 'canvas', 'typescript', '성능최적화', '트러블슈팅', 'frontend'],
     period: { start: '2025-12', end: '2026-02' },
     projectName: 'stolink',
