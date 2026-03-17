@@ -493,7 +493,7 @@ if (json != null) {
           title: "세션 메모리 누수 → TTL 기반 자동 정리 스케줄러",
           subtitle: "k6 부하 테스트 중 발견, RSS 25.8% 감소",
           problem:
-            "**챗봇 API 부하 테스트 중 힙 메모리가 테스트 종료 후에도 baseline으로 복귀하지 않는 현상을 발견했습니다.**\n원인 추적 결과, ChatService의 Map 세션 저장소에 TTL이 없어 사용자가 떠나도 Strong Reference로 세션이 영구 잔류하는 구조. 운영 시간에 비례해 메모리가 단조 증가하는 누수였습니다.",
+            "**챗봇 API 부하 테스트 중 힙 메모리가 테스트 종료 후에도 baseline으로 복귀하지 않는 현상을 발견했습니다.**\n원인 추적 결과, ChatService의 Map 세션 저장소에 TTL이 없어 사용자가 떠나도 Strong Reference로 세션이 영구 잔류하는 구조. 운영 시간이 길어질수록 메모리가 계속 쌓이는 누수였습니다.",
           approach:
             "**SessionData에 lastAccessedAt를 추가하고, @nestjs/schedule 기반 TTL 정리 스케줄러를 도입했습니다.**\n- `@Interval`로 주기적 정리(기본 10분), TTL(기본 30분) 초과 세션 자동 삭제\n- 정량 비교를 위해 디버그 엔드포인트와 AI Mock 모드를 추가, k6 커스텀 메트릭으로 시계열 수집",
           result:
