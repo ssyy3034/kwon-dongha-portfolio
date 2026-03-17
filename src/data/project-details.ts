@@ -131,10 +131,7 @@ return completePaymentProcess(orderId, paymentKey, tossResponse.method());`,
             "**100개 스레드 동시 차감에서 10회 반복 모두 잔액 정합성 100%를 확인했습니다.**\n동일 멱등키로 들어오는 중복 요청은 DB 트랜잭션 시작 전에 즉시 차단됩니다. 이 테스트 코드가 CI에 포함되어 결제 코드 변경 시 회귀를 자동으로 감지합니다.",
           retrospective:
             "처음에는 비관적 락과 낙관적 락(@Version)을 함께 사용했는데, 비관적 락이 행 단위 배타적 접근을 이미 보장하므로 @Version은 충돌을 감지할 일이 없는 죽은 코드였습니다. 리뷰를 통해 이를 인지하고 @Version을 제거했으며, JPA Dirty Checking으로 명시적 save() 호출도 제거했습니다. SELECT FOR UPDATE는 DB 레벨 락이므로 앱 인스턴스가 늘어나도 동일 DB를 사용하는 한 정상 동작합니다. 다만 동시 결제 트래픽이 극단적으로 늘면 행 잠금 대기로 인한 응답 지연이 생길 수 있고, 이때는 큐 기반 순차 처리나 결제 서비스 분리를 검토해야 합니다.",
-          details: [
-            "**Dirty Checking**: 비관적 락 안에서 엔티티 변경 → 커밋 시 자동 UPDATE, 명시적 save() 불필요",
-            "**Testcontainers**: 실제 PostgreSQL + 100 스레드 동시 요청으로 정합성 검증",
-          ],
+          details: [],
           codeSnippet: `// CreditService.java — 비관적 락 + Dirty Checking
 @Transactional
 public CreditResponse useCredit(UUID userId, CreditUseRequest request) {
@@ -382,11 +379,7 @@ if (json != null) {
             "**응답 487ms → 3ms, Gemini API 호출이 요청 수 비례(N회) → 일 1회로 고정됐습니다.**\n모든 산모가 같은 날 동일한 질문을 받아 기능 일관성이 확보됐고, 기능 결함(요청마다 다른 질문)도 캐싱으로 동시에 해결됐습니다.",
           retrospective:
             "자정에 키가 만료되면서 첫 번째 요청이 Gemini API를 호출하게 됩니다. 이 시점에 동시 요청이 있으면 Cache Stampede 문제가 발생할 수 있습니다. 자정 직전에 다음 날 질문을 미리 캐싱하는 스케줄러를 붙였으면 더 안전했을 것입니다. 또 Redis가 다운될 때를 대비한 fallback이 없어서, Gemini API를 직접 호출하도록 대비하면 장애 전파를 방지할 수 있습니다.",
-          details: [
-            "**기능 결함 발견**: 같은 날인데 요청마다 다른 질문 생성 → 캐싱이 기능 결함과 성능을 동시에 해결",
-            "**키 설계**: `daily_question:{yyyyMMdd}`, TTL = 자정까지 남은 초 — 날짜 변경 자체가 무효화, 스케줄러 불필요",
-            "**Gemini 호출 절감**: 요청 수 비례(N회) → 일 1회 고정, API 비용 선형 증가 구조 제거",
-          ],
+          details: [],
           impact: "487ms → 3ms / Gemini 일 1회",
         },
       ],
