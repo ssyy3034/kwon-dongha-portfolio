@@ -20,6 +20,9 @@ export class AiService {
   }
 
   async checkGuardrail(message: string): Promise<boolean> {
+    if (process.env.AI_MOCK === 'true') {
+      return true;
+    }
     try {
       const response = await this.client.chat.completions.create({
         model: 'gpt-4o-mini',
@@ -43,6 +46,9 @@ export class AiService {
     systemPrompt: string,
     messages: { role: 'user' | 'assistant'; content: string }[],
   ): Promise<AiResponse> {
+    if (process.env.AI_MOCK === 'true') {
+      return { content: 'Mock 응답입니다.', tokenUsage: 0 };
+    }
     const response = await this.client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [

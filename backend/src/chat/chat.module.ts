@@ -10,5 +10,6 @@ import { ChatLoggingInterceptor } from '../analytics/interceptors/chat-logging.i
   imports: [AiModule, AnalyticsModule, ResumeModule],
   controllers: [ChatController],
   providers: [ChatService, ChatLoggingInterceptor],
+  exports: [ChatService],
 })
 export class ChatModule {}

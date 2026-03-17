@@ -311,6 +311,28 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
   },
 
   // ═══════════════════════════════════════════════════
+  // TROUBLESHOOTING — Knowledge Garden
+  // ═══════════════════════════════════════════════════
+  {
+    type: 'troubleshooting',
+    title: '세션 메모리 누수 → TTL 기반 자동 정리 스케줄러',
+    summary:
+      'k6 부하 테스트 중 힙 메모리가 GC 후에도 반환되지 않는 누수 탐지 → Map의 Strong Reference + TTL 부재가 원인 → @Interval TTL 스케줄러로 해결, RSS 25.8% 감소.',
+    content:
+      '## 발견\n챗봇 API 부하 테스트 중 힙 메모리가 테스트 종료 후에도 baseline으로 복귀하지 않는 현상 발견.\n\n' +
+      '## 원인\nChatService의 Map에 TTL이 없어 사용자가 떠나도 Strong Reference로 세션 영구 잔류. 운영 시간에 비례해 메모리 단조 증가.\n\n' +
+      '## 해결\nSessionData { entries, lastAccessedAt } 구조로 변경. @nestjs/schedule @Interval로 주기적 정리, TTL 초과 세션 자동 삭제.\n\n' +
+      '## 성과\n- Baseline: 40세션/400엔트리 영구 잔류, RSS 114.80MB\n- TTL 적용: idle 후 세션 0건, RSS 85.13MB (25.8% 감소)',
+    tags: ['knowledge-garden', 'nestjs', 'nodejs', '성능최적화', '트러블슈팅', 'backend'],
+    period: { start: '2026-03', end: '2026-03' },
+    projectName: 'knowledge-garden',
+    metrics: [
+      { label: '세션 잔류', before: '영구 누적', after: 'idle 후 0건 (100% 해소)' },
+      { label: 'RSS 메모리', before: '114.80MB', after: '85.13MB (25.8% 감소)' },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════
   // EXPERIENCE
   // ═══════════════════════════════════════════════════
   {

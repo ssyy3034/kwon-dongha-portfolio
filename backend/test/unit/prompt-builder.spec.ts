@@ -1,12 +1,14 @@
 import { ChatService } from '../../src/chat/chat.service';
 import { AiService } from '../../src/ai/ai.service';
+import { ResumeService } from '../../src/resume/resume.service';
 
 describe('ChatService - Sliding Window', () => {
   let service: ChatService;
 
   beforeEach(() => {
     const mockAiService = {} as AiService;
-    service = new ChatService(mockAiService);
+    const mockResumeService = {} as ResumeService;
+    service = new ChatService(mockAiService, mockResumeService);
   });
 
   it('should return all messages when under limit', () => {
