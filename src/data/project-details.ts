@@ -500,11 +500,7 @@ if (json != null) {
             "**Baseline: 40세션/400엔트리 영구 잔류, RSS 114.80MB → TTL 적용: idle 후 세션 0건, RSS 85.13MB.**\n세션 잔류 100% 해소, RSS 25.8%(29.67MB) 감소.",
           retrospective:
             "현재는 단일 인스턴스 인메모리 Map이라 Scale-out 시 서버 간 세션이 공유되지 않습니다. Redis로 세션 스토어를 외부화하면 이 한계를 해결할 수 있고, TTL도 EXPIRE로 자연스럽게 처리됩니다.",
-          details: [
-            "**발견 과정**: k6 부하 테스트 중 힙 메모리 GC 후 미복귀 → Map Strong Reference가 원인",
-            "**디버그 엔드포인트**: NODE_ENV !== 'production'일 때만 조건부 등록",
-            "**AI Mock 모드**: OpenAI API 호출 없이 순수 서버 성능만 측정",
-          ],
+          details: [],
           impact: "세션 100% 회수 / RSS 25.8% 감소",
         },
       ],
