@@ -35,7 +35,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       'canvas', 'postgresql', 'neo4j', 'docker', 'backend', 'fullstack', 'AI연동',
       '보안', 'DX',
     ],
-    period: { start: '2025-12', end: '2026-02' },
+    period: { start: '2025-12', end: '2026-01' },
     projectName: null,
     techStack: [
       { category: 'Frontend', items: ['React', 'TypeScript', 'Canvas (D3.js)'] },
@@ -224,7 +224,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       '## 해결\n토스페이먼츠 연동 크레딧 충전 시스템에 동시성 제어(비관적 락) 및 재시도로 인한 중복 결제 방지(멱등키) 로직 구성.\n\n' +
       '## 검증\nTestcontainers를 활용해 100개 스레드 동시 요청 환경에서 잔액 정합성 100% 보장을 수치로 검증.',
     tags: ['stolink', 'spring-boot', 'jpa', 'postgresql', '동시성제어', '트러블슈팅', '테스트', 'backend'],
-    period: { start: '2025-12', end: '2026-02' },
+    period: { start: '2025-12', end: '2026-01' },
     projectName: 'stolink',
     metrics: [
       { label: '잔액 정합성', before: '미검증', after: '100스레드 동시 요청 100%' },
@@ -240,7 +240,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       '## 해결\nFetch Join으로 연관 데이터를 한 번의 쿼리에 함께 조회하도록 개선.\n\n' +
       '## 성과\nAPI 응답 450ms → 25ms (18배 개선).',
     tags: ['stolink', 'spring-boot', 'jpa', '성능최적화', '트러블슈팅', 'backend', 'database'],
-    period: { start: '2025-12', end: '2026-02' },
+    period: { start: '2025-12', end: '2026-01' },
     projectName: 'stolink',
     metrics: [
       { label: 'API 응답시간', before: '450ms', after: '25ms' },
@@ -256,7 +256,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       '## 해결\n1. SameSite/Secure 쿠키 정책 수립 및 CloudFront 라우팅 최적화로 OAuth2 기반 통합 인증 환경 구축\n2. Access/Refresh Token을 HttpOnly Cookie에 저장 → XSS 공격 방어 체계 확립\n\n' +
       '## 성과\n크로스 도메인 인증 통합, XSS 방어 체계 확립.',
     tags: ['stolink', 'spring-boot', 'aws', 'cloudfront', '보안', '인프라', '트러블슈팅', 'backend'],
-    period: { start: '2025-12', end: '2026-02' },
+    period: { start: '2025-12', end: '2026-01' },
     projectName: 'stolink',
   },
   {
@@ -269,7 +269,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       '## 해결\nCanvas API로 전환하여 렌더링을 단일 비트맵 레이어로 처리. DOM 요소 수에 비례하는 레이아웃 비용을 제거했습니다.\n\n' +
       '## 성과\nINP 420ms → 64ms, 650+ 노드 환경에서 60FPS 유지.',
     tags: ['stolink', 'react', 'canvas', 'typescript', '성능최적화', '트러블슈팅', 'frontend'],
-    period: { start: '2025-12', end: '2026-02' },
+    period: { start: '2025-12', end: '2026-01' },
     projectName: 'stolink',
     metrics: [
       { label: 'INP', before: '420ms', after: '64ms' },
@@ -286,7 +286,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       '## 해결\n문서 ID 파싱용 HashMap 도입으로 탐색 복잡도를 O(n²)에서 O(n)으로 개선.\n\n' +
       '## 성과\n연산 속도 1ms 이하로 단축.',
     tags: ['stolink', 'react', 'typescript', '성능최적화', 'frontend'],
-    period: { start: '2025-12', end: '2026-02' },
+    period: { start: '2025-12', end: '2026-01' },
     projectName: 'stolink',
     metrics: [
       { label: '탐색 복잡도', before: 'O(n²)', after: 'O(n)' },
@@ -303,7 +303,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       '## 해결\nVite를 활용해 코드를 분할하고, 사용자가 버튼에 마우스를 올릴 때 필요한 파일만 미리 불러오도록 구현.\n\n' +
       '## 성과\n초기 번들 사이즈 450KB → 187KB (58% 감소).',
     tags: ['stolink', 'react', 'typescript', 'vite', '성능최적화', 'frontend'],
-    period: { start: '2025-12', end: '2026-02' },
+    period: { start: '2025-12', end: '2026-01' },
     projectName: 'stolink',
     metrics: [
       { label: '초기 번들 사이즈', before: '450KB', after: '187KB (58% 감소)' },

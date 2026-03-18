@@ -42,8 +42,8 @@
     "team": "1인",
     "description": "NestJS로 챗봇 백엔드를, Next.js로 포트폴리오 프론트엔드를 개발했습니다. MongoDB 텍스트 검색으로 이력서 데이터를 LLM에 주입하고, 가드레일과 분석 로깅을 구성했습니다.",
     "metrics": [
-      { "value": "NestJS", "label": "모듈·DI·인터셉터·가드 활용" },
-      { "value": "Next.js", "label": "App Router 기반 SSR 포트폴리오" }
+      { "value": "92.85 → 40.35MB", "label": "heapUsed (TTL 정리 후)" },
+      { "value": "4개 모듈", "label": "Chat·AI·Analytics·Resume DI 연결" }
     ],
     "tech": ["NestJS", "MongoDB", "OpenAI API", "Next.js", "TypeScript", "Docker"],
     "link": "/projects/knowledge-garden",
