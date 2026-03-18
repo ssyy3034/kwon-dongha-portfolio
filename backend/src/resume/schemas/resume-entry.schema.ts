@@ -104,7 +104,7 @@ ResumeEntrySchema.index({ type: 1, tags: 1 });
 // 3. Project-scoped lookup
 ResumeEntrySchema.index({ projectName: 1, type: 1 });
 
-// 4. Full-text search (chatbot RAG)
+// 4. Full-text search (chatbot context retrieval)
 ResumeEntrySchema.index(
   { title: 'text', summary: 'text', content: 'text' },
   { weights: { title: 10, summary: 5, content: 1 }, default_language: 'none' },

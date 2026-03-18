@@ -484,17 +484,17 @@ if (json != null) {
         {
           id: "session-memory-leak",
           title: "세션 메모리 누수 → TTL 기반 자동 정리 스케줄러",
-          subtitle: "k6 부하 테스트 중 발견, RSS 25.8% 감소",
+          subtitle: "k6 부하 테스트 중 발견, heapUsed 52MB 회수",
           problem:
-            "**챗봇 API 부하 테스트 중 힙 메모리가 테스트 종료 후에도 baseline으로 복귀하지 않는 현상을 발견했습니다.**\n원인 추적 결과, ChatService의 Map 세션 저장소에 TTL이 없어 사용자가 떠나도 Strong Reference로 세션이 영구 잔류하는 구조. 운영 시간이 길어질수록 메모리가 계속 쌓이는 누수였습니다.",
+            "**챗봇 API 부하 테스트 중 힙 메모리가 테스트 종료 후에도 baseline으로 복귀하지 않는 현상을 발견했습니다.**\n원인 추적 결과, ChatService의 Map 세션 저장소에 TTL이 없어 사용자가 떠나도 삭제 로직 없이 세션이 영구 잔류하는 구조. 운영 시간이 길어질수록 메모리가 계속 쌓이는 누수였습니다.",
           approach:
             "**SessionData에 lastAccessedAt를 추가하고, @nestjs/schedule 기반 TTL 정리 스케줄러를 도입했습니다.**\n- `@Interval`로 주기적 정리(기본 10분), TTL(기본 30분) 초과 세션 자동 삭제",
           result:
-            "**Baseline: 40세션/400엔트리 영구 잔류, RSS 114.80MB → TTL 적용: idle 후 세션 0건, RSS 85.13MB.**\n세션 잔류 100% 해소, RSS 25.8%(29.67MB) 감소.",
+            "**1,000세션(20,000엔트리) 누적 시 heapUsed 92.85MB → TTL 정리 후 40.35MB로 baseline 복귀.**\n52.50MB(56.5%) 회수 확인.",
           retrospective:
             "현재는 단일 인스턴스 인메모리 Map이라 Scale-out 시 서버 간 세션이 공유되지 않습니다. Redis로 세션 스토어를 외부화하면 이 한계를 해결할 수 있고, TTL도 EXPIRE로 자연스럽게 처리됩니다.",
           details: [],
-          impact: "세션 100% 회수 / RSS 25.8% 감소",
+          impact: "heapUsed 52MB 회수 (56.5%)",
         },
       ],
       frontend: [
@@ -528,9 +528,9 @@ if (json != null) {
         description: "가중치 텍스트 검색 컨텍스트 주입, 가드레일 필터링, 슬라이딩 윈도우 대화 관리",
       },
       {
-        metric: "114.80 → 85.13MB",
+        metric: "92.85 → 40.35MB",
         label: "세션 메모리 누수 해소",
-        description: "TTL 스케줄러 도입, k6 실측 RSS 25.8% 감소, idle 후 세션 100% 회수",
+        description: "TTL 스케줄러 도입, k6 실측 heapUsed 56.5% 회수",
       },
       {
         label: "Next.js 프론트엔드",

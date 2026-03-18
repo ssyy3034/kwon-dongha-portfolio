@@ -128,7 +128,7 @@
           "name": "NestJS",
           "slug": "nestjs",
           "color": "E0234E",
-          "description": "포트폴리오 챗봇 백엔드를 모듈·DI·인터셉터 기반으로 설계했습니다"
+          "description": "포트폴리오 챗봇 백엔드를 모듈·DI·인터셉터 기반으로 설계 및 구현했습니다"
         },
         {
           "name": "JPA / Hibernate",

@@ -43,7 +43,7 @@ export class ChatService {
     session.lastAccessedAt = Date.now();
     session.entries.push({ role: 'user', content: dto.message });
 
-    // MongoDB에서 관련 데이터 검색 (간이 RAG)
+    // MongoDB 텍스트 검색으로 관련 데이터 조회
     const context = await this.buildContext(dto.message);
     const prompt = context
       ? `${SYSTEM_PROMPT}\n\n# 관련 포트폴리오 데이터 (MongoDB 검색 결과 — 이 데이터를 기반으로 정확하게 답변해. 이 데이터에 없는 내용은 추측하지 마.)\n${context}`

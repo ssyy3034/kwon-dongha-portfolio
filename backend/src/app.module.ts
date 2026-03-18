@@ -27,7 +27,10 @@ if (process.env.NODE_ENV !== 'production') {
         autoIndex: true,
       }),
     }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 200 }]),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: parseInt(process.env.THROTTLE_LIMIT ?? '200', 10),
+    }]),
     ChatModule,
     AiModule,
     AnalyticsModule,
