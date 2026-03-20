@@ -159,6 +159,14 @@ function SectionCard({
       )}
 
       {/* 다이어그램 — 카드 하단에 풀 너비로 */}
+      {section.diagram && (
+        <div className="px-5 sm:px-7 pb-5 sm:pb-7">
+          <div className="p-3 sm:p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-700 overflow-x-auto">
+            {section.diagram.caption && (
+              <p className="text-[10px] sm:text-xs text-stone-500 font-semibold mb-3">
+                {section.diagram.caption}
+              </p>
+            )}
             {section.diagram.type === "mermaid" ? (
               <Mermaid chart={section.diagram.content} />
             ) : section.diagram.type === "svg" ? (
