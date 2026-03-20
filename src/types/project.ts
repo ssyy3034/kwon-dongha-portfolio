@@ -11,7 +11,7 @@ export interface ProblemSolution {
   details?: string[];
   codeSnippet?: string;
   diagram?: {
-    type: "mermaid" | "image";
+    type: "mermaid" | "image" | "svg";
     content: string;
     caption?: string;
   };
@@ -31,7 +31,7 @@ export interface ProjectDetail {
   architectureImage?: string;
   architectureCaption?: string;
   architectureDiagram?: {
-    type: "mermaid";
+    type: "mermaid" | "svg";
     content: string;
   };
   sections: {

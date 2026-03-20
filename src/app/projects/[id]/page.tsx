@@ -159,15 +159,14 @@ function SectionCard({
       )}
 
       {/* 다이어그램 — 카드 하단에 풀 너비로 */}
-      {section.diagram?.type === "mermaid" && (
-        <div className="px-5 sm:px-7 pb-5 sm:pb-7">
-          <div className="p-3 sm:p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-700 overflow-x-auto">
-            {section.diagram.caption && (
-              <p className="text-[10px] sm:text-xs text-stone-500 font-semibold mb-3">
-                {section.diagram.caption}
-              </p>
-            )}
-            <Mermaid chart={section.diagram.content} />
+            {section.diagram.type === "mermaid" ? (
+              <Mermaid chart={section.diagram.content} />
+            ) : section.diagram.type === "svg" ? (
+              <div 
+                className="flex justify-center overflow-hidden" 
+                dangerouslySetInnerHTML={{ __html: section.diagram.content }} 
+              />
+            ) : null}
           </div>
         </div>
       )}
@@ -371,6 +370,11 @@ export default function ProjectDetailPage({ params }: PageProps) {
                 <div className="p-4 sm:p-6 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-center">
                   <Mermaid chart={detail.architectureDiagram.content} />
                 </div>
+              ) : detail.architectureDiagram?.type === "svg" ? (
+                <div 
+                  className="p-4 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-center"
+                  dangerouslySetInnerHTML={{ __html: detail.architectureDiagram.content }}
+                />
               ) : detail.architectureImage ? (
                 <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
                   <Image

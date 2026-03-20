@@ -291,35 +291,62 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
     architectureDiagram: {
       type: "mermaid",
       content: `flowchart TD
-  User["사용자 (User)"]
-  ExtAI["외부 AI 서비스<br/>(OpenAI / Gemini)"]
+  User["<b>사용자 (User)</b>"]
+  ExtAI["<b>외부 AI 서비스</b><br/>(OpenAI / Gemini)"]
 
-  subgraph AWS["AWS 클라우드"]
-    CF["CloudFront<br/>(정적 콘텐츠 / 캐싱)"]
-    S3["Amazon S3<br/>(FE 호스팅)"]
-    RDS[("Amazon RDS<br/>(MariaDB 11.8)")]
+  subgraph AWS["<b>AWS 클라우드 (Cloud)</b>"]
+    CF["<b>CloudFront</b><br/>(정적 콘텐츠 / 캐싱)"]
+    S3["<b>Amazon S3</b><br/>(FE 호스팅)"]
+    RDS[("<b>Amazon RDS</b><br/>(MariaDB 11.8)")]
 
-    subgraph EC2["Amazon EC2 (t3.small)<br/>Docker Compose"]
-      Spring["Spring Boot<br/>(Main API 서버)"]
-      Flask["Flask AI 서비스<br/>(Worker)"]
-      Redis[("Redis<br/>(세션 / 캐시)")]
-      RabbitMQ["RabbitMQ<br/>(메시지 큐)"]
-      Monitor["모니터링<br/>(Prometheus + Grafana)"]
+    subgraph EC2["<b>Amazon EC2 (t3.small)</b> / Docker Compose"]
+      Spring["<b>Spring Boot</b><br/>(Main API 서버)"]
+      Flask["<b>Flask AI 서버</b><br/>(Worker)"]
+      Redis[("<b>Redis</b><br/>(세션 / 캐시)")]
+      RabbitMQ["<b>RabbitMQ</b><br/>(메시지 큐)"]
+      Monitor["<b>모니터링</b><br/>(Prometheus+Grafana)"]
     end
   end
 
-  User --> CF
+  User ==> CF
   CF --> S3
   CF --> Spring
   CF --> Flask
   Spring --> RDS
-  Spring --> Redis
-  Spring --> RabbitMQ
-  RabbitMQ --> Flask
+  Spring --- Redis
+  Spring ==> RabbitMQ
+  RabbitMQ ==> Flask
   Flask -.-> Spring
   Flask --> ExtAI
   Monitor -.-> Spring
-  Monitor -.-> Redis`
+  Monitor -.-> Redis
+
+  %% 스타일 정의
+  classDef default font-family:Inter,system-ui,sans-serif,font-size:13px;
+  classDef storage fill:#fff,stroke:#333,stroke-width:2px;
+  classDef aws fill:#f8f9fa,stroke:#232F3E,stroke-width:2px,stroke-dasharray: 5 5;
+  classDef ec2 fill:#fff,stroke:#F58534,stroke-width:2px;
+  
+  classDef spring fill:#6DB33F,stroke:#2D882D,color:#fff;
+  classDef flask fill:#306998,stroke:#1C4A75,color:#fff;
+  classDef redis fill:#DC382D,stroke:#A5201A,color:#fff;
+  classDef rabbit fill:#FF6600,stroke:#CC5200,color:#fff;
+  classDef monitor fill:#E6522C,stroke:#A63214,color:#fff;
+  classDef ai fill:#01A88D,stroke:#007D69,color:#fff;
+  classDef basic fill:#8C4FFF,stroke:#7030A0,color:#fff;
+  classDef s3 fill:#E05243,stroke:#B03020,color:#fff;
+
+  class Spring spring;
+  class Flask flask;
+  class Redis redis;
+  class RabbitMQ rabbit;
+  class Monitor monitor;
+  class ExtAI ai;
+  class CF basic;
+  class S3 s3;
+  class AWS aws;
+  class EC2 ec2;
+  class RDS storage;`
     },
     overview:
       "캡스톤 디자인 (2인 팀)으로 시작해 수료 후 개인적으로 아키텍처 개선을 이어갔습니다. 인증, 일기 CRUD, AI 연동 등 Spring Boot + Flask 이중 서버 백엔드 전체와 Docker Compose 기반 인프라를 담당했습니다. k6 부하 테스트에서 AI 추론(~30초)의 동기 호출이 서비스 전체를 마비시키는 문제를 발견하고 RabbitMQ 비동기 처리로 전환하여 TPS를 1.16에서 1,949까지 개선했으며, Redis 캐싱과 Caffeine 다층 캐시로 반복 API 호출 비용을 줄였습니다.",
