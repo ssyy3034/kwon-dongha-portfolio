@@ -399,11 +399,11 @@ export default function ProjectDetailPage({ params }: PageProps) {
                       <img 
                         src={detail.architectureDiagram.content}
                         alt="Project Architecture"
-                        className="min-w-[1000px] lg:min-w-[1100px] h-auto object-contain"
+                        className="w-full max-w-[900px] h-auto object-contain mx-auto"
                       />
                     ) : (
                       <div 
-                        className="min-w-[1000px] lg:min-w-[1100px]"
+                        className="w-full max-w-[900px] mx-auto"
                         dangerouslySetInnerHTML={{ __html: detail.architectureDiagram.content }}
                       />
                     )}
