@@ -393,23 +393,21 @@ export default function ProjectDetailPage({ params }: PageProps) {
                   <Mermaid chart={detail.architectureDiagram.content} className="min-w-[850px] py-6" />
                 </div>
               ) : detail.architectureDiagram?.type === "svg" ? (
-                <div className="p-4 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-start sm:justify-center">
-                  {detail.architectureDiagram.content.startsWith("/") ? (
-                    <div className="min-w-[850px] relative w-full aspect-[16/9]">
-                      <Image 
+                <div className="p-4 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto">
+                  <div className="flex justify-start sm:justify-center min-w-max">
+                    {detail.architectureDiagram.content.startsWith("/") ? (
+                      <img 
                         src={detail.architectureDiagram.content}
                         alt="Project Architecture"
-                        fill
-                        className="object-contain"
-                        unoptimized
+                        className="min-w-[1000px] lg:min-w-[1100px] h-auto object-contain"
                       />
-                    </div>
-                  ) : (
-                    <div 
-                      className="min-w-[850px]"
-                      dangerouslySetInnerHTML={{ __html: detail.architectureDiagram.content }}
-                    />
-                  )}
+                    ) : (
+                      <div 
+                        className="min-w-[1000px] lg:min-w-[1100px]"
+                        dangerouslySetInnerHTML={{ __html: detail.architectureDiagram.content }}
+                      />
+                    )}
+                  </div>
                 </div>
               ) : detail.architectureImage ? (
                 <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
