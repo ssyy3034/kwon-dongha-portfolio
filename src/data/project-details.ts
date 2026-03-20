@@ -290,7 +290,7 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
       "산모가 일기를 쓰면 AI가 감정을 분석해 피드백을 제공하는 서비스입니다. 부모 사진으로 아기 캐릭터를 생성하는 기능도 함께 제공합니다.",
     architectureDiagram: {
       type: "svg",
-      content: "/images/aidiary_architecture.drawio.svg"
+      content: "/images/aidiary_arch_v4.svg"
     },
     overview:
       "캡스톤 디자인 (2인 팀)으로 시작해 수료 후 개인적으로 아키텍처 개선을 이어갔습니다. 인증, 일기 CRUD, AI 연동 등 Spring Boot + Flask 이중 서버 백엔드 전체와 Docker Compose 기반 인프라를 담당했습니다. k6 부하 테스트에서 AI 추론(~30초)의 동기 호출이 서비스 전체를 마비시키는 문제를 발견하고 RabbitMQ 비동기 처리로 전환하여 TPS를 1.16에서 1,949까지 개선했으며, Redis 캐싱과 Caffeine 다층 캐시로 반복 API 호출 비용을 줄였습니다.",

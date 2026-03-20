@@ -12,9 +12,10 @@ mermaid.initialize({
 
 interface MermaidProps {
   chart: string;
+  className?: string;
 }
 
-export default function Mermaid({ chart }: MermaidProps) {
+export default function Mermaid({ chart, className }: MermaidProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState("");
 
@@ -33,7 +34,7 @@ export default function Mermaid({ chart }: MermaidProps) {
 
   return (
     <div
-      className="mermaid flex justify-center my-12 p-8 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-700/60 shadow-sm overflow-hidden"
+      className={`mermaid ${className || ""}`}
       ref={ref}
       dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}
       suppressHydrationWarning
