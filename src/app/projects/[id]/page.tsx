@@ -348,7 +348,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
         </motion.section>
 
         {/* Architecture Section */}
-        {detail.architectureImage && (
+        {(detail.architectureImage || detail.architectureDiagram) && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -366,16 +366,23 @@ export default function ProjectDetailPage({ params }: PageProps) {
                   System Architecture
                 </h2>
               </div>
-              <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
-                <Image
-                  src={detail.architectureImage}
-                  alt={`${project.title} Architecture Diagram`}
-                  fill
-                  className="object-contain p-2 sm:p-4"
-                  sizes="(max-width: 1100px) 100vw, 1100px"
-                  priority
-                />
-              </div>
+              
+              {detail.architectureDiagram?.type === "mermaid" ? (
+                <div className="p-4 sm:p-6 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-center">
+                  <Mermaid chart={detail.architectureDiagram.content} />
+                </div>
+              ) : detail.architectureImage ? (
+                <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
+                  <Image
+                    src={detail.architectureImage}
+                    alt={`${project.title} Architecture Diagram`}
+                    fill
+                    className="object-contain p-2 sm:p-4"
+                    sizes="(max-width: 1100px) 100vw, 1100px"
+                    priority
+                  />
+                </div>
+              ) : null}
             </div>
           </motion.section>
         )}

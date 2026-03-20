@@ -30,6 +30,10 @@ export interface ProjectDetail {
   overview: string;
   architectureImage?: string;
   architectureCaption?: string;
+  architectureDiagram?: {
+    type: "mermaid";
+    content: string;
+  };
   sections: {
     backend?: ProblemSolution[];
     frontend?: ProblemSolution[];
