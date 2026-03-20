@@ -291,20 +291,20 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
     architectureDiagram: {
       type: "mermaid",
       content: `flowchart TD
-  User["User"]
-  ExtAI["External AI<br>(OpenAI / Gemini)"]
+  User["사용자 (User)"]
+  ExtAI["외부 AI 서비스<br/>(OpenAI / Gemini)"]
 
-  subgraph AWS["AWS Cloud"]
-    CF["CloudFront<br>(SSL/TLS 1.2)"]
-    S3["Amazon S3<br>(SPA React)"]
-    RDS[("MariaDB 11.8<br>(Amazon RDS)")]
+  subgraph AWS["AWS 클라우드"]
+    CF["CloudFront<br/>(정적 콘텐츠 / 캐싱)"]
+    S3["Amazon S3<br/>(FE 호스팅)"]
+    RDS[("Amazon RDS<br/>(MariaDB 11.8)")]
 
-    subgraph EC2["Amazon EC2 (t3.small)<br>Docker Compose"]
-      Spring["Spring Boot (8080)<br>Main API Server"]
-      Flask["Flask AI Service<br>(Worker : 5000/8000)"]
-      Redis[("Redis (6379)<br>(Session / Cache)")]
-      RabbitMQ["RabbitMQ (5672)<br>(Message Queue)"]
-      Monitor["Prometheus<br>+ Grafana"]
+    subgraph EC2["Amazon EC2 (t3.small)<br/>Docker Compose"]
+      Spring["Spring Boot<br/>(Main API 서버)"]
+      Flask["Flask AI 서비스<br/>(Worker)"]
+      Redis[("Redis<br/>(세션 / 캐시)")]
+      RabbitMQ["RabbitMQ<br/>(메시지 큐)"]
+      Monitor["모니터링<br/>(Prometheus + Grafana)"]
     end
   end
 
