@@ -168,12 +168,26 @@ function SectionCard({
               </p>
             )}
             {section.diagram.type === "mermaid" ? (
-              <Mermaid chart={section.diagram.content} />
+              <Mermaid chart={section.diagram.content} className="min-w-[700px] py-4" />
             ) : section.diagram.type === "svg" ? (
-              <div 
-                className="flex justify-center overflow-hidden" 
-                dangerouslySetInnerHTML={{ __html: section.diagram.content }} 
-              />
+              <div className="flex justify-center overflow-x-auto min-w-full">
+                {section.diagram.content.startsWith("/") ? (
+                  <div className="min-w-[700px] relative w-full aspect-[16/9]">
+                    <Image 
+                      src={section.diagram.content}
+                      alt="Section Diagram"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    className="min-w-[700px]" 
+                    dangerouslySetInnerHTML={{ __html: section.diagram.content }} 
+                  />
+                )}
+              </div>
             ) : null}
           </div>
         </div>
@@ -375,14 +389,28 @@ export default function ProjectDetailPage({ params }: PageProps) {
               </div>
               
               {detail.architectureDiagram?.type === "mermaid" ? (
-                <div className="p-4 sm:p-6 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-center">
-                  <Mermaid chart={detail.architectureDiagram.content} />
+                <div className="p-4 sm:p-6 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-start sm:justify-center">
+                  <Mermaid chart={detail.architectureDiagram.content} className="min-w-[850px] py-6" />
                 </div>
               ) : detail.architectureDiagram?.type === "svg" ? (
-                <div 
-                  className="p-4 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-center"
-                  dangerouslySetInnerHTML={{ __html: detail.architectureDiagram.content }}
-                />
+                <div className="p-4 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-start sm:justify-center">
+                  {detail.architectureDiagram.content.startsWith("/") ? (
+                    <div className="min-w-[850px] relative w-full aspect-[16/9]">
+                      <Image 
+                        src={detail.architectureDiagram.content}
+                        alt="Project Architecture"
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      className="min-w-[850px]"
+                      dangerouslySetInnerHTML={{ __html: detail.architectureDiagram.content }}
+                    />
+                  )}
+                </div>
               ) : detail.architectureImage ? (
                 <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
                   <Image
