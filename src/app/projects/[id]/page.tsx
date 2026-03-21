@@ -273,6 +273,18 @@ export default function ProjectDetailPage({ params }: PageProps) {
             <p className="text-base sm:text-lg text-stone-600 dark:text-stone-400 max-w-2xl leading-relaxed">
               {detail.tagline}
             </p>
+            {project.website && (
+              <a
+                href={project.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-full bg-gradient-to-r ${colors.gradient} text-white text-sm font-bold shadow-lg hover:shadow-xl hover:scale-[1.03] transition-all duration-200 group no-print`}
+              >
+                <ExternalLink size={15} />
+                서비스 바로가기
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </a>
+            )}
           </motion.div>
         </div>
       </header>
@@ -327,16 +339,31 @@ export default function ProjectDetailPage({ params }: PageProps) {
                   </p>
                 </div>
               </div>
-              {project.github && (
-                <a
-                  href={project.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`col-span-2 sm:col-span-1 sm:ml-auto flex items-center justify-center sm:justify-start gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r ${colors.gradient} text-white text-sm font-bold shadow-sm hover:shadow-md transition-shadow`}
-                >
-                  GitHub
-                  <ExternalLink size={13} />
-                </a>
+              {(project.github || project.website) && (
+                <div className="col-span-2 sm:col-span-1 sm:ml-auto flex items-center gap-2">
+                  {project.website && (
+                    <a
+                      href={project.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border-2 border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-300 text-sm font-bold hover:border-stone-500 dark:hover:border-stone-400 transition-colors`}
+                    >
+                      Website
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
+                  {project.github && (
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r ${colors.gradient} text-white text-sm font-bold shadow-sm hover:shadow-md transition-shadow`}
+                    >
+                      GitHub
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
+                </div>
               )}
             </div>
 

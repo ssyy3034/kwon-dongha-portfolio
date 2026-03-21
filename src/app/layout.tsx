@@ -26,7 +26,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "권동하 - Software Engineer",
   description:
-    "기술에 다정함을 담아 옳은 방향으로 전달하는 소프트웨어 엔지니어 권동하의 포트폴리오입니다.",
+    "탄탄한 기본기와 원리를 중시하는 소프트웨어 엔지니어 권동하의 포트폴리오입니다.",
 };
 
 export default function RootLayout({
