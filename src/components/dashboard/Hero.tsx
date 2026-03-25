@@ -34,117 +34,52 @@ export default function Hero({
   }>({ show: false, data: null, x: 0, y: 0 });
 
   return (
-    <header className="max-w-[1400px] mx-auto px-5 sm:px-6 md:px-10 pt-12 pb-8 md:pt-24 md:pb-20">
-      {/* 1. HEADER SECTION */}
-      <div className="max-w-4xl mb-10 lg:mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200/50 dark:border-amber-700/50 text-amber-700 dark:text-amber-400 mb-6">
-          <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-          <span className="text-xs font-bold">{profile.bio.badge}</span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9]">
-          I&apos;m{" "}
-          <Typewriter
-            words={[profile.name]}
-            loop={false}
-            cursorClassName="hidden"
-          />
-          , a<br />
-          <span className="inline-grid pb-2">
-            <span className="invisible col-start-1 row-start-1 font-black leading-[0.9] tracking-tight pb-2">
-              Software Engineer|
-            </span>
-            <span className="col-start-1 row-start-1 bg-clip-text text-transparent bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 font-black leading-[0.9] tracking-tight pb-2">
-              <Typewriter
-                words={["Software Engineer", "Problem Solver", "Team Player"]}
-                loop={true}
-                delaySpeed={3000}
-                typeSpeed={80}
-                deleteSpeed={50}
-                cursorClassName="text-amber-500"
-              />
-            </span>
-          </span>
-        </h1>
-        <p className="mt-6 md:mt-8 text-lg sm:text-xl md:text-2xl text-stone-600 dark:text-stone-400 font-medium max-w-2xl leading-relaxed">
-          {profile.bio.headline.replace("{name}", profile.name)}
-        </p>
-      </div>
-
-      {/* 2. CONTENT COLUMNS */}
-      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8 lg:gap-16">
-        {/* LEFT COLUMN: Intro Cards */}
-        <div className="flex-1 max-w-2xl">
-          <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-10">
-            {profile.bio.paragraphs.map((p, i) => {
-              const titles = [
-                {
-                  icon: Code,
-                  label: "Software Engineer",
-                  color: "text-blue-500 dark:text-blue-400",
-                  bg: "bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800",
-                },
-                {
-                  icon: Lightbulb,
-                  label: "Problem Solver",
-                  color: "text-amber-500 dark:text-amber-400",
-                  bg: "bg-amber-50 dark:bg-amber-900/30 border-amber-100 dark:border-amber-800",
-                },
-                {
-                  icon: Users,
-                  label: "Team Player",
-                  color: "text-emerald-500 dark:text-emerald-400",
-                  bg: "bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800",
-                },
-              ];
-              const info = titles[i] || titles[0];
-              const Icon = info.icon;
-
-              return (
-                <div
-                  key={i}
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-5 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white/40 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 hover:bg-white/80 dark:hover:bg-stone-800/80 hover:border-stone-300 dark:hover:border-stone-600 hover:shadow-xl dark:hover:shadow-stone-900/50 transition-all duration-500 group relative overflow-hidden"
-                >
-                  <div
-                    className={`shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl ${info.bg} border flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}
-                  >
-                    <Icon
-                      className={`${info.color} w-5 h-5 sm:w-[26px] sm:h-[26px]`}
-                    />
-                  </div>
-                  <div className="relative z-10 min-w-0">
-                    <h3
-                      className={`font-black text-base sm:text-lg mb-1.5 sm:mb-2 ${info.color}`}
-                    >
-                      {info.label}
-                    </h3>
-                    <p className="text-stone-900 dark:text-stone-100 font-bold mb-1.5 sm:mb-2 text-sm sm:text-[15px]">
-                      {p.slogan}
-                    </p>
-                    <ul className="space-y-1 sm:space-y-1.5">
-                      {p.points.map((point, idx) => (
-                        <li
-                          key={idx}
-                          className="flex gap-2 text-stone-600 dark:text-stone-400 text-[13px] sm:text-[14px] leading-relaxed font-medium"
-                        >
-                          <span className="shrink-0 text-amber-500">•</span>
-                          <span>{point}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              );
-            })}
+    <header className="max-w-[1400px] mx-auto px-5 sm:px-6 md:px-10 pt-12 pb-8 md:pt-24 md:pb-32 lg:min-h-[90vh] flex flex-col justify-center">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-12 lg:gap-16">
+        {/* LEFT COLUMN: Headline & CTA */}
+        <div className="flex-1 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200/50 dark:border-amber-700/50 text-amber-700 dark:text-amber-400 mb-6">
+            <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+            <span className="text-[11px] sm:text-xs font-bold tracking-widest uppercase">{profile.bio.badge}</span>
           </div>
+          
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[80px] font-black tracking-tight leading-[1] mb-8">
+            I&apos;m{" "}
+            <Typewriter
+              words={[profile.name]}
+              loop={false}
+              cursorClassName="hidden"
+            />
+            , a<br />
+            <span className="inline-grid pb-2 mt-2">
+              <span className="invisible col-start-1 row-start-1 font-black leading-[1] tracking-tight pb-2">
+                Software Engineer|
+              </span>
+              <span className="col-start-1 row-start-1 bg-clip-text text-transparent bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 font-black leading-[1] tracking-tight pb-2">
+                <Typewriter
+                  words={["Software Engineer", "Problem Solver", "Team Player"]}
+                  loop={true}
+                  delaySpeed={3000}
+                  typeSpeed={80}
+                  deleteSpeed={50}
+                  cursorClassName="text-amber-500"
+                />
+              </span>
+            </span>
+          </h1>
+          
+          <p className="text-lg sm:text-xl md:text-2xl text-stone-600 dark:text-stone-400 font-medium max-w-2xl leading-[1.6] mb-10 break-keep">
+            {profile.bio.headline.replace("{name}", profile.name)}
+          </p>
 
-          <div className="flex flex-wrap gap-3 sm:gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4 relative z-20">
             <Link
               href="/#projects"
-              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-stone-900 dark:bg-amber-600 text-white rounded-2xl text-sm sm:text-base font-black hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 group"
+              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-stone-900 dark:bg-amber-600 text-white rounded-2xl text-[15px] sm:text-base font-black hover:bg-stone-800 dark:hover:bg-amber-500 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 group"
             >
               <Folder
                 size={18}
-                className="group-hover:scale-110 transition-transform"
+                className="group-hover:scale-110 transition-transform hidden sm:block"
               />
               프로젝트 둘러보기
               <ArrowRight
@@ -156,8 +91,9 @@ export default function Hero({
               href={profile.cta.secondary.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-2xl text-sm font-bold hover:bg-stone-200 dark:hover:bg-stone-700 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 rounded-2xl text-[15px] sm:text-base font-bold hover:bg-stone-50 dark:hover:bg-stone-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-1"
             >
+              <Github size={18} />
               {profile.cta.secondary.text}
             </a>
           </div>
