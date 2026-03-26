@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { GitHubStreakData } from "@/lib/github-fetcher";
 import Nav from "./dashboard/Nav";
 import Hero from "./dashboard/Hero";
-import Philosophy from "./dashboard/Philosophy";
 import Skills from "./dashboard/Skills";
 import ProjectList from "./dashboard/ProjectList";
 import PortfolioPrint from "./dashboard/PortfolioPrint";
@@ -54,9 +53,15 @@ export default function Dashboard({
         </button>
       </section>
 
-      {/* PHILOSOPHY */}
-      <section ref={contentRef}>
-        <Philosophy />
+      {/* SKILLS */}
+      <section
+        ref={contentRef}
+        id="skills"
+        className="py-24 md:py-32 bg-white dark:bg-stone-900 border-y border-stone-100 dark:border-stone-800 no-print"
+      >
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+          <Skills />
+        </div>
       </section>
 
       {/* PROJECTS */}
@@ -67,15 +72,7 @@ export default function Dashboard({
         <ProjectList />
       </section>
 
-      {/* SKILLS */}
-      <section
-        id="skills"
-        className="py-24 md:py-32 bg-white dark:bg-stone-900 border-b border-stone-100 dark:border-stone-800 no-print"
-      >
-        <div className="max-w-[1400px] mx-auto px-6 md:px-10">
-          <Skills />
-        </div>
-      </section>
+
 
       {/* FOOTER */}
       <footer className="py-16 no-print">

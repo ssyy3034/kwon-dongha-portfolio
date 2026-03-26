@@ -27,9 +27,15 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTooltip(false), 8000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -251,6 +257,23 @@ export default function ChatWidget() {
                 </button>
               </form>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tooltip Hint */}
+      <AnimatePresence>
+        {showTooltip && !isOpen && messages.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, x: 20, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 10, scale: 0.9 }}
+            transition={{ delay: 2, duration: 0.5, type: "spring", stiffness: 200 }}
+            className="absolute right-[70px] top-1/2 -translate-y-1/2 w-max px-4 py-2.5 bg-stone-900 dark:bg-white text-white dark:text-stone-900 text-xs sm:text-[13px] font-bold rounded-2xl shadow-xl pointer-events-none origin-right flex items-center gap-2"
+          >
+            <Sparkles size={14} className="text-amber-400 dark:text-amber-500" />
+            포트폴리오에 대해 질문해보세요!
+            <div className="absolute top-1/2 -translate-y-1/2 -right-1.5 border-[6px] border-transparent border-l-stone-900 dark:border-l-white" />
           </motion.div>
         )}
       </AnimatePresence>
