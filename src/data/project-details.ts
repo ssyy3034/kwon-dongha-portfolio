@@ -53,11 +53,73 @@ private List<DocumentTreeResponse> buildTreeInMemory(List<Document> documents) {
           impact: "450ms → 25ms (18배)",
         },
         {
+          id: "cascading-failure",
+          title: "외부 API 타임아웃 누락 → 톰캣 쓰레드풀·HikariCP 커넥션풀 연쇄 고갈",
+          subtitle: "쓰레드 덤프로 원인을 추적하고, Fail-Fast 타임아웃으로 장애 격리",
+          problem:
+            "**프로덕션 서버가 간헐적으로 모든 API 요청에 응답하지 못하고 멈추는 장애가 발생했습니다.**\nAI 이미지 서버를 헬스체크하는 `ImageServerHealthChecker`에서, `RestTemplate`의 기본 Connection/Read Timeout이 무한 대기(-1)로 설정되어 있었습니다. 이 헬스체크 로직이 `@TransactionalEventListener` 내부에서 `@Transactional(propagation = REQUIRES_NEW)`로 별도 트랜잭션을 할당받은 상태에서 실행되고 있어, 외부 서버 무응답 시 쓰레드가 DB 커넥션을 점유한 채 무한정 대기했습니다.\n- 대기 쓰레드가 누적되며 HikariCP 커넥션 풀(최대 20개)이 고갈\n- 로그인 등 DB 접근이 필요한 정상 API까지 커넥션을 얻지 못해 대기\n- 최종적으로 톰캣 메인 쓰레드 풀 전체가 마비되는 Cascading Failure",
+          approach:
+            "**기능 발표 일정이 있어 우선 컨테이너 재시작으로 임시 대응한 뒤, 쓰레드 덤프를 분석해 원인 추적에 들어갔습니다.**\n쓰레드 덤프에서 다수의 톰캣 쓰레드가 `RestTemplate.getForObject()` 호출 지점에서 `BLOCKED` 상태로 멈춰 있는 것을 확인했고, 해당 코드를 역추적해보니 `ImageServerHealthChecker`의 RestTemplate에 타임아웃이 아예 설정되지 않은 것이 원인이었습니다.\n- `RestTemplate` 대신 `RestTemplateBuilder`를 사용하여 Connect/Read Timeout 5초를 강제 설정\n- 외부 서버 미응답 시 5초 후 `ImageServerNotHealthyException`을 던지고 즉각 DB 커넥션과 쓰레드를 반환\n- 타임아웃 값은 `@Value`로 외부화하여 운영 환경에서 재배포 없이 조정 가능하도록 설계",
+          result:
+            "**이전에는 대기 요청 20건만으로 서버 전체가 마비되었으나, 수정 후에는 외부 서버가 완전히 다운된 상황에서도 코어 서비스 응답이 정상 유지되었습니다.** 잦았던 수동 컨테이너 재시작 운영 이슈가 해소되었고, 외부 시스템 장애가 내부로 전파되는 Cascading Failure를 구조적으로 격리했습니다.",
+          retrospective:
+            "RestTemplate의 기본 타임아웃이 무한대라는 사실을 알고 있었다면 애초에 발생하지 않았을 장애였습니다. '프레임워크의 기본값을 신뢰하지 마라'는 교훈을 얻었고, 이후 모든 외부 HTTP 호출에 명시적 타임아웃을 강제하는 것을 원칙으로 삼았습니다. 또한 @TransactionalEventListener 내부에서 외부 I/O를 수행하면 트랜잭션 경계 안에서 커넥션이 묶인다는 점을 인지하게 되어, 이후 결제 PG 연동에서는 외부 호출을 트랜잭션 밖으로 분리하는 설계를 선제적으로 적용했습니다.",
+          details: [
+            "**연쇄 장애 흐름**: RestTemplate 무한 대기 → 톰캣 쓰레드 점유 → REQUIRES_NEW로 HikariCP 커넥션 점유 → 정상 API 커넥션 대기 → 전체 서비스 마비",
+            "**설계 파급 효과**: 이 경험이 직접적 계기가 되어, 결제 PG 연동 시 TransactionTemplate으로 검증·외부 호출·DB 반영을 3단계로 분리하는 방어적 아키텍처를 적용",
+          ],
+          codeSnippet: `// Before — RestTemplate 기본 Timeout = 무한 대기(-1)
+this.restTemplate = new RestTemplate();  // ← 외부 서버 미응답 시 쓰레드가 영원히 블로킹
+
+// After — RestTemplateBuilder로 Fail-Fast 타임아웃 강제
+public ImageServerHealthChecker(RestTemplateBuilder builder,
+        @Value("\${app.image-server.health-timeout-ms:5000}") int timeoutMs) {
+    this.restTemplate = builder
+            .setConnectTimeout(Duration.ofMillis(timeoutMs))  // 연결 타임아웃 5초
+            .setReadTimeout(Duration.ofMillis(timeoutMs))     // 응답 타임아웃 5초
+            .build();
+}`,
+          diagram: {
+            type: "mermaid",
+            content: `sequenceDiagram
+  participant C as Client
+  participant T as Tomcat Thread Pool
+  participant H as HikariCP (max 20)
+  participant HC as HealthChecker
+  participant AI as AI Image Server (Down)
+
+  rect rgb(254, 226, 226)
+  Note over T,AI: Before — 타임아웃 없음 → Cascading Failure
+  C->>+T: API 요청
+  T->>+H: REQUIRES_NEW → 커넥션 획득
+  H->>+HC: RestTemplate.getForObject()
+  HC->>AI: GET /health (timeout = ∞)
+  Note over HC,AI: ⚠️ 외부 서버 무응답 → 무한 대기
+  Note over H: ⚠️ DB 커넥션 점유 (반환 불가)
+  Note over T,H: × 20 → 풀 고갈 → 전 API 마비
+  end
+
+  rect rgb(220, 252, 231)
+  Note over T,AI: After — 5초 Fail-Fast 타임아웃
+  C->>+T: API 요청
+  T->>+H: REQUIRES_NEW → 커넥션 획득
+  H->>+HC: RestTemplate.getForObject()
+  HC->>AI: GET /health (timeout = 5s)
+  Note over HC,AI: 5초 후 SocketTimeoutException
+  HC-->>-H: throw ImageServerNotHealthyException
+  H-->>-T: 커넥션 즉시 반환 ✓
+  T-->>-C: 에러 응답 (장애 격리 성공)
+  end`,
+            caption: "Cascading Failure 발생 메커니즘과 Fail-Fast 타임아웃 적용 후 격리",
+          },
+          impact: "외부 서버 장애 → 전체 서비스 마비 전파 차단",
+        },
+        {
           id: "connection-pool",
           title: "결제 PG 외부 API 호출에 의한 DB 커넥션 풀 고갈 방지",
-          subtitle: "트랜잭션-외부 I/O 분리로 장애 격리",
+          subtitle: "Cascading Failure 경험을 토대로 트랜잭션-외부 I/O 선제 분리",
           problem:
-            "**트랜잭션 안에서 PG API를 호출하는 구조로, 동시 결제 10건이면 커넥션 풀이 고갈될 위험이 있었습니다.**\n결제 승인 로직이 하나의 트랜잭션 안에서 토스페이먼츠 API를 동기 호출하고 있었습니다. HikariCP 기본 풀은 10개인데 PG 응답이 1~2초 소요되므로, 동시 결제 10건이면 일반 API(문서 조회, 에디터 저장)까지 커넥션 부족 오류가 발생할 수 있는 구조였습니다.",
+            "**위 Cascading Failure를 겪은 뒤, 결제 플로우에도 동일한 구조적 위험이 있음을 인지했습니다.**\n결제 승인 로직이 하나의 트랜잭션 안에서 토스페이먼츠 API를 동기 호출하고 있었습니다. HikariCP 기본 풀은 10개인데 PG 응답이 1~2초 소요되므로, 동시 결제 10건이면 일반 API(문서 조회, 에디터 저장)까지 커넥션 부족 오류가 발생할 수 있는 구조였습니다.",
           approach:
             "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\nTX1에서 검증+상태 전환 후 커밋(커넥션 반환) → 트랜잭션 밖에서 PG API 호출(커넥션 미점유) → TX2에서 승인 결과 반영. PG 승인 후 TX2 실패 시 보상 트랜잭션(PaymentCompensation)으로 정합성 대비.",
           result:
@@ -126,11 +188,11 @@ return completePaymentProcess(orderId, paymentKey, tossResponse.method());`,
           problem:
             "**동시 결제 시 Race Condition으로 잔액이 음수가 되거나, 네트워크 재시도로 이중 차감이 발생할 수 있는 구조였습니다.**\n잔액 100크레딧 상태에서 50크레딧 결제가 동시에 두 건 들어오면, 둘 다 '100 읽음 → 50 차감 → 50 저장'을 실행해 잔액이 음수가 될 수 있습니다. 또한 네트워크 불안정으로 클라이언트가 같은 결제를 재시도하면 이중 차감이 발생할 위험도 있었습니다. 테스트 결제 환경이지만 실서비스와 동일한 수준의 정합성을 목표로 설계했습니다.",
           approach:
-            "**비관적 락(`SELECT FOR UPDATE`)으로 동시 접근을 직렬화하고, 멱등키로 중복 결제를 방어했습니다.**\n`SELECT FOR UPDATE`로 잔액 행을 잠가서 같은 행에 대한 동시 접근을 순차 처리되도록 했습니다. 행 단위 잠금만으로 충분하기 때문에 낙관적 락(@Version)은 사용하지 않았고, 엔티티 변경은 `@Transactional` 커밋 시 JPA Dirty Checking에 맡겼습니다. 중복 결제는 멱등키에 DB UNIQUE 제약을 걸어 같은 요청이 두 번 처리되지 않도록 방어했습니다.\n- **Testcontainers**로 실제 PostgreSQL을 띄워 검증 (Mock DB에서는 락 동작 신뢰 불가)\n- 100 스레드 동시 차감 시나리오를 10회 반복 실행",
+            "**비관적 락(`SELECT FOR UPDATE`)으로 동시 접근을 직렬화하고, 멱등키로 중복 결제를 방어했습니다.**\n잔액 차감과 결제 상태 전이 모두 `SELECT FOR UPDATE`(비관적 락)로 직렬화하고, `@Version`을 방어적 안전장치로 병행했습니다. 결제 확인 시 낙관적 락 충돌이 발생하면 이미 완료된 결제인지 재확인하여 중복 처리를 방지합니다. 중복 결제는 멱등키에 DB UNIQUE 제약을 걸고, 토스페이먼츠 API 호출 시에도 `Idempotency-Key` 헤더를 전달해 PG 측 중복까지 이중으로 방어했습니다.\n- **Testcontainers**로 실제 PostgreSQL을 띄워 검증 (Mock DB에서는 락 동작 신뢰 불가)\n- 100 스레드 동시 차감 시나리오를 10회 반복 실행",
           result:
             "**100개 스레드 동시 차감에서 10회 반복 모두 잔액 정합성 100%를 확인했습니다.**\n동일 멱등키로 들어오는 중복 요청은 DB 트랜잭션 시작 전에 즉시 차단됩니다. 이 테스트 코드가 CI에 포함되어 결제 코드 변경 시 회귀를 자동으로 감지합니다.",
           retrospective:
-            "처음에는 비관적 락과 낙관적 락(@Version)을 함께 사용했는데, 비관적 락이 행 단위 배타적 접근을 이미 보장하므로 @Version은 충돌을 감지할 일이 없는 죽은 코드였습니다. 리뷰를 통해 이를 인지하고 @Version을 제거했으며, JPA Dirty Checking으로 명시적 save() 호출도 제거했습니다. SELECT FOR UPDATE는 DB 레벨 락이므로 앱 인스턴스가 늘어나도 동일 DB를 사용하는 한 정상 동작합니다. 다만 동시 결제 트래픽이 극단적으로 늘면 행 잠금 대기로 인한 응답 지연이 생길 수 있고, 이때는 큐 기반 순차 처리나 결제 서비스 분리를 검토해야 합니다.",
+            "비관적 락을 주 전략으로 선택한 이유는 결제 특성상 충돌 후 재시도보다 대기 후 순차 처리가 데이터 정합성에 더 안전하기 때문입니다. `@Version`은 비관적 락이 커버하지 못하는 트랜잭션 간 틈새(예: PG 호출 후 DB 반영 사이)에서 동일 결제가 중복 완료되는 것을 감지하는 방어적 안전장치로 병행했습니다. SELECT FOR UPDATE는 DB 레벨 락이므로 앱 인스턴스가 늘어나도 동일 DB를 사용하는 한 정상 동작합니다. 다만 동시 결제 트래픽이 극단적으로 늘면 행 잠금 대기로 인한 응답 지연이 생길 수 있고, 이때는 큐 기반 순차 처리나 결제 서비스 분리를 검토해야 합니다.",
           details: [],
           codeSnippet: `// CreditService.java — 비관적 락 + Dirty Checking
 @Transactional
