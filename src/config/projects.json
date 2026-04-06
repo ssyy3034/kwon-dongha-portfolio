@@ -31,7 +31,6 @@
     "tech": ["Spring Boot", "RabbitMQ", "Redis", "JPA", "MariaDB", "Docker", "React"],
     "link": "/projects/aidiary",
     "github": "https://github.com/ssyy3034/aidiary-main",
-    "website": "https://aidiary.shop/",
     "color": "red"
   },
   {

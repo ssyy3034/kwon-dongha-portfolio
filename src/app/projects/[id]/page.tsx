@@ -199,7 +199,7 @@ function SectionCard({
 export default function ProjectDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const project = projects.find((p) => p.id === id);
+  const project = projects.find((p) => p.id === id) as typeof projects[0] & { website?: string; github?: string };
   const detail = project ? getProjectDetail(id) : undefined;
 
   const hasBackend = (detail?.sections.backend?.length ?? 0) > 0;
