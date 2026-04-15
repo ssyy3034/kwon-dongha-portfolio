@@ -7,7 +7,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
       "웹소설 작가를 위한 세컨드 브레인 서비스입니다. 에디터에서 집필하면 AI가 글을 분석하고, 월드 페이지에서 인물·관계·사건을 시각화합니다. 독자는 StoRead에서 관계도와 함께 작품을 열람할 수 있습니다.",
     architectureImage: "/images/stolink-arch.png",
     overview:
-      "크래프톤 정글 최종 프로젝트 (5인 팀). OAuth2 인증, 토스페이먼츠 결제 연동, 문서 CRUD 등 백엔드와 Canvas 관계도, Tiptap 에디터, 폴더 트리 사이드바 등 프론트엔드를 담당했습니다. SVG → Canvas 전환으로 관계도 INP를 420ms에서 64ms로 개선하고, 결제 동시성 제어는 Testcontainers로 100스레드 환경에서 정합성을 검증했습니다.",
+      "크래프톤 정글 최종 프로젝트 (5인 팀). OAuth2 인증, 토스페이먼츠 결제 연동, 문서 CRUD 등 백엔드와 Canvas 관계도, Tiptap 에디터, 폴더 트리 사이드바 등 프론트엔드를 담당했습니다. SVG → Canvas 전환으로 관계도 INP를 420ms에서 64ms로 개선하고, 외부 API 타임아웃 누락으로 인한 Cascading Failure를 쓰레드 덤프 분석으로 추적하여 해결했으며, 결제 동시성 제어는 Testcontainers로 100스레드 환경에서 정합성을 검증했습니다.",
 
     sections: {
       backend: [
@@ -54,24 +54,33 @@ private List<DocumentTreeResponse> buildTreeInMemory(List<Document> documents) {
         },
         {
           id: "cascading-failure",
-          title: "외부 API 타임아웃 누락 → 톰캣 쓰레드풀·HikariCP 커넥션풀 연쇄 고갈",
-          subtitle: "쓰레드 덤프로 원인을 추적하고, Fail-Fast 타임아웃으로 장애 격리",
+          title:
+            "외부 API 타임아웃 누락 → 톰캣 쓰레드풀·HikariCP 커넥션풀 연쇄 고갈",
+          subtitle:
+            "쓰레드 덤프 분석 → 필드 주입 빈 라이프사이클 문제 발견 → 생성자 주입 리팩토링",
           problem:
-            "**프로덕션 서버가 간헐적으로 모든 API 요청에 응답하지 못하고 멈추는 장애가 발생했습니다.**\nAI 이미지 서버를 헬스체크하는 `ImageServerHealthChecker`에서, `RestTemplate`의 기본 Connection/Read Timeout이 무한 대기(-1)로 설정되어 있었습니다. 이 헬스체크 로직이 `@TransactionalEventListener` 내부에서 `@Transactional(propagation = REQUIRES_NEW)`로 별도 트랜잭션을 할당받은 상태에서 실행되고 있어, 외부 서버 무응답 시 쓰레드가 DB 커넥션을 점유한 채 무한정 대기했습니다.\n- 대기 쓰레드가 누적되며 HikariCP 커넥션 풀(최대 20개)이 고갈\n- 로그인 등 DB 접근이 필요한 정상 API까지 커넥션을 얻지 못해 대기\n- 최종적으로 톰캣 메인 쓰레드 풀 전체가 마비되는 Cascading Failure",
+            "**프로덕션 서버가 간헐적으로 모든 API 요청에 응답하지 못하고 멈추는 장애가 발생했습니다.**\n크롬 개발자 도구에서 API 요청이 타임아웃으로 실패하는 것을 확인했으나, 서버의 CPU·메모리는 정상이었습니다. 쓰레드 덤프를 떠서 분석한 결과, 다수의 톰캣 쓰레드가 AI 이미지 서버 헬스체크용 `RestTemplate.getForObject()`에서 Socket Read(RUNNABLE) 상태로 블로킹되어 있었습니다. 이 호출이 `@TransactionalEventListener` 내부에서 `@Transactional(propagation = REQUIRES_NEW)`로 별도 트랜잭션을 할당받은 상태에서 실행되고 있어, 외부 서버 무응답 시 쓰레드가 DB 커넥션을 점유한 채 무한정 대기했습니다.\n- 대기 쓰레드가 누적되며 HikariCP 커넥션 풀 고갈\n- 후속 요청이 커넥션을 획득하지 못하고 WAITING 상태로 전이\n- 최종적으로 톰캣 메인 쓰레드 풀 전체가 마비되는 Cascading Failure",
           approach:
-            "**기능 발표 일정이 있어 우선 컨테이너 재시작으로 임시 대응한 뒤, 쓰레드 덤프를 분석해 원인 추적에 들어갔습니다.**\n쓰레드 덤프에서 다수의 톰캣 쓰레드가 `RestTemplate.getForObject()` 호출 지점에서 `BLOCKED` 상태로 멈춰 있는 것을 확인했고, 해당 코드를 역추적해보니 `ImageServerHealthChecker`의 RestTemplate에 타임아웃이 아예 설정되지 않은 것이 원인이었습니다.\n- `RestTemplate` 대신 `RestTemplateBuilder`를 사용하여 Connect/Read Timeout 5초를 강제 설정\n- 외부 서버 미응답 시 5초 후 `ImageServerNotHealthyException`을 던지고 즉각 DB 커넥션과 쓰레드를 반환\n- 타임아웃 값은 `@Value`로 외부화하여 운영 환경에서 재배포 없이 조정 가능하도록 설계",
+            "**쓰레드 덤프를 분석해 원인 추적에 들어갔습니다.**\n추적해보니 해당 RestTemplate의 Timeout을 `@Value` 필드 주입으로 설정했으나, 빈 라이프사이클상 필드 주입은 생성자 이후에 이루어지므로 RestTemplate 생성 시점에는 값이 0인 채로 남아 기본값(무한 대기)으로 동작하고 있었습니다.\n- 필드 주입이 빈 라이프사이클 문제의 근본 원인임을 파악하고, 해당 서비스의 설정 주입 방식을 생성자 주입으로 리팩토링\n- 빈 생성 시점에 Timeout이 확실히 반영되도록 수정\n- 외부 서버 미응답 시 5초 후 `ImageServerNotHealthyException`을 던지고 즉각 DB 커넥션과 쓰레드를 반환",
           result:
             "**이전에는 대기 요청 20건만으로 서버 전체가 마비되었으나, 수정 후에는 외부 서버가 완전히 다운된 상황에서도 코어 서비스 응답이 정상 유지되었습니다.** 잦았던 수동 컨테이너 재시작 운영 이슈가 해소되었고, 외부 시스템 장애가 내부로 전파되는 Cascading Failure를 구조적으로 격리했습니다.",
           retrospective:
-            "RestTemplate의 기본 타임아웃이 무한대라는 사실을 알고 있었다면 애초에 발생하지 않았을 장애였습니다. '프레임워크의 기본값을 신뢰하지 마라'는 교훈을 얻었고, 이후 모든 외부 HTTP 호출에 명시적 타임아웃을 강제하는 것을 원칙으로 삼았습니다. 또한 @TransactionalEventListener 내부에서 외부 I/O를 수행하면 트랜잭션 경계 안에서 커넥션이 묶인다는 점을 인지하게 되어, 이후 결제 PG 연동에서는 외부 호출을 트랜잭션 밖으로 분리하는 설계를 선제적으로 적용했습니다.",
+            "필드 주입이 빈 라이프사이클에서 어떤 시점에 동작하는지 정확히 몰랐기 때문에 발생한 장애였습니다. 생성자 주입으로 전환하면서 Spring의 DI 메커니즘을 깊이 이해하게 되었고, 이후 모든 외부 HTTP 호출에 명시적 타임아웃을 강제하는 것을 원칙으로 삼았습니다. 또한 트랜잭션 내부에서 네트워크 I/O를 수행하는 아키텍처적 결함이 근본 원인이었으며, 이 경험을 교훈 삼아 결제 PG 연동에서는 외부 호출을 트랜잭션 밖으로 분리하는 설계를 선제적으로 적용했습니다.",
           details: [
-            "**연쇄 장애 흐름**: RestTemplate 무한 대기 → 톰캣 쓰레드 점유 → REQUIRES_NEW로 HikariCP 커넥션 점유 → 정상 API 커넥션 대기 → 전체 서비스 마비",
+            "**근본 원인**: @Value 필드 주입이 생성자 이후에 실행되는 빈 라이프사이클 문제 → RestTemplate Timeout 미적용 → 무한 대기",
+            "**연쇄 장애 흐름**: Socket Read(RUNNABLE) 블로킹 → REQUIRES_NEW로 HikariCP 커넥션 점유 → 후속 요청 WAITING 전이 → 전체 서비스 마비",
             "**설계 파급 효과**: 이 경험이 직접적 계기가 되어, 결제 PG 연동 시 TransactionTemplate으로 검증·외부 호출·DB 반영을 3단계로 분리하는 방어적 아키텍처를 적용",
           ],
-          codeSnippet: `// Before — RestTemplate 기본 Timeout = 무한 대기(-1)
-this.restTemplate = new RestTemplate();  // ← 외부 서버 미응답 시 쓰레드가 영원히 블로킹
+          codeSnippet: `// Before — @Value 필드 주입 → 생성자 시점에 값이 0, RestTemplate 무한 대기
+@Value("\${app.image-server.health-timeout-ms:5000}")
+private int timeoutMs;  // ← 필드 주입은 생성자 이후에 실행됨
 
-// After — RestTemplateBuilder로 Fail-Fast 타임아웃 강제
+public ImageServerHealthChecker() {
+    // timeoutMs = 0 → 기본값 무한 대기(-1)로 동작
+    this.restTemplate = new RestTemplate();
+}
+
+// After — 생성자 주입으로 빈 생성 시점에 Timeout 확실히 반영
 public ImageServerHealthChecker(RestTemplateBuilder builder,
         @Value("\${app.image-server.health-timeout-ms:5000}") int timeoutMs) {
     this.restTemplate = builder
@@ -89,18 +98,18 @@ public ImageServerHealthChecker(RestTemplateBuilder builder,
   participant AI as AI Image Server (Down)
 
   rect rgb(254, 226, 226)
-  Note over T,AI: Before — 타임아웃 없음 → Cascading Failure
+  Note over T,AI: Before — @Value 필드 주입 → Timeout 미적용 → Cascading Failure
   C->>+T: API 요청
   T->>+H: REQUIRES_NEW → 커넥션 획득
   H->>+HC: RestTemplate.getForObject()
   HC->>AI: GET /health (timeout = ∞)
-  Note over HC,AI: ⚠️ 외부 서버 무응답 → 무한 대기
+  Note over HC,AI: ⚠️ Socket Read(RUNNABLE) 상태로 블로킹
   Note over H: ⚠️ DB 커넥션 점유 (반환 불가)
-  Note over T,H: × 20 → 풀 고갈 → 전 API 마비
+  Note over T,H: 풀 고갈 → 후속 요청 WAITING 전이 → 전 API 마비
   end
 
   rect rgb(220, 252, 231)
-  Note over T,AI: After — 5초 Fail-Fast 타임아웃
+  Note over T,AI: After — 생성자 주입으로 Timeout 확실히 반영
   C->>+T: API 요청
   T->>+H: REQUIRES_NEW → 커넥션 획득
   H->>+HC: RestTemplate.getForObject()
@@ -110,25 +119,30 @@ public ImageServerHealthChecker(RestTemplateBuilder builder,
   H-->>-T: 커넥션 즉시 반환 ✓
   T-->>-C: 에러 응답 (장애 격리 성공)
   end`,
-            caption: "Cascading Failure 발생 메커니즘과 Fail-Fast 타임아웃 적용 후 격리",
+            caption:
+              "Cascading Failure 발생 메커니즘과 Fail-Fast 타임아웃 적용 후 격리",
           },
           impact: "외부 서버 장애 → 전체 서비스 마비 전파 차단",
         },
         {
           id: "connection-pool",
           title: "결제 PG 외부 API 호출에 의한 DB 커넥션 풀 고갈 방지",
-          subtitle: "Cascading Failure 경험을 토대로 트랜잭션-외부 I/O 선제 분리",
+          subtitle:
+            "Cascading Failure 경험을 토대로 트랜잭션-외부 I/O 선제 분리",
           problem:
             "**위 Cascading Failure를 겪은 뒤, 결제 플로우에도 동일한 구조적 위험이 있음을 인지했습니다.**\n결제 승인 로직이 하나의 트랜잭션 안에서 토스페이먼츠 API를 동기 호출하고 있었습니다. HikariCP 기본 풀은 10개인데 PG 응답이 1~2초 소요되므로, 동시 결제 10건이면 일반 API(문서 조회, 에디터 저장)까지 커넥션 부족 오류가 발생할 수 있는 구조였습니다.",
           approach:
-            "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\nTX1에서 검증+상태 전환 후 커밋(커넥션 반환) → 트랜잭션 밖에서 PG API 호출(커넥션 미점유) → TX2에서 승인 결과 반영. PG 승인 후 TX2 실패 시 보상 트랜잭션(PaymentCompensation)으로 정합성 대비.",
+            "**네트워크 I/O와 DB 트랜잭션을 분리했습니다.**\n첫 번째 트랜잭션에서 결제 검증과 상태 전환(IN_PROGRESS)만 수행하고 즉시 커밋하여 커넥션을 반환합니다. 이후 트랜잭션 밖에서 토스페이먼츠 API를 호출하므로, PG 응답을 1~2초 기다리는 동안에도 DB 커넥션을 점유하지 않습니다. PG 승인이 완료되면 두 번째 트랜잭션에서 크레딧 차감과 결제 완료 처리만 수행합니다.\n\n트랜잭션을 분리하면 PG는 승인했는데 두 번째 트랜잭션이 실패하는 데이터 불일치가 발생할 수 있습니다. 이때 즉시 PG 취소를 호출하면 사용자 입장에서는 결제가 실패한 경험이 됩니다. 대신 토스페이먼츠가 발송하는 웹훅을 백업 경로로 활용하여, 웹훅 수신 시 누락된 내부 트랜잭션을 다시 시도하는 최종적 일관성(Eventual Consistency) 전략을 택했습니다.\n\n웹훅으로도 해결되지 않는 경우를 대비해 PaymentScheduler가 주기적으로 실패 건을 재처리합니다. 웹훅 재시도는 최대 3회(5분 × 재시도 횟수 간격), 보상 트랜잭션 재시도는 최대 5회(10분 간격)로 구성했습니다. 최대 재시도를 초과하면 REQUIRES_MANUAL 상태로 전환하여 수동 처리 대상으로 분류합니다.",
           result:
-            "**PG 응답 지연이 DB 커넥션 풀에 영향을 주지 않는 구조로 전환.**\n결제 API에 지연을 주입해도 일반 API가 정상 동작하는 것을 확인. 장애가 결제 기능에만 격리됩니다.",
+            "**PG 응답 지연이 DB 커넥션 풀에 영향을 주지 않는 구조로 전환되었습니다.**\n결제 API에 의도적으로 지연을 주입한 상태에서도 문서 조회·에디터 저장 등 일반 API가 정상 응답하는 것을 직접 확인했습니다. 장애가 결제 기능에만 격리되어, Cascading Failure에서 경험한 '하나의 외부 호출이 전체 서비스를 마비시키는' 문제를 결제 플로우에서도 구조적으로 방지했습니다.",
           retrospective:
             "'트랜잭션 안에서 외부 API 호출 금지'는 백엔드 설계의 기본 원칙인데, 초기 구현에서 놓쳤다가 코드 리뷰 과정에서 발견해 수정했습니다. 현재 구조에서도 PG사가 완전히 다운됐을 때를 대비한 회로 차단기(Circuit Breaker)가 없습니다. Resilience4j를 적용해 PG 연속 실패 시 빠른 실패(Fail Fast)와 사용자에게 명확한 안내 메시지를 주는 것이 다음 단계입니다.",
           details: [
-            "**보상 트랜잭션**: PG 승인 후 TX2 실패 시 PG 취소 API 호출로 정합성 확보 — 분리 구조의 엣지 케이스 대응",
-            "**장애 격리 검증**: 결제 API에 지연 주입 후 일반 API(문서 조회·에디터 저장) 정상 응답 직접 확인",
+            "**TX 분리 흐름**: TX1(검증 + IN_PROGRESS 상태 전환 → 커밋) → Non-TX(PG API 호출, 커넥션 미점유) → TX2(크레딧 차감 + 완료 처리)",
+            "**최종적 일관성 전략**: TX2 실패 시 즉시 취소 대신 웹훅 재처리로 사용자 결제 완료 경험 보장 — 토스페이먼츠 웹훅 수신 시 누락된 내부 트랜잭션을 재시도",
+            "**다단계 재시도**: 웹훅 재시도 최대 3회(5분 × 재시도 횟수) + 보상 트랜잭션 재시도 최대 5회(10분 간격) — 최대 초과 시 REQUIRES_MANUAL로 수동 처리 전환",
+            "**PaymentCompensation 엔티티**: PENDING → RESOLVED 또는 REQUIRES_MANUAL 상태 관리로 미해결 건 추적",
+            "**장애 격리 검증**: 결제 API에 의도적 지연 주입 후 일반 API(문서 조회·에디터 저장)가 정상 응답하는 것을 직접 확인",
           ],
           diagram: {
             type: "mermaid",
@@ -186,27 +200,27 @@ return completePaymentProcess(orderId, paymentKey, tossResponse.method());`,
           title: "크레딧 결제 동시성 제어와 멱등성 보장",
           subtitle: "100 스레드 동시 요청 / 잔액 정합성 100% 검증",
           problem:
-            "**동시 결제 시 Race Condition으로 잔액이 음수가 되거나, 네트워크 재시도로 이중 차감이 발생할 수 있는 구조였습니다.**\n잔액 100크레딧 상태에서 50크레딧 결제가 동시에 두 건 들어오면, 둘 다 '100 읽음 → 50 차감 → 50 저장'을 실행해 잔액이 음수가 될 수 있습니다. 또한 네트워크 불안정으로 클라이언트가 같은 결제를 재시도하면 이중 차감이 발생할 위험도 있었습니다. 테스트 결제 환경이지만 실서비스와 동일한 수준의 정합성을 목표로 설계했습니다.",
+            "**AI 코드 리뷰를 통해 트랜잭션 경합 시 발생하는 갱신 손실 및 이중 차감 취약점을 인지하게 되었습니다.**\n동일 계정 동시 결제 시 Race Condition으로 인해 양쪽 프로세스가 차감 전 잔액을 읽어 데이터가 덮어씌워지거나, 비정상적인 재시도로 인해 중복 결제되는 위험이 있었습니다. 이를 정확히 검증하고자 Testcontainers와 CountDownLatch를 이용해 100개의 스레드가 경합하는 테스트 환경을 구축했고, 정합성이 깨지는 현상을 재현하며 결함을 확인했습니다.",
           approach:
-            "**비관적 락(`SELECT FOR UPDATE`)으로 동시 접근을 직렬화하고, 멱등키로 중복 결제를 방어했습니다.**\n잔액 차감과 결제 상태 전이 모두 `SELECT FOR UPDATE`(비관적 락)로 직렬화하고, `@Version`을 방어적 안전장치로 병행했습니다. 결제 확인 시 낙관적 락 충돌이 발생하면 이미 완료된 결제인지 재확인하여 중복 처리를 방지합니다. 중복 결제는 멱등키에 DB UNIQUE 제약을 걸고, 토스페이먼츠 API 호출 시에도 `Idempotency-Key` 헤더를 전달해 PG 측 중복까지 이중으로 방어했습니다.\n- **Testcontainers**로 실제 PostgreSQL을 띄워 검증 (Mock DB에서는 락 동작 신뢰 불가)\n- 100 스레드 동시 차감 시나리오를 10회 반복 실행",
+            "**정합성이 필수적인 결제 로직 특성을 고려해 재시도 비용이 큰 낙관적 락 대신, 비관적 락을 채택하고 멱등키를 병행했습니다.**\n- **동시성 제어**: 충돌 후의 재시도 로직보다 데이터 정합성 보장이 확실한 비관적 락(SELECT FOR UPDATE)을 적용해 트랜잭션을 직렬화했습니다. 성능 저하를 방지하기 위해 인덱스 기반의 행 단위 락으로 점유 범위를 최소화했습니다.\n- **멱등성 보장**: 이중 차감을 원천 차단하고자 멱등키를 도입하여 DB UNIQUE 제약과 토스페이먼츠 API 헤더 검증으로 내부 및 통신 구간에 걸쳐 차단했습니다.",
           result:
-            "**100개 스레드 동시 차감에서 10회 반복 모두 잔액 정합성 100%를 확인했습니다.**\n동일 멱등키로 들어오는 중복 요청은 DB 트랜잭션 시작 전에 즉시 차단됩니다. 이 테스트 코드가 CI에 포함되어 결제 코드 변경 시 회귀를 자동으로 감지합니다.",
+            "**테스트 결과, 초과 차감 없이 잔액 정합성 100% 검증을 통과했습니다.**\n동일한 멱등키로 들어온 중복 결제 요청 역시 트랜잭션 전단계에서 즉시 차단됨을 확인했습니다. 현재 이 동시성 검증 테스트 코드는 CI 파이프라인에 통합되어 로직 수정에 따른 잠재적인 회귀 오류를 지속해서 감지하고 있습니다.",
           retrospective:
-            "비관적 락을 주 전략으로 선택한 이유는 결제 특성상 충돌 후 재시도보다 대기 후 순차 처리가 데이터 정합성에 더 안전하기 때문입니다. `@Version`은 비관적 락이 커버하지 못하는 트랜잭션 간 틈새(예: PG 호출 후 DB 반영 사이)에서 동일 결제가 중복 완료되는 것을 감지하는 방어적 안전장치로 병행했습니다. SELECT FOR UPDATE는 DB 레벨 락이므로 앱 인스턴스가 늘어나도 동일 DB를 사용하는 한 정상 동작합니다. 다만 동시 결제 트래픽이 극단적으로 늘면 행 잠금 대기로 인한 응답 지연이 생길 수 있고, 이때는 큐 기반 순차 처리나 결제 서비스 분리를 검토해야 합니다.",
+            "비관적 락을 주 전략으로 선택한 이유는 결제 도메인 특성상 충돌 처리보다 트랜잭션의 엄격한 직렬화가 데이터 무결성에 더 기여하기 때문입니다. SELECT FOR UPDATE는 DB 레벨 락이므로 앱 인스턴스가 여러 개여도 안전하게 동시성을 제어합니다. 다만 동시 결제 트래픽이 극단적으로 몰릴 때는 행 잠금 대기로 인한 지연 가능성도 존재하므로, 그 단계에 다다르면 큐(RabbitMQ 등) 기반 비동기 순차 처리 체계로의 확장을 검토해야 함을 깨달았습니다.",
           details: [],
-          codeSnippet: `// CreditService.java — 비관적 락 + Dirty Checking
+          codeSnippet: `// CreditService.java — 비관적 락으로 트랜잭션 직렬화
 @Transactional
 public CreditResponse useCredit(UUID userId, CreditUseRequest request) {
 
-    // ① SELECT FOR UPDATE → 다른 TX가 같은 행을 읽지도 쓰지도 못하게 잠금
-    Credit credit = creditRepository.findByUserIdWithLock(userId);  // ← 비관적 락
+    // ① 인덱스 기반 행 단위 비관적 락 획득
+    Credit credit = creditRepository.findByUserIdWithLock(userId);
 
-    // ② 엔티티 상태 변경만 하면 커밋 시 자동 UPDATE (Dirty Checking)
-    credit.use(request.amount());  // ← balance -= amount, save() 불필요
+    // ② 상태 변경 시 트랜잭션 커밋과 함께 즉시 반영 (Dirty Checking)
+    credit.use(request.amount());
 }
 
 // CreditRepository.java
-@Lock(LockModeType.PESSIMISTIC_WRITE)  // ← SELECT c FROM Credit c ... FOR UPDATE
+@Lock(LockModeType.PESSIMISTIC_WRITE)
 @Query("SELECT c FROM Credit c WHERE c.userId = :userId")
 Optional<Credit> findByUserIdWithLock(UUID userId);`,
           impact: "100 스레드 동시 / 잔액 정합성 100%",
@@ -269,7 +283,8 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
             "**DOM → Canvas**: 개별 이벤트를 위해 생성한 수천 개의 SVG 태그를 단일 Canvas 요소로 교체해 Paint 오버헤드 완화",
             "**이벤트 위임**: 개별 리스너 부착 대신, react-force-graph-2d의 nodePointerAreaPaint로 클릭 영역을 커스텀 정의하고 라이브러리 이벤트 콜백으로 상호작용 처리",
           ],
-          impact: "빈번한 Style Recalculation/Layout/Paint 방지 / 대규모 스케일에서 60fps 유지",
+          impact:
+            "빈번한 Style Recalculation/Layout/Paint 방지 / 대규모 스케일에서 60fps 유지",
         },
         {
           id: "bundle-optimization",
@@ -352,27 +367,28 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
       "산모가 일기를 쓰면 AI가 감정을 분석해 피드백을 제공하는 서비스입니다. 부모 사진으로 아기 캐릭터를 생성하는 기능도 함께 제공합니다.",
     architectureDiagram: {
       type: "svg",
-      content: "/images/aidiary_arch_v5.svg"
+      content: "/images/aidiary_arch_v5.svg",
     },
     overview:
-      "캡스톤 디자인 (2인 팀)으로 시작해 수료 후 개인적으로 아키텍처 개선을 이어갔습니다. 인증, 일기 CRUD, AI 연동 등 Spring Boot + Flask 이중 서버 백엔드 전체와 Docker Compose 기반 인프라를 담당했습니다. k6 부하 테스트에서 AI 추론(~30초)의 동기 호출이 서비스 전체를 마비시키는 문제를 발견하고 RabbitMQ 비동기 처리로 전환하여 TPS를 1.16에서 1,949까지 개선했으며, Redis 캐싱과 Caffeine 다층 캐시로 반복 API 호출 비용을 줄였습니다.",
+      "캡스톤 디자인 (2인 팀)으로 시작해 수료 후 개인적으로 아키텍처 개선을 이어갔습니다. 인증, 일기 CRUD, AI 연동 등 Spring Boot + Flask 이중 서버 백엔드 전체와 Docker Compose 기반 인프라를 담당했습니다. AI 합성(~30초)의 동기 블로킹 문제를 @Async 시도 → 부하 테스트에서 메모리 고갈 확인 → RabbitMQ 전환으로 단계적으로 해결하여 TPS를 1.16에서 1,949까지 개선했으며, 도메인 카테고리 해시 기반 캐시로 반복 API 호출 비용을 줄였습니다.",
 
     sections: {
       backend: [
         {
           id: "rabbitmq-async",
           title: "AI 이미지 합성 동기 블로킹 → RabbitMQ 비동기 전환",
-          subtitle: "WAS 처리량 1.16 → 1,949 TPS, 응답 30s → 4.9ms",
+          subtitle:
+            "WAS 처리량 1.16 → 1,949 TPS, 동기 대기 30초 → 비동기 즉시 응답(4.9ms)",
           problem:
-            "**ML 이미지 합성(~30초)이 Tomcat 스레드를 직접 점유해, 동시 사용자 10~20명에서 서비스 전체가 마비됐습니다.**\nFlask ML 추론을 동기 호출하는 구조에서, 스레드 풀이 30초씩 점유돼 일기 작성·건강 기록 등 무관한 API까지 전부 무응답.\n- k6 실측 최대 처리량: **1.16 TPS**",
+            "**ML 이미지 합성(~30초) 작업이 Tomcat 스레드를 직접 점유하여, 동시 사용자 10~20명 수준에서도 전체 서비스가 마비되었습니다.**\nFlask ML 추론을 동기 호출하는 구조에서, 스레드 풀이 30초씩 점유돼 일기 작성·건강 기록 등 무관한 API까지 전부 무응답.\n- k6 실측 최대 처리량: **1.16 TPS**",
           approach:
-            "**RabbitMQ로 WAS와 AI 처리를 분리하고, 3중 멱등성 가드로 중복 처리를 방지했습니다.**\n먼저 `@Async` + `ConcurrentHashMap`을 시도했지만 Scale-out 시 서버 간 상태 불일치와 메모리 누수(GC 후 +28MB 잔류) 문제가 드러나 RabbitMQ로 전환.\n- Spring Boot: 큐 발행 → 202 Accepted (4.9ms)\n- Python Worker: `prefetch_count=1` + 수동 ACK → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존",
+            "**@Async → 부하 테스트에서 한계 확인 → RabbitMQ로 전환했습니다.**\n우선 `@Async`로 톰캣 스레드를 즉시 반환하도록 전환하여 처리량을 개선했으나, 부하 테스트에서 요청이 몰리자 로컬 큐 포화로 메모리 고갈이 발생했습니다. AI 합성 작업의 무거운 특성상 별도 서비스 분리를 검토하는 과정에서, WAS 내부 메모리 큐에 의존하는 `@Async`는 서버 종료·재배포 시 작업이 유실되는 구조적 한계도 확인했습니다.\n이에 RabbitMQ를 도입하여 메시지 영속성을 확보하고, AI 합성 처리를 WAS와 물리적으로 분리했습니다.\n- Spring Boot: 큐 발행 → 202 Accepted (4.9ms)\n- Python Worker: `prefetch_count=1` + 수동 ACK → Webhook 결과 전달\n- DLQ로 Worker 장애 시 메시지 보존",
           result:
-            "**WAS 처리량 1.16 → 1,949 TPS, 응답 레이턴시 30,000ms → 4.9ms.**\n500 VU 부하에서 p95 318ms, 에러율 0%. 총 175,463건 처리. AI 처리 지연과 무관하게 WAS 가용성 유지.",
+            "**WAS 처리량 1.16 → 1,949 TPS. 동기 대기 30초 → 비동기 전환으로 즉시 응답(4.9ms).**\n500 VU 부하에서 p95 318ms, 총 175,463건 처리. AI 서비스가 다운되더라도 로그인·일기 작성 등 주요 기능은 정상 동작하는 장애 격리 구조를 확보했습니다.",
           retrospective:
-            "Webhook 방식을 채택하다 보니 클라이언트가 주기적으로 상태를 폴링해야 합니다. UX 관점에서는 '생성 요청 → 기다림 → 완료 알림'이 깔끔하지 않고, 폴링 요청도 불필요하게 생깁니다. SSE(Server-Sent Events)나 WebSocket으로 서버에서 직접 완료 이벤트를 푸시하는 방식이 더 나았을 것 같습니다. 또 Python Worker 프로세스에 대한 헬스 체크나 모니터링이 없어서, Worker가 죽어도 바로 알 수 없는 약점이 있습니다. Prometheus + Grafana 같은 모니터링 스택을 붙이면 이 부분을 보완할 수 있습니다.",
+            "@Async에서 바로 RabbitMQ로 간 것이 아니라, 부하 테스트에서 실제로 메모리 고갈을 겪고, 서비스 분리를 설계하는 과정에서 작업 유실 문제를 확인한 뒤 전환했습니다. Webhook 방식을 채택하다 보니 클라이언트가 주기적으로 상태를 폴링해야 하는데, SSE나 WebSocket으로 서버에서 직접 완료 이벤트를 푸시하는 방식이 UX 측면에서 더 나았을 것입니다.",
           details: [
-            "**의존 방향 정리**: AI 서비스 호출을 인터페이스 기반으로 추상화하고, Entity 대신 DTO만 전달하도록 설계. 트랜잭션 경계를 분리하여 AI 처리 모듈을 별도 서버로 떼어낼 때 변경 범위를 최소화",
+            "**@Async 한계**: 부하 테스트에서 로컬 큐 포화로 메모리 고갈 실측 / WAS 내부 메모리 큐 의존으로 서버 종료·재배포 시 작업 유실",
             "**장애 격리**: AI 연산을 별도 Worker로 분리하여, Flask 서버가 다운되더라도 로그인·일기 작성 등 주요 기능은 정상 동작",
             "**DLQ 및 3중 멱등성 가드**: Worker 장애 시 메시지 유실 방지(DLQ), 메시지 재전달로 인한 중복 처리 방지를 Worker → Webhook → DB 각 단계에서 적용",
           ],
@@ -397,55 +413,38 @@ Optional<Credit> findByUserIdWithLock(UUID userId);`,
         },
 
         {
-          id: "multi-layer-cache",
-          title: "주차별 맞춤 정보 — 산모 상태 기반 개인화 응답 + 다층 캐시",
+          id: "gemini-cache",
+          title:
+            "Gemini API 매 요청 호출 → 컨텍스트 해시 기반 캐시로 호출 최소화",
           subtitle:
-            "감정·건강 데이터를 반영한 맞춤 응답, Caffeine + Redis + DB 3계층 캐시",
+            "주차별 정보 487ms → 0.1ms — 도메인 카테고리 해시로 캐시 무효화 제어",
           problem:
-            "**임신 주차 정보가 모든 산모에게 동일한 응답을 반환해, 개인화된 서비스를 제공하지 못하고 있었습니다.**\n기존 구현은 주차 번호만으로 Gemini를 호출해 42주 고정 콘텐츠를 생성하는 구조였습니다. 같은 20주차라도 최근 감정이 불안한 산모와 안정적인 산모가 동일한 정보를 받고 있었고, 체중·혈압 등 건강 데이터도 반영되지 않았습니다.",
+            "**주차별 정보와 오늘의 질문 기능이 매 요청마다 Gemini API를 호출하고 있어, 응답 시간 평균 487ms에 API 비용이 요청 수에 비례해 선형 증가하는 구조였습니다.**\n주차별 정보는 주차 번호만으로 Gemini를 호출해 42주 고정 콘텐츠를 생성하는 구조로, 같은 20주차라도 최근 감정이 불안한 산모와 안정적인 산모가 동일한 정보를 받고 있었습니다. 오늘의 질문은 기획 의도상 하루에 하나의 질문을 모든 산모가 공유해야 하는데, 요청마다 다른 질문을 생성하는 기능 결함도 있었습니다.",
           approach:
-            "**산모의 일기 감정 분석 이력과 건강 기록을 Gemini 프롬프트에 주입해 개인화하고, 사용자×주차×컨텍스트 조합의 다양성에 대응하는 3계층 캐시를 설계했습니다.**\n`UserContextService`가 최근 7일 일기 감정 빈도와 최신 건강 기록을 수집해 요약 텍스트를 생성합니다. 이 컨텍스트를 SHA-256으로 해싱해 캐시 키(`userId:contextHash`)로 사용합니다. 동일한 컨텍스트(감정·건강 상태 변화 없음)에는 캐시가 HIT되고, 일기를 쓰거나 건강 기록이 바뀌면 해시가 달라져 자동으로 새 Gemini 호출이 발생합니다.\n- **L1 Caffeine**: 200 엔트리, 2분 TTL — 동일 사용자 반복 조회 시 네트워크 홉 없이 응답\n- **L2 Redis**: 24h + Jitter TTL — 서버 간 공유, 캐시 스탬피드 방지\n- **L3 DB**: `PersonalizedWeekContent` 엔티티로 영속화 — 서버 재시작·Redis 장애 시에도 유실 없음\n- 컨텍스트 미입력 사용자는 기존 42주 공통 캐시로 Fallback",
+            "**같은 주차·같은 건강 상태의 산모에게는 동일한 응답이 돌아오므로, 상태가 바뀌지 않은 요청은 캐싱할 수 있다고 판단했습니다.**\n\n산모의 최근 7일 일기 감정 빈도와 최신 건강 기록을 수집해 Gemini 프롬프트에 주입하여 개인화했습니다. 그런데 개인화로 인해 사용자×주차×감정·건강 상태 조합이 다양해졌고, 상태가 불규칙하게 바뀌므로(일기를 쓰거나 건강 기록이 바뀔 때) 단순 TTL 캐시로는 '바뀌었을 때 무효화, 안 바뀌었으면 유지'를 처리할 수 없었습니다.\n\n처음에는 원시 컨텍스트를 그대로 SHA-256으로 해싱했으나, 혈압이 1만 변해도 새 키가 생겨 캐시 히트율이 급락했습니다. 이에 감정(긍정/중립/부정)·혈압(정상/주의/위험)·태동(활발/보통/저조) 등 도메인 기준으로 카테고리화한 뒤 해싱하여, **의미 있는 상태 변화에서만 캐시가 무효화**되는 구조를 설계했습니다.\n\n**Caffeine 캐시 구성**\nCaffeine 로컬 캐시로 네트워크 홉 없이 즉시 반환합니다.\n- **Caffeine**: 200 엔트리, 2분 TTL — 동일 사용자 반복 조회 시 즉시 응답\n- 캐시 MISS 시 Gemini를 다시 호출하면 되므로 DB 영속화는 불필요\n\n**오늘의 질문 — DB 날짜 기반 저장**\n하루 1회 생성되는 공통 데이터이므로 개인화 캐시와 전략을 분리했습니다. 날짜 컬럼으로 조회하여 당일 데이터가 있으면 반환, 없으면 Gemini를 호출해 저장합니다. 하루 1회만 호출되므로 캐시보다 영속 저장이 적합했습니다.",
           result:
-            "**같은 주차라도 산모의 감정·건강 상태에 따라 다른 맞춤 응답을 제공하며, 3계층 캐시로 반복 요청 시 Gemini API 비용을 절감합니다.**\n개인화로 사용자×주차×컨텍스트 조합이 다양해져 캐시가 실질적으로 필요한 구조가 됐습니다. DB 영속화 덕에 Redis 장애나 서버 재시작에도 기존 응답을 즉시 복원할 수 있습니다.",
+            "**주차별 정보 응답 487ms → 0.1ms(Caffeine HIT), 오늘의 질문은 Gemini 호출 일 1회 고정.**\nGemini 호출이 매 요청에서 컨텍스트 변경 시 또는 일 1회로 고정되어 API 비용을 대폭 절감했습니다. 주차별 정보는 산모의 감정·건강 상태에 따라 다른 맞춤 응답을 제공하게 되었고, 오늘의 질문은 모든 산모가 같은 날 동일한 질문을 받아 기능 일관성도 확보했습니다.",
           retrospective:
-            "컨텍스트 해시가 감정·건강 데이터의 정확한 값에 의존하기 때문에, 체중이 0.1kg만 변해도 새 캐시 엔트리가 생깁니다. 값을 구간(예: 60~62kg)으로 양자화하면 캐시 히트율을 높일 수 있었을 것입니다. 또한 현재는 L3 DB 조회가 contextHash 기반 단건 조회라 인덱스만으로 충분하지만, 사용자 수가 크게 늘면 오래된 엔트리를 주기적으로 정리하는 배치가 필요합니다.",
+            "카테고리 경계값 설정이 도메인 지식에 의존합니다. 현재는 의료 기준(예: 혈압 140 이상 = 위험)을 참고했지만, 실제 산모 데이터가 축적되면 통계 기반으로 경계값을 보정해야 캐시 히트율과 응답 정확도를 동시에 높일 수 있을 것입니다.",
           details: [
-            "**캐시 키 설계**: SHA-256(userId + week + emotions + healthData) → 감정·건강 변화 시 해시 자동 변경으로 무효화",
-            "**Fallback 전략**: 컨텍스트 미입력 → 42주 공통 캐시 / Redis 장애 → DB → Gemini 직접 호출",
+            "**용도별 캐시 전략 분리**: 개인화 데이터(컨텍스트 해시 기반 Caffeine) vs 공통 데이터(날짜 기반 DB 저장) — 데이터 특성에 맞는 캐시 설계",
+            "**캐시 키 설계**: 원시 값 해싱 → 히트율 급락 → 도메인 카테고리(감정 3단계·혈압 3단계·태동 3단계)로 양자화 후 SHA-256 해싱, 의미 있는 변화에서만 무효화",
+            "**Fallback 전략**: 컨텍스트 미입력 사용자 → 42주 공통 캐시 / 캐시 MISS → Gemini 직접 호출",
           ],
-          codeSnippet: `// PregnancyWeekCacheService.java — L1 → L2 → L3 → Gemini 순차 조회
-String cacheKey = ctx.userId() + ":" + ctx.contextHash();  // ← 감정·건강 변화 시 해시 변경
+          codeSnippet: `// PregnancyWeekCacheService.java — 도메인 카테고리 해시 기반 캐시
+// 원시 값이 아닌 도메인 카테고리로 양자화 후 해싱
+String category = categorize(ctx.emotions(), ctx.bloodPressure(), ctx.fetalMovement());
+String cacheKey = ctx.userId() + ":" + sha256(ctx.week() + ":" + category);
 
-// L1: Caffeine (JVM 내 캐시, 네트워크 홉 없이)
-PregnancyWeekDTO dto = localCache.getIfPresent(cacheKey);  // ← L1
+// Caffeine (JVM 내 캐시, 네트워크 홉 없이 즉시 반환)
+PregnancyWeekDTO dto = localCache.getIfPresent(cacheKey);  // ← ~0.1ms
 if (dto != null) return dto;
 
-// L2: Redis (서버 간 공유, JSON 역직렬화 필요)
-String json = redisTemplate.opsForValue().get(redisKey);   // ← L2
-if (json != null) {
-    dto = objectMapper.readValue(json, PregnancyWeekDTO.class);
-    localCache.put(cacheKey, dto);   // L1 승격
-    return dto;
-}
-
-// L3: DB → L1+L2 승격 / MISS → Gemini 호출 → 전 계층 저장
-// (이하 동일 패턴: 역직렬화 → populateCache → return)`,
-          impact: "개인화 응답 + Gemini API 호출 최소화",
-        },
-        {
-          id: "redis-cache",
-          title: "오늘의 질문 — 매 요청 Gemini API 호출 → Redis 날짜 기반 캐싱",
-          subtitle: "응답 487ms → 3ms, Gemini 호출 일 1회 고정",
-          problem:
-            "**'오늘의 질문'이 요청마다 Gemini API를 호출해 매번 다른 질문을 생성하는 기능 결함이 있었고, 응답도 avg 487ms로 느렸습니다.**\n기획 의도는 하루에 하나의 질문을 모든 산모가 공유하는 것이었는데, 구현을 확인해보니 요청마다 Flask → Gemini API를 동기 호출하고 있었습니다.\n- 같은 날인데 요청마다 다른 질문 생성 → '오늘의 질문' 기능 의미 자체가 무너짐\n- API 비용이 요청 수에 비례해 선형 증가 (사용자 100명 = Gemini 100번 호출)",
-          approach:
-            "**다층 캐시에서 이미 사용 중인 Redis를 활용해, 날짜 자체를 키로, 자정까지 남은 시간을 TTL로 설정하여 하루 1회만 Gemini API를 호출하도록 했습니다.**\n`daily_question:{yyyyMMdd}` 형태로 키를 설계하면 날짜가 바뀌는 순간 자동으로 만료되어, 별도 스케줄러 없이 다음 날 첫 요청이 새 질문을 생성합니다. 하루 뒤 버려질 일회성 데이터이므로 DB 영속화 대신 TTL 자동 만료가 적합했습니다.\n- HIT 시 Redis에서 ~1ms 즉시 반환, AI API 호출 없음\n- MISS(하루 첫 요청)에만 Flask → Gemini 호출 (~500ms, 하루 1번만)\n- 캐시 무효화 전략이 필요 없음 — 날짜 변경 자체가 무효화",
-          result:
-            "**응답 487ms → 3ms, Gemini API 호출이 요청 수 비례(N회) → 일 1회로 고정됐습니다.**\n모든 산모가 같은 날 동일한 질문을 받아 기능 일관성이 확보됐고, 기능 결함(요청마다 다른 질문)도 캐싱으로 동시에 해결됐습니다.",
-          retrospective:
-            "자정에 키가 만료되면서 첫 번째 요청이 Gemini API를 호출하게 됩니다. 이 시점에 동시 요청이 있으면 Cache Stampede 문제가 발생할 수 있습니다. 자정 직전에 다음 날 질문을 미리 캐싱하는 스케줄러를 붙였으면 더 안전했을 것입니다. 또 Redis가 다운될 때를 대비한 fallback이 없어서, Gemini API를 직접 호출하도록 대비하면 장애 전파를 방지할 수 있습니다.",
-          details: [],
-          impact: "487ms → 3ms / Gemini 일 1회",
+// MISS → Gemini 호출 → 캐시 저장
+dto = geminiClient.getPersonalizedWeekInfo(ctx);  // ← ~487ms
+localCache.put(cacheKey, dto);
+return dto;`,
+          impact: "응답 487ms → 0.1ms / Gemini API 호출 최소화",
         },
       ],
       frontend: [
@@ -474,18 +473,13 @@ if (json != null) {
       {
         metric: "1.16 → 1,949 TPS",
         label: "WAS 수용 처리량",
+        description: "RabbitMQ 비동기 전환 (큐 발행 기준), 500 VU / p95 318ms",
+      },
+      {
+        metric: "487ms → 0.1ms",
+        label: "Gemini API 캐시 최적화",
         description:
-          "RabbitMQ 비동기 전환 (큐 발행 기준), 500 VU / p95 318ms / 에러율 0%",
-      },
-      {
-        metric: "487ms → 3ms",
-        label: "오늘의 질문 API",
-        description: "Redis 날짜 기반 캐싱, Gemini 호출 일 1회 고정",
-      },
-      {
-        metric: "3계층 캐시",
-        label: "주차별 맞춤 정보",
-        description: "감정·건강 컨텍스트 개인화, Caffeine + Redis + DB",
+          "도메인 카테고리 해시 기반 캐시, 용도별 전략 분리 (개인화: 컨텍스트 해시 / 공통: 날짜 기반 DB)",
       },
     ],
 
@@ -496,14 +490,7 @@ if (json != null) {
       },
       {
         category: "Backend",
-        items: [
-          "Spring Boot",
-          "JPA",
-          "MariaDB",
-          "RabbitMQ",
-          "Redis",
-          "Caffeine",
-        ],
+        items: ["Spring Boot", "JPA", "MariaDB", "RabbitMQ", "Caffeine"],
       },
       {
         category: "AI",
@@ -516,105 +503,6 @@ if (json != null) {
       {
         category: "Tools",
         items: ["Git", "GitHub Actions"],
-      },
-    ],
-  },
-
-  "knowledge-garden": {
-    id: "knowledge-garden",
-    tagline:
-      "포트폴리오 겸 챗봇 백엔드를 NestJS로, 프론트엔드를 Next.js로 구현한 개인 프로젝트입니다.",
-    overview:
-      "NestJS의 모듈·DI·인터셉터·가드 등 프레임워크 기능을 활용해 챗봇 백엔드를 구성하고, Next.js App Router로 프론트엔드를 개발했습니다. 챗봇은 MongoDB 텍스트 검색으로 이력서 데이터를 찾아 LLM 컨텍스트에 주입하는 구조이며, 가드레일로 무관 질문을 필터링하고 인터셉터로 응답 분석 로그를 수집합니다.",
-
-    sections: {
-      backend: [
-        {
-          id: "chatbot-api",
-          title: "LLM 챗봇 API 설계",
-          subtitle: "MongoDB 텍스트 검색 + 가드레일 + 세션 관리",
-          problem:
-            "**포트폴리오 방문자가 프로젝트에 대해 자유롭게 질문할 수 있는 챗봇이 필요했습니다.**\n단순히 LLM에 전체 이력서를 넣으면 토큰 낭비가 심하고, 무관한 질문(날씨, 코딩 문제 등)에도 응답하게 됩니다.",
-          approach:
-            "**질문과 관련된 이력서 데이터만 검색해서 LLM 컨텍스트에 주입하는 구조로 설계했습니다.**\n- MongoDB 텍스트 인덱스에 필드별 가중치(title 10x, summary 5x, content 1x)를 설정하고, 상위 5개 문서를 시스템 프롬프트에 마크다운으로 주입\n- LLM 가드레일 분류기(max_tokens: 5, temp: 0)로 포트폴리오 무관 질문을 사전 필터링\n- 인메모리 슬라이딩 윈도우로 최근 10턴 대화 맥락 유지\n- 입력 검증(500자 제한), 글로벌 쓰로틀링(200req/min)",
-          result:
-            "**질문에 맞는 프로젝트·경험 데이터만 컨텍스트로 들어가 토큰 효율을 높이고, 무관한 질문은 가드레일에서 걸러냅니다.** 대화 맥락이 유지되어 후속 질문도 자연스럽게 이어집니다.",
-          details: [
-            "**모듈 구성**: Chat(오케스트레이션) · AI(LLM 호출·가드레일) · Analytics(로깅) · Resume(데이터 검색) 4개 모듈을 NestJS DI로 연결",
-            "**분석 로깅**: 인터셉터에서 토큰 사용량·응답 시간을 비동기로 MongoDB에 저장하고, 클라이언트 응답에서는 내부 메타데이터를 제거",
-            "**TTL 자동 정리**: MongoDB TTL 인덱스로 90일 지난 로그 자동 만료",
-          ],
-          impact: "텍스트 검색 기반 컨텍스트 주입 + 가드레일 필터링",
-        },
-        {
-          id: "session-memory-leak",
-          title: "세션 메모리 누수 → TTL 기반 자동 정리 스케줄러",
-          subtitle: "k6 부하 테스트 중 발견, heapUsed 52MB 회수",
-          problem:
-            "**챗봇 API 부하 테스트 중 힙 메모리가 테스트 종료 후에도 baseline으로 복귀하지 않는 현상을 발견했습니다.**\n원인 추적 결과, ChatService의 Map 세션 저장소에 TTL이 없어 사용자가 떠나도 삭제 로직 없이 세션이 영구 잔류하는 구조. 운영 시간이 길어질수록 메모리가 계속 쌓이는 누수였습니다.",
-          approach:
-            "**SessionData에 lastAccessedAt를 추가하고, @nestjs/schedule 기반 TTL 정리 스케줄러를 도입했습니다.**\n- `@Interval`로 주기적 정리(기본 10분), TTL(기본 30분) 초과 세션 자동 삭제",
-          result:
-            "**1,000세션(20,000엔트리) 누적 시 heapUsed 92.85MB → TTL 정리 후 40.35MB로 baseline 복귀.**\n52.50MB(56.5%) 회수 확인.",
-          retrospective:
-            "현재는 단일 인스턴스 인메모리 Map이라 Scale-out 시 서버 간 세션이 공유되지 않습니다. Redis로 세션 스토어를 외부화하면 이 한계를 해결할 수 있고, TTL도 EXPIRE로 자연스럽게 처리됩니다.",
-          details: [],
-          impact: "heapUsed 52MB 회수 (56.5%)",
-        },
-      ],
-      frontend: [
-        {
-          id: "portfolio-frontend",
-          title: "Next.js App Router 기반 포트폴리오",
-          subtitle: "대시보드 · 프로젝트 상세 · 챗봇 위젯 · PDF 내보내기",
-          problem:
-            "**프로젝트 경험을 체계적으로 보여주면서, 방문자가 챗봇으로 바로 질문할 수 있는 인터랙티브한 포트폴리오가 필요했습니다.**",
-          approach:
-            "**Next.js App Router로 페이지를 구성하고, 공통 데이터는 JSON 설정 파일로 관리합니다.**\n- 프로필 데이터를 Context API로 공유하여 대시보드·PDF·챗봇에서 일관되게 사용\n- 프로젝트 상세 페이지는 동적 라우트(`/projects/[id]`)로 Backend/Frontend 탭 분리\n- 챗봇 위젯은 Framer Motion으로 열림/닫힘 애니메이션 처리, sessionStorage로 세션 유지\n- react-markdown으로 챗봇 응답 마크다운 렌더링, 추천 질문 제공",
-          result:
-            "**하나의 JSON 설정으로 대시보드·상세 페이지·PDF가 동기화되고, 챗봇을 통해 방문자가 프로젝트에 대해 바로 질문할 수 있습니다.**",
-          details: [
-            "**PDF 내보내기**: 프로필 데이터를 기반으로 인쇄용 레이아웃을 별도 구성",
-            "**다크 모드**: Tailwind CSS 다크 모드 전체 지원",
-            "**반응형**: 모바일 하단 네비게이션, 데스크톱 상단 네비게이션 분리",
-          ],
-          impact: "JSON 기반 데이터 동기화 + 인터랙티브 챗봇",
-        },
-      ],
-    },
-
-    achievements: [
-      {
-        label: "NestJS 모듈 아키텍처",
-        description: "Chat · AI · Analytics · Resume 4개 도메인 모듈 분리, DI 기반 의존성 관리",
-      },
-      {
-        label: "LLM 챗봇",
-        description: "가중치 텍스트 검색 컨텍스트 주입, 가드레일 필터링, 슬라이딩 윈도우 대화 관리",
-      },
-      {
-        metric: "92.85 → 40.35MB",
-        label: "세션 메모리 누수 해소",
-        description: "TTL 스케줄러 도입, k6 실측 heapUsed 56.5% 회수",
-      },
-      {
-        label: "Next.js 프론트엔드",
-        description: "App Router, 동적 라우트, Framer Motion 챗봇 위젯, PDF 내보내기",
-      },
-    ],
-
-    techStack: [
-      {
-        category: "Backend",
-        items: ["NestJS", "MongoDB", "Mongoose", "OpenAI API"],
-      },
-      {
-        category: "Frontend",
-        items: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
-      },
-      {
-        category: "Infra",
-        items: ["Docker", "Vercel"],
       },
     ],
   },

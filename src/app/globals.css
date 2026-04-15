@@ -73,28 +73,36 @@
 
   @page {
     size: A4;
-    margin: 15mm 15mm 15mm 15mm;
+    margin: 10mm 10mm 10mm 10mm;
   }
 
-  /* Structural Typography - Grid-First Scale */
+  /* Structural Typography */
   h1 {
-    font-size: 64pt !important;
+    font-size: 36pt !important;
     margin-bottom: 10mm !important;
     letter-spacing: -0.07em !important;
     font-weight: 1000 !important;
     line-height: 0.8 !important;
   }
   h2 {
-    font-size: 24pt !important;
-    margin-bottom: 8mm !important;
+    font-size: 16pt !important;
+    margin-bottom: 5mm !important;
     font-weight: 950 !important;
     letter-spacing: -0.04em !important;
     line-height: 1 !important;
   }
   h3 {
-    font-size: 16pt !important;
-    margin-bottom: 6mm !important;
+    font-size: 12pt !important;
+    margin-bottom: 4mm !important;
     font-weight: 900 !important;
+  }
+
+  /* print-portfolio 내부는 inline style이 제어 */
+  .print-portfolio p,
+  .print-portfolio div,
+  .print-portfolio span {
+    font-size: inherit !important;
+    line-height: inherit !important;
   }
 
   p,
@@ -118,27 +126,27 @@
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   }
   .gap-8 {
-    gap: 8mm !important;
+    gap: 4mm !important;
   }
   .gap-12 {
-    gap: 12mm !important;
+    gap: 6mm !important;
   }
 
   .mb-20 {
-    margin-bottom: 20mm !important;
+    margin-bottom: 10mm !important;
   }
   .mb-16 {
-    margin-bottom: 15mm !important;
+    margin-bottom: 8mm !important;
   }
   .mb-12 {
-    margin-bottom: 12mm !important;
+    margin-bottom: 6mm !important;
   }
 
   .space-y-20 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 20mm !important;
+    margin-top: 10mm !important;
   }
   .space-y-16 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 15mm !important;
+    margin-top: 8mm !important;
   }
 
   /* Page Break & Continuity (CRITICAL) */
@@ -149,7 +157,6 @@
   .break-inside-avoid {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-    display: block !important;
   }
 
   /* Mermaid & Visual Assets Optimization */

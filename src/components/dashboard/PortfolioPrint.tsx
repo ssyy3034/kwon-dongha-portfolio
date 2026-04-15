@@ -4,204 +4,198 @@ import { useProfile } from "@/context/ProfileContext";
 import projects from "@/config/projects.json";
 import { getProjectDetail } from "@/data/project-details";
 import FormattedText from "@/components/common/FormattedText";
-import {
-  Users,
-  Briefcase,
-  Server,
-  Monitor,
-} from "lucide-react";
-import { getProjectColors } from "@/config/project-theme";
-import Mermaid from "@/components/common/Mermaid";
-import CodeBlock from "@/components/common/CodeBlock";
 
+/* ── 색상 시스템 ── */
+const C = {
+  text: "#111827",       // gray-900
+  sub: "#6B7280",        // gray-500
+  light: "#9CA3AF",      // gray-400
+  border: "#E5E7EB",     // gray-200
+  bg: "#F9FAFB",         // gray-50
+  red: "#DC2626",
+  blue: "#2563EB",
+  green: "#059669",
+  accent: "#D97706",     // amber-600
+};
 
-function SectionCard({ section, colors }: { section: any; colors: any }) {
+/* ── 트러블슈팅 카드 ── */
+function TroubleCard({ section }: { section: any }) {
   return (
-    <article className="mb-10 break-inside-avoid shadow-none border-none">
-      {/* 라인 기반 헤더 - Narrative Style */}
-      <div className="flex items-baseline justify-between gap-4 border-b-2 border-stone-100 pb-2 mb-6">
-        <h3 className="text-[14px] font-black text-stone-900 tracking-tight flex items-center gap-2">
-          <div
-            className={`w-2.5 h-2.5 rounded-full ${colors.bg} border-2 border-white shadow-sm`}
-          />
-          {section.title}
-        </h3>
+    <div style={{ marginBottom: "14px", pageBreakInside: "avoid" }}>
+      {/* 제목 */}
+      <div
+        style={{
+          fontSize: "24px",
+          fontWeight: 900,
+          color: C.text,
+          borderBottom: `2px solid ${C.text}`,
+          paddingBottom: "6px",
+          marginBottom: "10px",
+          lineHeight: 1.2,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {section.title}
         {section.impact && (
-          <span
-            className={`text-[10px] font-black ${colors.text} uppercase tracking-[0.2em] bg-stone-50 px-2 py-0.5 rounded`}
-          >
+          <div style={{ fontSize: "13px", color: C.accent, fontWeight: 700, marginTop: "4px" }}>
             {section.impact}
-          </span>
+          </div>
         )}
       </div>
 
-      <div className="pl-4 relative">
-        {/* 수직 타임라인 연결선 (Grid 구조에 맞춰 조정) */}
-        <div className="absolute left-[8px] top-2 bottom-6 w-0.5 bg-stone-100/60" />
-
-        {/* --- GRID Layout for Problem & Approach --- */}
-        <div className="grid grid-cols-2 gap-8 mb-6 relative">
-          {/* Problem Column */}
-          <div className="relative pl-6">
-            <div className="absolute left-[-1.5px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-red-500 shadow-sm" />
-            <div className="mb-2">
-              <span className="text-[10px] font-black text-red-500 uppercase tracking-widest bg-red-50 px-1.5 py-0.5 rounded">
-                Problem
-              </span>
-              {section.subtitle && (
-                <span className="text-stone-400 text-[10px] ml-2">
-                  — {section.subtitle}
-                </span>
-              )}
+      {/* Problem / Approach / Result — 좌측 컬러 바 */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        {/* Problem */}
+        <div style={{ display: "flex", gap: "0" }}>
+          <div style={{ width: "3px", borderRadius: "2px", backgroundColor: C.red, flexShrink: 0 }} />
+          <div style={{ paddingLeft: "10px", flex: 1 }}>
+            <div style={{ fontSize: "8.5px", fontWeight: 700, color: C.red, marginBottom: "2px", letterSpacing: "0.05em" }}>
+              PROBLEM
             </div>
-            <div className="text-stone-700 leading-relaxed text-[10pt] font-medium min-h-[4em]">
+            <div style={{ fontSize: "9.5px", color: "#374151", lineHeight: 1.6 }}>
               <FormattedText noDark text={section.problem || ""} />
             </div>
           </div>
+        </div>
 
-          {/* Approach Column */}
-          <div className="relative pl-6">
-            <div className="absolute left-[-1.5px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-blue-500 shadow-sm" />
-            <div className="mb-2">
-              <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-1.5 py-0.5 rounded">
-                Approach
-              </span>
+        {/* Approach */}
+        <div style={{ display: "flex", gap: "0" }}>
+          <div style={{ width: "3px", borderRadius: "2px", backgroundColor: C.blue, flexShrink: 0 }} />
+          <div style={{ paddingLeft: "10px", flex: 1 }}>
+            <div style={{ fontSize: "8.5px", fontWeight: 700, color: C.blue, marginBottom: "2px", letterSpacing: "0.05em" }}>
+              APPROACH
             </div>
-            <div className="text-stone-700 leading-relaxed text-[10pt] font-medium min-h-[4em]">
+            <div style={{ fontSize: "9.5px", color: "#374151", lineHeight: 1.6 }}>
               <FormattedText noDark text={section.approach || ""} />
             </div>
           </div>
         </div>
 
-        {/* --- Result (Full Width) --- */}
-        <div className="relative pl-6 mb-8">
-          <div className="absolute left-[-1.5px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-green-500 shadow-sm" />
-          <div className="mb-2">
-            <span className="text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-1.5 py-0.5 rounded">
-              Result
-            </span>
-          </div>
-          <div className="text-stone-900 leading-relaxed text-[10pt] font-extrabold pb-4 border-b border-stone-50">
-            <FormattedText noDark text={section.result || ""} />
+        {/* Result */}
+        <div style={{ display: "flex", gap: "0" }}>
+          <div style={{ width: "3px", borderRadius: "2px", backgroundColor: C.green, flexShrink: 0 }} />
+          <div style={{ paddingLeft: "10px", flex: 1 }}>
+            <div style={{ fontSize: "8.5px", fontWeight: 700, color: C.green, marginBottom: "2px", letterSpacing: "0.05em" }}>
+              RESULT
+            </div>
+            <div style={{ fontSize: "9.5px", color: C.text, lineHeight: 1.6, fontWeight: 600 }}>
+              <FormattedText noDark text={section.result || ""} />
+            </div>
           </div>
         </div>
-
-        {/* 세부항목 - 차별화된 스타일 */}
-        {section.details && section.details.length > 0 && (
-          <div className="mt-4 ml-6 space-y-2 pl-4">
-            {section.details.map((d: string, i: number) => (
-              <div
-                key={i}
-                className="text-[10pt] text-stone-500 leading-relaxed italic flex items-start gap-2"
-              >
-                <span className="text-stone-300 mt-1">↳</span>
-                <FormattedText noDark text={d} />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 기술적 결과물 - 수평 흐름에 맞춘 최적화 */}
-        {(section.codeSnippet || section.diagram) && (
-          <div className="mt-8 ml-6 space-y-6">
-            {section.codeSnippet && (
-              <div className="rounded-2xl overflow-hidden border border-stone-100 shadow-sm bg-[#1c1917]">
-                <CodeBlock code={section.codeSnippet} />
-              </div>
-            )}
-            {section.diagram?.type === "mermaid" && (
-              <div className="p-8 bg-stone-50/50 rounded-2xl border border-stone-100">
-                {section.diagram.caption && (
-                  <p className="text-[11px] text-stone-400 font-black mb-4 uppercase tracking-[0.25em] text-center italic">
-                    {section.diagram.caption}
-                  </p>
-                )}
-                <div className="max-h-[300px] flex justify-center">
-                  <Mermaid chart={section.diagram.content} />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
-    </article>
+    </div>
   );
 }
 
+/* ── 메인 컴포넌트 ── */
 export default function PortfolioPrint() {
   const { profile } = useProfile();
 
   return (
-    <div className="bg-white text-stone-900 font-sans">
-      {/* ===== PAGE 1: RESUME SUMMARY - GRID OPTIMIZED ===== */}
-      <section className="pt-12 pb-12 border-b-2 border-stone-900 mb-12 text-center">
-        <header className="mb-12">
-          <h1
-            className="text-8xl font-black tracking-tighter mb-4"
-            style={{ fontFamily: "var(--font-editorial)" }}
-          >
-            {profile.name}
-          </h1>
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-3xl font-black text-amber-600 uppercase tracking-[0.25em]">
-              {profile.role}
-            </p>
-            <div className="flex gap-10 text-stone-400 font-black text-[11px] uppercase tracking-[0.3em] border-t border-stone-100 pt-6 mt-2">
-              <span>{profile.social.email}</span>
-              <span className="text-stone-100">/</span>
-              <span>{profile.social.github.replace("https://", "")}</span>
-            </div>
-          </div>
-        </header>
+    <div className="print-portfolio" style={{ backgroundColor: "#fff", color: C.text, fontFamily: "system-ui, -apple-system, sans-serif" }}>
 
-        {/* Bio Highlights - GRID FIRST (Fixed Horizontal) */}
-        <div className="grid grid-cols-3 gap-8 mb-16 h-[220px]">
-          {profile.bio.cards?.map((card, idx) => (
-            <div
-              key={idx}
-              className="p-8 bg-stone-50/40 rounded-[2.5rem] border border-stone-100 text-left relative overflow-hidden flex flex-col justify-between"
-            >
-              <div
-                className="absolute top-0 left-0 w-1.5 h-full"
-                style={{ backgroundColor: card.color }}
-              />
-              <div>
-                <h3
-                  className="text-[13px] font-black uppercase tracking-[0.15em] mb-4"
-                  style={{ color: card.color }}
-                >
-                  {card.title}
-                </h3>
-                <p className="text-[13px] text-stone-800 leading-relaxed font-semibold">
-                  <FormattedText
-                    noDark
-                    text={typeof card.content === "string" ? card.content : ""}
-                  />
-                </p>
+      {/* ====== PAGE 1: 프로필 ====== */}
+      <section style={{ paddingBottom: "16px" }}>
+        {/* 상단: 사진 + 이름/역할/소개 */}
+        <div style={{
+          display: "flex",
+          gap: "24px",
+          alignItems: "flex-start",
+          marginBottom: "20px",
+        }}>
+          {/* 프로필 사진 */}
+          <img
+            src="/images/me.jpg"
+            alt={profile.name}
+            style={{
+              width: "120px",
+              height: "150px",
+              objectFit: "cover",
+              borderRadius: "8px",
+              flexShrink: 0,
+            }}
+          />
+          {/* 이름 + 역할 + 한줄 소개 */}
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "8px" }}>
+              <div style={{
+                fontSize: "42px",
+                fontWeight: 900,
+                letterSpacing: "-0.03em",
+                lineHeight: 1,
+                color: C.text,
+              }}>
+                {profile.name}
+              </div>
+              <div style={{
+                fontSize: "13px",
+                fontWeight: 700,
+                color: C.sub,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase" as const,
+              }}>
+                Backend Developer
               </div>
             </div>
-          ))}
+            <p style={{
+              fontSize: "14px",
+              color: "#374151",
+              lineHeight: 1.5,
+              margin: 0,
+            }}>
+              {profile.bio.headline.replace("{name}", profile.name)}
+            </p>
+          </div>
         </div>
 
-        {/* Integrated Tech Stack Grid - Spaced out */}
-        <div className="grid grid-cols-2 gap-12 text-left">
-          {profile.skills.map((cat) => (
+        {/* Contact & Channels */}
+        <div style={{
+          marginBottom: "20px",
+          paddingBottom: "16px",
+          borderBottom: `1px solid ${C.border}`,
+        }}>
+          <div style={{ fontSize: "14px", fontWeight: 800, color: C.text, marginBottom: "8px" }}>
+            Contact &amp; Channels
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+            {[
+              { label: "Email", value: profile.social.email },
+              { label: "Github", value: profile.social.github },
+              { label: "Blog", value: (profile.social as any).blog || "https://velog.io/@ansqhrl3037" },
+              { label: "Portfolio", value: "https://www.ssyy3034.dev/" },
+            ].map((item) => (
+              <div key={item.label} style={{ display: "flex", alignItems: "center", fontSize: "11px" }}>
+                <span style={{ color: C.text, fontWeight: 700, minWidth: "70px" }}>
+                  •  {item.label}
+                </span>
+                <span style={{ color: C.light, margin: "0 8px" }}>|</span>
+                <span style={{ color: C.sub }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 자기소개 — paragraphs */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {profile.bio.paragraphs?.map((para, idx) => (
             <div
-              key={cat.category}
-              className="p-8 bg-white border border-stone-50 rounded-[2rem] shadow-sm"
+              key={idx}
+              style={{
+                padding: "10px 14px",
+                border: `1px solid ${C.border}`,
+                borderRadius: "6px",
+                borderLeft: `3px solid ${["#3c78d8", "#f6b800", "#00a388"][idx] || C.sub}`,
+              }}
             >
-              <h3 className="text-[12px] font-black text-stone-900 border-b-2 border-stone-900 pb-2 mb-6 uppercase tracking-widest flex justify-between items-center">
-                {cat.category}
-                <span className="w-8 h-0.5 bg-stone-200" />
-              </h3>
-              <div className="flex flex-wrap gap-x-6 gap-y-3">
-                {cat.items.map((skill) => (
-                  <span
-                    key={skill.name}
-                    className="text-[14px] font-bold text-stone-600 hover:text-amber-600 transition-colors"
-                  >
-                    {skill.name}
-                  </span>
+              <div style={{ fontSize: "11px", fontWeight: 700, color: C.text, marginBottom: "4px" }}>
+                {para.slogan}
+              </div>
+              <div style={{ fontSize: "10px", color: "#374151", lineHeight: 1.6 }}>
+                {para.points.map((p, i) => (
+                  <div key={i} style={{ marginBottom: i < para.points.length - 1 ? "3px" : 0 }}>
+                    {p}
+                  </div>
                 ))}
               </div>
             </div>
@@ -209,137 +203,144 @@ export default function PortfolioPrint() {
         </div>
       </section>
 
-      {/* ===== PROJECT DETAIL PAGES ===== */}
+      {/* ====== PROJECT PAGES ====== */}
       {projects.map((project) => {
         const detail = getProjectDetail(project.id);
         if (!detail) return null;
-        const colors = getProjectColors(project.color);
 
         return (
-          <div key={project.id} className="break-before-page pt-10">
-            {/* Project Branding Header - Narrative Style */}
-            <header className="mb-12">
-              <div className="flex items-end justify-between mb-8">
-                <div>
-                  <h1
-                    className="text-7xl font-black text-stone-900 tracking-tighter leading-none"
-                    style={{ fontFamily: "var(--font-editorial)" }}
-                  >
-                    {project.title}
-                  </h1>
-                  <p
-                    className={`text-[12px] font-black ${colors.text} uppercase tracking-[0.4em] mt-5`}
-                  >
-                    {project.subtitle}
-                  </p>
+          <div key={project.id} style={{ breakBefore: "page" }}>
+
+            {/* 프로젝트 헤더 */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              borderBottom: `2px solid ${C.text}`,
+              paddingBottom: "6px",
+              marginBottom: "10px",
+            }}>
+              <div>
+                <div style={{
+                  fontSize: "44px",
+                  fontWeight: 900,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                  margin: 0,
+                  color: C.text,
+                }}>
+                  {project.title}
                 </div>
-                <div className="text-right">
-                  <span className="text-[12px] font-black text-stone-300 uppercase tracking-[0.2em] block mb-2">
-                    Timeline
-                  </span>
-                  <span className="text-2xl font-black text-stone-900 tabular-nums">
-                    {project.period}
-                  </span>
-                </div>
+                <p style={{ fontSize: "10px", color: C.sub, marginTop: "4px" }}>
+                  {project.subtitle}
+                </p>
               </div>
+              <div style={{ textAlign: "right", fontSize: "10px", color: C.sub }}>
+                <div>{project.period}</div>
+                <div>{project.role} · {project.team}</div>
+              </div>
+            </div>
 
-              {/* Tagline & Overview - High Impact Single Column */}
-              {detail && (
-                <div className="mb-10 p-10 bg-stone-50 rounded-[2.5rem] border border-stone-100 relative overflow-hidden shadow-inner">
-                  <div
-                    className={`absolute top-0 left-0 w-2.5 h-full ${colors.bg}`}
-                  />
-                  <p className="text-stone-900 font-black leading-tight text-[22px] mb-6 max-w-3xl tracking-tight">
-                    <FormattedText noDark text={detail.tagline} />
-                  </p>
-                  <p className="text-stone-500 leading-relaxed text-[11pt] font-semibold max-w-4xl italic">
-                    <FormattedText noDark text={detail.overview} />
-                  </p>
-                </div>
-              )}
+            {/* 프로젝트 설명 */}
+            <div style={{
+              padding: "10px 12px",
+              backgroundColor: C.bg,
+              borderRadius: "6px",
+              border: `1px solid ${C.border}`,
+              marginBottom: "10px",
+            }}>
+              <div style={{ fontSize: "11px", fontWeight: 700, color: C.text, lineHeight: 1.45, marginBottom: "6px" }}>
+                <FormattedText noDark text={detail.tagline} />
+              </div>
+              <div style={{ fontSize: "10px", color: "#374151", lineHeight: 1.55 }}>
+                <FormattedText noDark text={detail.overview} />
+              </div>
+            </div>
 
-              {/* Horizontal Achievement Bar - GRID IMPACT */}
-              <div className="grid grid-cols-4 gap-6 mb-12">
-                {detail.achievements.map((a, idx) => (
-                  <div
-                    key={idx}
-                    className="p-6 bg-white border border-stone-50 rounded-3xl shadow-sm text-center flex flex-col justify-center"
-                  >
-                    <div
-                      className={`text-2xl font-black ${colors.text} mb-2 tabular-nums tracking-tighter`}
-                    >
-                      {a.metric}
-                    </div>
-                    <div className="text-[10px] font-black text-stone-400 uppercase tracking-widest leading-tight">
-                      {a.label}
-                    </div>
+            {/* Achievements */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${detail.achievements.length}, 1fr)`,
+              gap: "8px",
+              marginBottom: "16px",
+            }}>
+              {detail.achievements.map((a, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    textAlign: "center",
+                    padding: "8px",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "6px",
+                  }}
+                >
+                  <div style={{ fontSize: "17px", fontWeight: 900, color: C.accent, letterSpacing: "-0.02em" }}>
+                    {a.metric}
                   </div>
+                  <div style={{ fontSize: "8px", color: C.sub, marginTop: "2px", letterSpacing: "0.03em" }}>
+                    {a.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Backend */}
+            {detail.sections.backend && detail.sections.backend.length > 0 && (
+              <div style={{ marginBottom: "12px" }}>
+                <div style={{
+                  fontSize: "18px",
+                  fontWeight: 800,
+                  color: C.text,
+                  paddingBottom: "5px",
+                  marginBottom: "12px",
+                  borderBottom: `1px solid ${C.border}`,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}>
+                  <span style={{
+                    display: "inline-block",
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    backgroundColor: C.text,
+                  }} />
+                  Backend
+                </div>
+                {detail.sections.backend.map((section, idx) => (
+                  <TroubleCard key={idx} section={section} />
                 ))}
               </div>
+            )}
 
-              {/* Role & Team Mini-Badge */}
-              <div className="flex gap-10 font-black uppercase text-[11px] tracking-[0.15em] text-stone-300 pl-4">
-                <div className="flex items-center gap-3">
-                  <Briefcase size={16} className="text-stone-900" />
-                  <span className="text-stone-900">{project.role}</span>
+            {/* Frontend */}
+            {detail.sections.frontend && detail.sections.frontend.length > 0 && (
+              <div style={{ breakBefore: "page" }}>
+                <div style={{
+                  fontSize: "36px",
+                  fontWeight: 800,
+                  color: C.text,
+                  paddingBottom: "6px",
+                  marginBottom: "14px",
+                  borderBottom: `1px solid ${C.border}`,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}>
+                  <span style={{
+                    display: "inline-block",
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    backgroundColor: C.text,
+                  }} />
+                  Frontend
                 </div>
-                <div className="flex items-center gap-3">
-                  <Users size={16} className="text-stone-900" />
-                  <span className="text-stone-900">{project.team}</span>
-                </div>
+                {detail.sections.frontend.map((section, idx) => (
+                  <TroubleCard key={idx} section={section} />
+                ))}
               </div>
-            </header>
-
-            {/* Engineering Deep Dive - Linear Narrative with Break Control */}
-            <div className="space-y-20 pb-16">
-              {/* Backend Section - Keep with Header */}
-              {detail.sections.backend &&
-                detail.sections.backend.length > 0 && (
-                  <section className="break-inside-avoid shadow-none">
-                    <div className="flex items-center gap-6 mb-12 border-b-4 border-stone-900 pb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center shadow-lg transform -rotate-3">
-                        <Server size={24} />
-                      </div>
-                      <h2 className="text-3xl font-black text-stone-900 uppercase tracking-tighter">
-                        Engineering: Backend
-                      </h2>
-                    </div>
-                    <div className="space-y-16">
-                      {detail.sections.backend.map((section, idx) => (
-                        <SectionCard
-                          key={idx}
-                          section={section}
-                          colors={colors}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-              {/* Frontend Section - Keep with Header */}
-              {detail.sections.frontend &&
-                detail.sections.frontend.length > 0 && (
-                  <section className="break-inside-avoid pt-12 border-t-4 border-stone-100 shadow-none">
-                    <div className="flex items-center gap-6 mb-12 border-b-4 border-stone-900 pb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-stone-900 text-white flex items-center justify-center shadow-lg transform rotate-3">
-                        <Monitor size={24} />
-                      </div>
-                      <h2 className="text-3xl font-black text-stone-900 uppercase tracking-tighter">
-                        Solution: Frontend
-                      </h2>
-                    </div>
-                    <div className="space-y-16">
-                      {detail.sections.frontend.map((section, idx) => (
-                        <SectionCard
-                          key={idx}
-                          section={section}
-                          colors={colors}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )}
-            </div>
+            )}
           </div>
         );
       })}

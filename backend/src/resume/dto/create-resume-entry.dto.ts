@@ -26,7 +26,7 @@ class TechStackItemDto {
   @IsString()
   category: string;
 
-  @ApiProperty({ example: ['Spring Boot', 'Redis'] })
+  @ApiProperty({ example: ['Spring Boot', 'Caffeine'] })
   @IsArray()
   @IsString({ each: true })
   items: string[];
@@ -51,11 +51,11 @@ export class CreateResumeEntryDto {
   @IsEnum(['project', 'troubleshooting', 'experience', 'skill', 'education', 'activity', 'introduction'])
   type: ResumeEntryType;
 
-  @ApiProperty({ example: 'Redis 날짜 기반 캐싱' })
+  @ApiProperty({ example: 'Caffeine 컨텍스트 해시 기반 캐싱' })
   @IsString()
   title: string;
 
-  @ApiProperty({ example: '매 요청마다 Gemini API 호출하던 구조를 Redis 캐싱으로 일 1회로 고정' })
+  @ApiProperty({ example: '매 요청마다 Gemini API 호출하던 구조를 Caffeine 캐싱으로 최소화' })
   @IsString()
   summary: string;
 
@@ -63,7 +63,7 @@ export class CreateResumeEntryDto {
   @IsString()
   content: string;
 
-  @ApiProperty({ example: ['redis', '캐싱', 'backend', '성능최적화'] })
+  @ApiProperty({ example: ['caffeine', '캐싱', 'backend', '성능최적화'] })
   @IsArray()
   @IsString({ each: true })
   @ArrayMinSize(1)

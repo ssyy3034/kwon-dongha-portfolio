@@ -31,7 +31,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
       '- Frontend: StoLink 작가용 웹앱 전체 화면 설계 및 개발, Tiptap 기반 커스텀 리치 텍스트 에디터, Canvas API 소설 인물 관계도 시각화 (650+ 노드 60FPS), 폴더 트리 기반 문서 탐색 사이드바\n' +
       '- DX: Antigravity 커스텀 커맨드로 이슈 → 브랜치 → 커밋 → PR 단일 명령 자동화, 부트캠프 내 타 팀까지 확산',
     tags: [
-      'stolink', 'spring-boot', 'jpa', 'redis', 'rabbitmq', 'react', 'typescript',
+      'stolink', 'spring-boot', 'jpa', 'rabbitmq', 'react', 'typescript',
       'canvas', 'postgresql', 'neo4j', 'docker', 'backend', 'fullstack', 'AI연동',
       '보안', 'DX',
     ],
@@ -39,7 +39,7 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
     projectName: null,
     techStack: [
       { category: 'Frontend', items: ['React', 'TypeScript', 'Canvas (D3.js)'] },
-      { category: 'Backend', items: ['Spring Boot', 'JPA (Hibernate)', 'Redis', 'RabbitMQ'] },
+      { category: 'Backend', items: ['Spring Boot', 'JPA (Hibernate)', 'RabbitMQ'] },
       { category: 'Database', items: ['PostgreSQL', 'Neo4j (Graph DB)'] },
       { category: 'Testing & Tools', items: ['JUnit / Vitest', 'Testcontainers', 'Vite', 'Claude Code CLI', 'Antigravity'] },
     ],
@@ -50,26 +50,26 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
     type: 'project',
     title: 'Aidiary : AI 기반 산모 감정 일기 서비스',
     summary:
-      '산모를 위한 AI 감정 일기 서비스. RabbitMQ 비동기 아키텍처로 1,949 TPS, Redis 다층 캐시, LangGraph AI 챗봇, Docker Compose + AWS 배포.',
+      '산모를 위한 AI 감정 일기 서비스. RabbitMQ 비동기 아키텍처로 1,949 TPS, Caffeine 캐시, LangGraph AI 챗봇, Docker Compose + AWS 배포.',
     content:
       '산모를 위한 AI 감정 일기 서비스입니다. 일기를 쓰면 AI가 감정을 분석하고 태아가 그려준 듯한 그림 일기로 하루를 요약해주며, 부모의 성격·외모를 바탕으로 만든 아이 캐릭터와 AI 챗봇으로 대화할 수 있습니다.\n\n' +
       'ML 라이브러리(MediaPipe, XLM-R 등) 활용을 위해 Spring Boot + Flask 이중 서버 구조로 분리했습니다.\n\n' +
       '담당 구현:\n' +
       '- Backend: RabbitMQ 메시지 브로커 아키텍처, MediaPipe + LLM 캐릭터 생성 파이프라인, LangGraph 기반 AI 챗봇 대화 흐름 제어\n' +
       '- Frontend: 아이 캐릭터 생성 화면 (이미지 압축, 비동기 대기, 결과 폴링), 임신 주차별 맞춤 큐레이션 화면\n' +
-      '- Infra: Docker Compose 6개 서비스 오케스트레이션, AWS EC2 배포, S3/CloudFront CDN, GitHub Actions CI/CD',
+      '- Infra: Docker Compose 5개 서비스 오케스트레이션, AWS EC2 배포, S3/CloudFront CDN, GitHub Actions CI/CD',
     tags: [
-      'aidiary', 'spring-boot', 'flask', 'redis', 'rabbitmq', 'react', 'typescript',
+      'aidiary', 'spring-boot', 'flask', 'rabbitmq', 'react', 'typescript',
       'mariadb', 'docker', 'aws', 'backend', 'fullstack', 'AI연동', '인프라',
     ],
     period: { start: '2025-04', end: '2026-02' },
     projectName: null,
     techStack: [
       { category: 'Frontend', items: ['React', 'TypeScript'] },
-      { category: 'Backend', items: ['Spring Boot', 'Flask', 'Redis', 'RabbitMQ'] },
+      { category: 'Backend', items: ['Spring Boot', 'Flask', 'RabbitMQ', 'Caffeine'] },
       { category: 'AI/ML', items: ['AI Agent & LLM (LangGraph, Gemini)', 'Vision & NLP (MediaPipe, XLM-R)'] },
       { category: 'Database', items: ['MariaDB'] },
-      { category: 'Infra', items: ['AWS (EC2, S3, CloudFront)', 'Messaging (RabbitMQ, Redis)', 'Docker Compose'] },
+      { category: 'Infra', items: ['AWS (EC2, S3, CloudFront)', 'RabbitMQ', 'Docker Compose'] },
     ],
     role: '백엔드·인프라 중심 풀스택',
     team: '2인 개발 (캡스톤 디자인 → 개인 개선)',
@@ -117,14 +117,14 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
   },
   {
     type: 'troubleshooting',
-    title: '외부 AI API 반복 호출 → Redis 날짜 기반 캐싱',
+    title: '외부 AI API 반복 호출 → DB 날짜 기반 저장으로 호출 고정',
     summary:
-      '"오늘의 질문" API가 매 요청마다 Gemini API 호출(avg 487ms) + 사용자마다 다른 질문 생성 → Redis 날짜 키 + 자정 TTL 캐싱으로 일 1회 호출 고정.',
+      '"오늘의 질문" API가 매 요청마다 Gemini API 호출(avg 487ms) + 사용자마다 다른 질문 생성 → DB 날짜 기반 저장으로 일 1회 호출 고정.',
     content:
       '## 문제\n- GET /api/diary-ai/daily-question avg=487ms (다른 API 대비 비정상적)\n- 같은 날인데 사용자마다 다른 질문 → "오늘의 질문" 기능 의미 무너짐\n- 매 요청마다 Flask → Gemini API 동기 호출\n\n' +
-      '## 해결\n캐시 키: daily_question:2026-02-28 (날짜 자체가 키)\nTTL: 자정까지 남은 초 → 스케줄러 없이 날짜 변경 시 자동 무효화\nHIT 시 ~1ms, MISS(하루 첫 요청) 시에만 Gemini 호출\n\n' +
-      '## 성과\n- 응답시간 487ms → 3ms (162배 단축)\n- Gemini API 호출 N:N → 일 1회 고정\n- 히트율 99.99% (hits: 8,294 / misses: 1)',
-    tags: ['aidiary', 'spring-boot', 'redis', '캐싱', '성능최적화', '트러블슈팅', 'backend'],
+      '## 해결\n하루 1회 생성되는 공통 데이터이므로 DB에 날짜 기반으로 저장. 당일 데이터가 있으면 반환, 없으면 Gemini 호출 후 저장.\n\n' +
+      '## 성과\n- Gemini API 호출 N:N → 일 1회 고정\n- 하루 1회만 호출되므로 캐시보다 영속 저장이 적합',
+    tags: ['aidiary', 'spring-boot', '캐싱', '성능최적화', '트러블슈팅', 'backend'],
     period: { start: '2025-04', end: '2026-02' },
     projectName: 'aidiary',
     metrics: [
@@ -135,17 +135,16 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
   },
   {
     type: 'troubleshooting',
-    title: '다층 캐시 아키텍처 — Hot Key / Avalanche / Penetration 방어',
+    title: 'Caffeine 캐시 아키텍처 — 개인화 컨텍스트 해시 기반 캐싱',
     summary:
-      '주차별 정보를 AI로 고도화 후 분산 캐시 3가지 장애 패턴 사전 식별 → Caffeine L1 + Redis L2 다층 캐시, TTL Jitter, VALID_WEEKS Set + null 마커로 각 레이어에서 차단.',
+      '주차별 정보를 AI로 개인화 후 컨텍스트 SHA-256 해시 기반 Caffeine 캐시로 호출 최소화. VALID_WEEKS Set + null 마커로 Cache Penetration 방어.',
     content:
-      '## 문제\n임신 주차별 정보를 static HashMap → Gemini AI 12개 필드로 고도화 후 avg 487ms.\n단순 Redis 캐시 추가 전 3가지 잠재 장애 패턴 식별:\n\n' +
-      '### Hot Key\n활성 사용자 대다수가 임신 2기(14~27주) 집중 → 소수 키에 편향.\n→ Caffeine L1(JVM 힙 직접 접근, 네트워크 홉 없음) + Redis L2 다층 캐시\n\n' +
-      '### Cache Avalanche\nwarmup 후 42개 키 동일 TTL → 동시 만료.\n→ TTL에 random(0, 2h) Jitter 적용\n\n' +
+      '## 문제\n임신 주차별 정보를 static HashMap → Gemini AI 12개 필드로 고도화 후 avg 487ms.\n개인화로 인해 사용자×주차×감정·건강 상태 조합이 다양해졌고, 상태가 불규칙하게 바뀌므로 단순 TTL로는 무효화 시점을 제어할 수 없었습니다.\n\n' +
+      '## 해결\n컨텍스트를 SHA-256으로 해싱하여 캐시 키(userId:contextHash)로 사용. 동일 컨텍스트에는 HIT, 상태 변화 시 해시가 달라져 자동 새 호출.\n\n' +
       '### Cache Penetration\nweek=99 같은 무효 요청 반복 → Gemini 비용 발생.\n→ VALID_WEEKS Set O(1) 선차단 + null 마커 5분 캐싱\n\n' +
-      '## 구현\n- Caffeine L1: maximumSize(42), expireAfterWrite(2min), W-TinyLFU 알고리즘\n- Redis L2: 24h ± 2h Jitter TTL\n- @EventListener(ApplicationReadyEvent) + @Async 사전 로딩\n\n' +
-      '## 성과\n- L2 Redis HIT ~2ms (244배 단축), L1 Caffeine HIT 네트워크 홉 없음\n- Gemini API 호출 일 최대 42회 고정',
-    tags: ['aidiary', 'spring-boot', 'redis', 'caffeine', '캐싱', '성능최적화', '아키텍처', '트러블슈팅', 'backend'],
+      '## 구현\n- Caffeine: maximumSize(200), expireAfterWrite(2min)\n- 캐시 MISS 시 Gemini 재호출하면 되므로 DB 영속화 불필요\n\n' +
+      '## 성과\n- Caffeine HIT ~0.1ms (4,870배 단축)\n- Gemini API 호출이 컨텍스트 변경 시에만 발생',
+    tags: ['aidiary', 'spring-boot', 'caffeine', '캐싱', '성능최적화', '아키텍처', '트러블슈팅', 'backend'],
     period: { start: '2025-04', end: '2026-02' },
     projectName: 'aidiary',
     metrics: [
@@ -216,18 +215,21 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
   // ═══════════════════════════════════════════════════
   {
     type: 'troubleshooting',
-    title: '크레딧 결제 동시성 제어 + 멱등키',
+    title: '크레딧 결제 동시성 제어 및 멱등성 보장',
     summary:
-      '순간적 결제 트래픽 폭증이나 중복 요청 시 부당한 크레딧 차감 방지 → 비관적 락 + 멱등키 로직 구성. Testcontainers로 100개 스레드 동시 요청 환경에서 잔액 정합성 100% 검증.',
+      "AI 코드 리뷰를 통해 발견한 '갱신 손실(Lost Update)' 및 '이중 차감' 취약점 해결. 비관적 락과 멱등키를 적용하고 Testcontainers 기반 100스레드 경합 테스트로 정합성 100% 검증.",
     content:
-      '## 문제\n순간적인 결제 트래픽 폭증이나 네트워크 지연에 따른 중복 요청 시 발생할 수 있는 부당한 크레딧 차감(사용자·비즈니스 금전 손실).\n\n' +
-      '## 해결\n토스페이먼츠 연동 크레딧 충전 시스템에 동시성 제어(비관적 락) 및 재시도로 인한 중복 결제 방지(멱등키) 로직 구성.\n\n' +
-      '## 검증\nTestcontainers를 활용해 100개 스레드 동시 요청 환경에서 잔액 정합성 100% 보장을 수치로 검증.',
+      '## 문제 인지 및 검증\n' +
+      "AI 코드 리뷰 과정에서 동일 계정 동시 결제 시 발생하는 '갱신 손실' 문제와 네트워크 지연에 따른 '이중 차감' 취약점이 리포트되었습니다. 이를 확인하고자 Testcontainers와 CountDownLatch를 활용해 100개의 스레드가 동시 요청하는 테스트 환경을 구축했고, 실제 잔액 정합성이 훼손되는 현상을 재현하며 결함을 확인했습니다.\n\n" +
+      '## 해결 방안\n' +
+      '결제 도메인 특성상 정합성이 최우선이므로, 재시도 비용이 큰 낙관적 락 대신 비관적 락(Pessimistic Lock)을 채택해 트랜잭션을 직렬화했습니다. 성능 저하 방지를 위해 인덱스 기반 행 단위 락으로 점유 범위를 최소화했고, 멱등키를 도입해 DB UNIQUE 제약과 토스페이먼츠 API 헤더 검증으로 이중 차단 체계를 구축했습니다.\n\n' +
+      '## 성과\n' +
+      '부하 테스트 재실행 결과, 100건의 동시 요청에서도 초과 차감 없이 정합성 100%를 달성했습니다. 현재 이 동시성 검증 테스트는 CI 파이프라인에 통합되어 로직 수정 시 잠재적인 회귀 오류를 방지하고 있습니다.',
     tags: ['stolink', 'spring-boot', 'jpa', 'postgresql', '동시성제어', '트러블슈팅', '테스트', 'backend'],
     period: { start: '2025-12', end: '2026-01' },
     projectName: 'stolink',
     metrics: [
-      { label: '잔액 정합성', before: '미검증', after: '100스레드 동시 요청 100%' },
+      { label: '잔액 정합성', before: '훼손 확인', after: '100스레드 동시 요청 100% 유지' },
     ],
   },
   {
@@ -458,10 +460,10 @@ export const SEED_DATA: CreateResumeEntryDto[] = [
   },
   {
     type: 'skill',
-    title: 'Redis',
-    summary: '날짜 키 기반 TTL 캐싱으로 API 호출 비용 절감 및 다층 캐시 구성.',
-    content: '날짜 키 기반 TTL 캐싱으로 API 호출 비용 절감 및 다층 캐시 구성.',
-    tags: ['redis', 'backend', '캐싱'],
+    title: 'Caffeine',
+    summary: 'SHA-256 컨텍스트 해시 기반 로컬 캐시로 외부 API 호출 최소화.',
+    content: 'SHA-256 컨텍스트 해시 기반 로컬 캐시로 외부 API 호출 최소화.',
+    tags: ['caffeine', 'backend', '캐싱'],
     period: null,
     category: 'Backend',
   },

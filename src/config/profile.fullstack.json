@@ -4,7 +4,7 @@
   "avatar": "/images/me.jpg",
   "bio": {
     "badge": "Software Engineer",
-    "headline": "탄탄한 기본기와 원리를 중시하는 개발자 {name}입니다.",
+    "headline": "안녕하세요, 측정하고 개선하는 신입 개발자 {name}입니다.",
     "paragraphs": [
       {
         "slogan": "프론트엔드부터 백엔드까지, 문제를 끝까지 따라갑니다",
@@ -42,7 +42,7 @@
         "title": "Problem Solver",
         "icon": "bulb",
         "color": "#f6b800",
-        "content": "느리거나 불안정한 부분을 발견하면 감보다 측정을 먼저 합니다. Canvas 전환·RabbitMQ 도입·Redis 캐싱 등 층을 가리지 않고 문제를 끝까지 따라가서 해결합니다."
+        "content": "느리거나 불안정한 부분을 발견하면 감보다 측정을 먼저 합니다. Canvas 전환·RabbitMQ 도입·Caffeine 캐싱 등 층을 가리지 않고 문제를 끝까지 따라가서 해결합니다."
       },
       {
         "title": "Team Player",
@@ -141,12 +141,6 @@
           "slug": "rabbitmq",
           "color": "FF6600",
           "description": "AI 연산 같은 무거운 작업을 비동기 큐로 분리해 서버 부하를 줄였습니다"
-        },
-        {
-          "name": "Redis",
-          "slug": "redis",
-          "color": "DC382D",
-          "description": "TTL 기반 응답 캐싱과 Caffeine 로컬 캐시를 조합해 응답 속도를 개선했습니다"
         }
       ]
     },

@@ -9,7 +9,7 @@ export class FilterResumeEntryDto {
   @IsEnum(['project', 'troubleshooting', 'experience', 'skill', 'education', 'activity', 'introduction'])
   type?: ResumeEntryType;
 
-  @ApiPropertyOptional({ description: 'Filter by tags (comma-separated). All tags must match.', example: 'redis,backend' })
+  @ApiPropertyOptional({ description: 'Filter by tags (comma-separated). All tags must match.', example: 'caffeine,backend' })
   @IsOptional()
   @Transform(({ value }) => (typeof value === 'string' ? value.split(',').map((t: string) => t.trim()) : value))
   @IsArray()
