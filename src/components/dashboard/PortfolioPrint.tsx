@@ -26,7 +26,7 @@ function TroubleCard({ section }: { section: any }) {
       <div
         style={{
           fontSize: "24px",
-          fontWeight: 900,
+          fontWeight: 500,
           color: C.text,
           borderBottom: `2px solid ${C.text}`,
           paddingBottom: "6px",
@@ -37,7 +37,7 @@ function TroubleCard({ section }: { section: any }) {
       >
         {section.title}
         {section.impact && (
-          <div style={{ fontSize: "13px", color: C.accent, fontWeight: 700, marginTop: "4px" }}>
+          <div style={{ fontSize: "13px", color: C.accent, fontWeight: 500, marginTop: "4px" }}>
             {section.impact}
           </div>
         )}
@@ -138,14 +138,14 @@ export default function PortfolioPrint() {
                 Backend Developer
               </div>
             </div>
-            <p style={{
-              fontSize: "14px",
+            <div style={{
+              fontSize: "21px",
+              fontWeight: 700,
               color: "#374151",
-              lineHeight: 1.5,
-              margin: 0,
+              lineHeight: 1.3,
             }}>
               {profile.bio.headline.replace("{name}", profile.name)}
-            </p>
+            </div>
           </div>
         </div>
 

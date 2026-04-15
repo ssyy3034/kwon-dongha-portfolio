@@ -97,19 +97,21 @@
     font-weight: 900 !important;
   }
 
-  /* print-portfolio 내부는 inline style이 제어 */
-  .print-portfolio p,
-  .print-portfolio div,
-  .print-portfolio span {
-    font-size: inherit !important;
-    line-height: inherit !important;
-  }
-
-  p,
-  div,
-  li {
+  /* print-portfolio 내부는 inline style이 제어하므로 제외 */
+  p:not(.print-portfolio *),
+  div:not(.print-portfolio *),
+  li:not(.print-portfolio *) {
     line-height: 1.6 !important;
     font-size: 10pt !important;
+  }
+
+  /* print-portfolio 내부 code, ul, li 등은 부모 font-size를 따름 */
+  .print-portfolio code,
+  .print-portfolio ul,
+  .print-portfolio li,
+  .print-portfolio strong {
+    font-size: inherit !important;
+    line-height: inherit !important;
   }
 
   /* Grid & Spacing Management */
