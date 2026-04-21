@@ -8,6 +8,22 @@ mermaid.initialize({
   theme: "neutral",
   securityLevel: "loose",
   fontFamily: "Inter, sans-serif",
+  themeVariables: {
+    fontSize: "16px",
+  },
+  sequence: {
+    actorMargin: 70,
+    messageMargin: 45,
+    boxMargin: 10,
+    noteMargin: 12,
+    useMaxWidth: true,
+  },
+  flowchart: {
+    nodeSpacing: 55,
+    rankSpacing: 60,
+    useMaxWidth: true,
+    htmlLabels: true,
+  },
 });
 
 interface MermaidProps {

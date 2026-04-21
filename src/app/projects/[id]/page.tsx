@@ -161,19 +161,19 @@ function SectionCard({
       {/* 다이어그램 — 카드 하단에 풀 너비로 */}
       {section.diagram && (
         <div className="px-5 sm:px-7 pb-5 sm:pb-7">
-          <div className="p-3 sm:p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-700 overflow-x-auto">
+          <div className="p-3 sm:p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg sm:rounded-xl border border-stone-200 dark:border-stone-700">
             {section.diagram.caption && (
               <p className="text-[10px] sm:text-xs text-stone-500 font-semibold mb-3">
                 {section.diagram.caption}
               </p>
             )}
             {section.diagram.type === "mermaid" ? (
-              <Mermaid chart={section.diagram.content} className="min-w-[700px] py-4" />
+              <Mermaid chart={section.diagram.content} className="py-4 w-full" />
             ) : section.diagram.type === "svg" ? (
-              <div className="flex justify-center overflow-x-auto min-w-full">
+              <div className="flex justify-center w-full">
                 {section.diagram.content.startsWith("/") ? (
-                  <div className="min-w-[700px] relative w-full aspect-[16/9]">
-                    <Image 
+                  <div className="relative w-full aspect-[16/9]">
+                    <Image
                       src={section.diagram.content}
                       alt="Section Diagram"
                       fill
@@ -182,9 +182,9 @@ function SectionCard({
                     />
                   </div>
                 ) : (
-                  <div 
-                    className="min-w-[700px]" 
-                    dangerouslySetInnerHTML={{ __html: section.diagram.content }} 
+                  <div
+                    className="w-full"
+                    dangerouslySetInnerHTML={{ __html: section.diagram.content }}
                   />
                 )}
               </div>
@@ -416,20 +416,20 @@ export default function ProjectDetailPage({ params }: PageProps) {
               </div>
               
               {detail.architectureDiagram?.type === "mermaid" ? (
-                <div className="p-4 sm:p-6 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto flex justify-start sm:justify-center">
-                  <Mermaid chart={detail.architectureDiagram.content} className="min-w-[850px] py-6" />
+                <div className="p-4 sm:p-6 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 flex justify-center">
+                  <Mermaid chart={detail.architectureDiagram.content} className="py-6 w-full" />
                 </div>
               ) : detail.architectureDiagram?.type === "svg" ? (
-                <div className="p-4 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto">
-                  <div className="flex justify-start sm:justify-center min-w-max">
+                <div className="p-4 sm:p-6 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800">
+                  <div className="flex justify-center w-full">
                     {detail.architectureDiagram.content.startsWith("/") ? (
-                      <img 
+                      <img
                         src={detail.architectureDiagram.content}
                         alt="Project Architecture"
                         className="w-full max-w-[900px] h-auto object-contain mx-auto"
                       />
                     ) : (
-                      <div 
+                      <div
                         className="w-full max-w-[900px] mx-auto"
                         dangerouslySetInnerHTML={{ __html: detail.architectureDiagram.content }}
                       />

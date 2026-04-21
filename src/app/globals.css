@@ -175,6 +175,26 @@
     height: auto !important;
   }
 
+  /* print-portfolio 내부 mermaid — 자연 비율 유지, 가독성 확보 */
+  .print-portfolio .mermaid {
+    margin: 4mm auto !important;
+    text-align: center !important;
+    filter: none !important;
+    overflow: visible !important;
+    width: auto !important;
+    max-height: none !important;
+  }
+
+  /* 기본 max-width:none으로 mermaid inline 스타일 무력화 → 자연 크기로 렌더 */
+  .print-portfolio .mermaid svg {
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: 14cm !important;
+    display: inline-block !important;
+    margin: 0 auto !important;
+  }
+
   /* Brand Colors & Visuals */
   .bg-stone-50 {
     background-color: #f8f8f8 !important;
